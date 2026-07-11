@@ -391,10 +391,10 @@
                 card.classList.remove('dia-folga');
             }
 
-            let minutesDeJantaDoDia = parseInt(jantaTxt, 10);
-            if (isNaN(minutesDeJantaDoDia)) { minutesDeJantaDoDia = 60; }
+            let minutosDeJantaDoDia = parseInt(jantaTxt, 10);
+            if (isNaN(minutosDeJantaDoDia)) { minutosDeJantaDoDia = 60; }
 
-            if (minutesDeJantaDoDia < 60 && jantaTxt !== "") {
+            if (minutosDeJantaDoDia < 60 && jantaTxt !== "") {
                 card.classList.add('janta-reduzida');
             } else {
                 card.classList.remove('janta-reduzida');
@@ -409,7 +409,7 @@
                 if (saidaMin <= entradaMin) { saidaMin += 1440; }
 
                 let tempoTotalNaEmpresa = saidaMin - entradaMin;
-                let tempoTrabalhadoNoDia = tempoTotalNaEmpresa - minutesDeJantaDoDia;
+                let tempoTrabalhadoNoDia = tempoTotalNaEmpresa - minutosDeJantaDoDia;
 
                 if (tempoTrabalhadoNoDia > JORNADA_CONTRATUAL_MINUTOS) {
                     const extraDoDiaMinutos = tempoTrabalhadoNoDia - JORNADA_CONTRATUAL_MINUTOS;
