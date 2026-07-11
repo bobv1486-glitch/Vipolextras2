@@ -327,4 +327,200 @@
 <script>
     function inicializarDias() {
         const container = document.getElementById('lista-pontos');
-        let
+        let htmlDias = '';
+        for (let i = 1; i <= 31; i++) {
+            let d = i < 10 ? '0' + i : i;
+            htmlDias += `
+            <div class="card-dia linha-ponto" id="card-dia-${i}">
+                <div class="card-header">
+                    <span class="dia-badge">Dia ${d}</span>
+                    <div class="valores-dia"><span class="v-extra id-extra-relogio">0:00</span><span class="v-money id-extra-dinheiro">R$ 0,00</span></div>
+                </div>
+                <div class="inputs-row">
+                    <div class="campo"><label>Entrada</label><input type="text" class="in-entrada" placeholder="08:00" oninput="salvarEDigitar()"></div>
+                    <div class="campo"><label>Minutos Janta</label><input type="text" class="in-janta" placeholder="60" oninput="salvarEDigitar()"></div>
+                    <div class="campo"><label>Saída</label><input type="text" class="in-saida" placeholder="16:20" oninput="salvarEDigitar()"></div>
+                </div>
+            </div>`;
+        }
+        container.innerHTML = htmlDias;
+    }
+
+    function textoParaMinutos(stringHora) {
+        if (!stringHora || !stringHora.includes(':')) return null;
+        const partes = stringHora.split(':');
+        return (parseInt(partes[0], 10) || 0) * 60 + (parseInt(partes[1], 10) || 0);
+    }
+
+    function minutesParaTexto(minutos) {
+        if (minutos <= 0) return "0:00";
+        const h = Math.floor(minutos / 60);
+        const m = minutos % 60;
+        return `${h}:${m < 10 ? '0' : ''}${m}`;
+    }
+
+    function calcularTudo() {
+        const todosOsCards = document.querySelectorAll('.linha-ponto');
+        let acumuladoMinutosExtrasMes = 0;
+        let ganhoTotalExtrasReais = 0;
+        let diasTrabalhadosContador = 0;
+        
+        const JORNADA_CONTRATUAL_MINUTOS = 440; 
+        const SALARIO_BASE = 3143.00;
+        const VALE_FIXO = 1258.00;
+        const HORA_NORMAL = SALARIO_BASE / 220;
+        const VALOR_EXTRA_50 = HORA_NORMAL * 1.5; 
+
+        todosOsCards.forEach(card => {
+            const entradaTxt = card.querySelector('.in-entrada').value.trim().toUpperCase();
+            const saidaTxt = card.querySelector('.in-saida').value.trim().toUpperCase();
+            const jantaTxt = card.querySelector('.in-janta').value.trim();
+            
+            const txtRelogio = card.querySelector('.id-extra-relogio');
+            const txtDinheiro = card.querySelector('.id-extra-dinheiro');
+
+            const checarFolga = (txt) => txt === 'F' || txt === 'FOLGA' || txt === 'FDS';
+
+            if (checarFolga(entradaTxt) || checarFolga(saidaTxt)) {
+                card.classList.add('dia-folga');
+                card.classList.remove('janta-reduzida');
+                txtRelogio.innerText = "Folga";
+                txtDinheiro.innerText = "R$ 0,00";
+                return;
+            } else {
+                card.classList.remove('dia-folga');
+            }
+
+            let minutesDeJantaDoDia = parseInt(jantaTxt, 10);
+            if (isNaN(minutesDeJantaDoDia)) { minutesDeJantaDoDia = 60; }
+
+            if (minutesDeJantaDoDia < 60 && jantaTxt !== "") {
+                card.classList.add('janta-reduzida');
+            } else {
+                card.classList.remove('janta-reduzida');
+            }
+
+            const entradaMin = textoParaMinutos(entradaTxt);
+            let saidaMin = textoParaMinutos(saidaTxt);
+
+            if (entradaMin !== null && saidaMin !== null) {
+                diasTrabalhadosContador++;
+                
+                if (saidaMin <= entradaMin) { saidaMin += 1440; }
+
+                let tempoTotalNaEmpresa = saidaMin - entradaMin;
+                let tempoTrabalhadoNoDia = tempoTotalNaEmpresa - minutesDeJantaDoDia;
+
+                if (tempoTrabalhadoNoDia > JORNADA_CONTRATUAL_MINUTOS) {
+                    const extraDoDiaMinutos = tempoTrabalhadoNoDia - JORNADA_CONTRATUAL_MINUTOS;
+                    acumuladoMinutosExtrasMes += extraDoDiaMinutos;
+                    
+                    txtRelogio.innerText = minutesParaTexto(extraDoDiaMinutos);
+                    
+                    const granaDoDia = (extraDoDiaMinutos / 60) * VALOR_EXTRA_50;
+                    ganhoTotalExtrasReais += granaDoDia;
+                    
+                    txtDinheiro.innerText = "R$ " + granaDoDia.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                } else {
+                    txtRelogio.innerText = "0:00";
+                    txtDinheiro.innerText = "R$ 0,00";
+                }
+            } else {
+                txtRelogio.innerText = "0:00";
+                txtDinheiro.innerText = "R$ 0,00";
+            }
+        });
+
+        document.getElementById('total-dias-trab').value = diasTrabalhadosContador + " dias";
+        document.getElementById('resumo-horas-banco').value = minutesParaTexto(acumuladoMinutosExtrasMes);
+        
+        let passagens = parseFloat(document.getElementById('input-passagem').value.replace(',', '.')) || 0;
+
+        const totalBrutoComExtrasEBeneficios = SALARIO_BASE + ganhoTotalExtrasReais + passagens;
+        const oQueRestaReceberDia05 = totalBrutoComExtrasEBeneficios - VALE_FIXO;
+
+        document.getElementById('txt-receber-dia-05').value = "R$ " + oQueRestaReceberDia05.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('txt-total-final').innerText = "R$ " + totalBrutoComExtrasEBeneficios.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function obterChaveAtual() {
+        const mesSelecionado = document.getElementById('sel-mes').value;
+        return `ponto_carlos_${mesSelecionado}`;
+    }
+
+    function salvarEDigitar() {
+        calcularTudo();
+        
+        const dadosMes = {
+            passagem: document.getElementById('input-passagem').value,
+            dias: []
+        };
+
+        for (let i = 1; i <= 31; i++) {
+            const card = document.getElementById(`card-dia-${i}`);
+            dadosMes.dias.push({
+                ent: card.querySelector('.in-entrada').value,
+                jan: card.querySelector('.in-janta').value,
+                sai: card.querySelector('.in-saida').value
+            });
+        }
+
+        localStorage.setItem(obterChaveAtual(), JSON.stringify(dadosMes));
+    }
+
+    function carregarMes() {
+        const dadosSalvos = localStorage.getItem(obterChaveAtual());
+        
+        if (dadosSalvos) {
+            const dados = JSON.parse(dadosSalvos);
+            document.getElementById('input-passagem').value = dados.passagem || "";
+            
+            for (let i = 1; i <= 31; i++) {
+                const card = document.getElementById(`card-dia-${i}`);
+                if (dados.dias && dados.dias[i-1]) {
+                    card.querySelector('.in-entrada').value = dados.dias[i-1].ent || "";
+                    card.querySelector('.in-janta').value = dados.dias[i-1].jan || "";
+                    card.querySelector('.in-saida').value = dados.dias[i-1].sai || "";
+                } else {
+                    card.querySelector('.in-entrada').value = "";
+                    card.querySelector('.in-janta').value = "";
+                    card.querySelector('.in-saida').value = "";
+                }
+            }
+        } else {
+            document.getElementById('input-passagem').value = "";
+            for (let i = 1; i <= 31; i++) {
+                const card = document.getElementById(`card-dia-${i}`);
+                card.querySelector('.in-entrada').value = "";
+                card.querySelector('.in-janta').value = "60";
+                card.querySelector('.in-saida').value = "";
+            }
+        }
+        calcularTudo();
+    }
+
+    function abrirTelaImpressaoPDF() {
+        const todosOsCards = document.querySelectorAll('.linha-ponto');
+        
+        todosOsCards.forEach(card => {
+            const entrada = card.querySelector('.in-entrada').value.trim();
+            const saida = card.querySelector('.in-saida').value.trim();
+            if (entrada === "" && saida === "") {
+                card.classList.add('ocultar-no-pdf');
+            }
+        });
+
+        window.print();
+
+        setTimeout(() => {
+            todosOsCards.forEach(card => card.classList.remove('ocultar-no-pdf'));
+        }, 1000);
+    }
+
+    window.onload = function() {
+        inicializarDias();
+        carregarMes();
+    };
+</script>
+</body>
+</html>
