@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="light">
+    <title>Folha de Ponto Mensal - Vipol</title>
+    <style>
+        :root {
+            color-scheme: light;
+        }
+        
+        html, body {
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            padding-bottom: 340px;
+            box-sizing: border-box;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        .topo {
+            text-align: center;
+            margin: 10px 0 20px 0;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .titulo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a365d !important;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .month-select {
+            width: 200px;
+            border: none;
+            border-bottom: 2px solid #1a365d;
+            font-size: 18px;
+            text-align: center;
+            font-weight: bold;
+            outline: none;
+            background: #ffffff !important;
+            color: #1a365d !important;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .info-colaborador {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #f8fafc !important;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .info-campo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #475569 !important;
+        }
+
+        .info-campo input {
+            flex: 1;
+            border: none;
+            border-bottom: 1px dashed #cbd5e1;
+            background: transparent !important;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0f172a !important;
+            outline: none;
+            padding: 2px 4px;
+        }
+
+        .lista-pontos {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .card-dia {
+            background: #ffffff !important;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            border: 1px solid #cbd5e1;
+        }
+
+        .card-dia.dia-folga {
+            background: #f1f5f9 !important;
+            border-color: #94a3b8;
+            opacity: 0.85;
+        }
+
+        .card-dia.janta-reduzida {
+            background: #fff7ed !important;
+            border-color: #fdba74;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .dia-badge {
+            background: #1a365d !important;
+            color: #ffffff !important;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .card-dia.dia-folga .dia-badge { background: #64748b !important; }
+
+        .valores-dia {
+            display: flex;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .v-extra { color: #16a34a !important; }
+        .v-money { color: #1a365d !important; }
+
+        .inputs-row {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 8px;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .campo label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #64748b !important;
+            text-transform: uppercase;
+        }
+
+        .campo input {
+            width: 100%;
+            padding: 10px 5px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            background: #f8fafc !important;
+            font-weight: bold;
+            color: #334155 !important;
+        }
+
+        .campo input:focus {
+            border-color: #1a365d;
+            background: #ffffff !important;
+        }
+
+        .painel-resumo {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff !important;
+            border-top: 3px solid #1a365d;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            padding: 12px;
+            z-index: 999;
+        }
+
+        .resumo-conteudo {
+            max-width: 480px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+        }
+
+        .resumo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: bold;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 4px;
+            color: #0f172a !important;
+        }
+
+        .resumo-item span:first-child { color: #64748b !important; }
+
+        .resumo-item input {
+            width: 90px;
+            border: none;
+            text-align: right;
+            font-size: 13px;
+            font-weight: bold;
+            outline: none;
+            color: #1e293b !important;
+            background: transparent !important;
+        }
+
+        .resumo-item .editavel {
+            border: 1px solid #cbd5e1;
+            background: #f8fafc !important;
+            padding: 2px 4px;
+            border-radius: 4px;
+            width: 75px;
+        }
+
+        .caixa-total-final {
+            grid-column: span 2;
+            background: #1a365d !important;
+            color: #ffffff !important;
+            padding: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .caixa-total-final span:last-child { font-size: 17px; font-weight: 900; }
+
+        .btn-pdf-container { grid-column: span 2; margin-top: 5px; }
+
+        .btn-pdf {
+            width: 100%;
+            background-color: #16a34a !important;
+            color: #ffffff !important;
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        @media print {
+            body { padding-bottom: 0 !important; background: #ffffff !important; }
+            .info-colaborador { background: #ffffff !important; border: 1px solid #94a3b8 !important; }
+            .info-colaborador input { border-bottom: none !important; }
+            .painel-resumo { position: static !important; box-shadow: none !important; border-top: 2px solid #1a365d !important; margin-top: 30px !important; page-break-inside: avoid; }
+            .btn-pdf-container { display: none !important; }
+            .card-dia { page-break-inside: avoid !important; }
+            .ocultar-no-pdf { display: none !important; }
+            .month-select { border: none !important; appearance: none; -webkit-appearance: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topo">
+        <div class="titulo">Folha de Ponto Mensal</div>
+        
+        <select id="sel-mes" class="month-select" onchange="carregarMes()">
+            <option value="Janeiro">JANEIRO</option>
+            <option value="Fevereiro">FEVEREIRO</option>
+            <option value="Marco">MARÇO</option>
+            <option value="Abril">ABRIL</option>
+            <option value="Maio">MAIO</option>
+            <option value="Junho">JUNHO</option>
+            <option value="Julho" selected>JULHO</option>
+            <option value="Agosto">AGOSTO</option>
+            <option value="Setembro">SETEMBRO</option>
+            <option value="Outubro">OUTUBRO</option>
+            <option value="Novembro">NOVEMBRO</option>
+            <option value="Dezembro">DEZEMBRO</option>
+        </select>
+        
+        <div class="info-colaborador">
+            <div class="info-campo"><span>Empresa:</span><input type="text" value="Vipol" readonly></div>
+            <div class="info-campo"><span>Colaborador:</span><input type="text" value="Carlos Vinicius de Oliveira" readonly></div>
+            <div class="info-campo"><span>Registro (Chapa):</span><input type="text" value="17808" readonly></div>
+        </div>
+    </div>
+
+    <div class="lista-pontos" id="lista-pontos"></div>
+
+    <div class="painel-resumo">
+        <div class="resumo-conteudo">
+            <div class="resumo-item"><span>Total Mês:</span><input type="text" id="total-dias-trab" readonly value="0 dias" style="color:#64748b !important;"></div>
+            <div class="resumo-item"><span>Salário Base:</span><input type="text" value="R$ 3143,00" readonly style="color:#64748b !important;"></div>
+            <div class="resumo-item"><span>Extras Totais:</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #16a34a !important;"></div>
+            <div class="resumo-item"><span>Vale (Dia 20 - 40%):</span><input type="text" value="R$ 1258,00" readonly style="color:#dc2626 !important; font-weight: bold;"></div>
+            <div class="resumo-item"><span>Passagens:</span><input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
+            <div class="resumo-item" style="background: #f8fafc !important; padding: 3px; border-radius: 4px;">
+                <span style="color: #1e3a8a !important;">A receber Dia 05:</span>
+                <input type="text" id="txt-receber-dia-05" readonly value="R$ 1.885,00" style="color: #1e3a8a !important; font-weight: bold;">
+            </div>
+            <div class="caixa-total-final">
+                <span>TOTAL BRUTO + BENEFÍCIOS:</span>
+                <span id="txt-total-final">R$ 3.143,00</span>
+            </div>
+            <div class="btn-pdf-container">
+                <button class="btn-pdf" onclick="abrirTelaImpressaoPDF()">Gerar Relatório PDF</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    function inicializarDias() {
+        const container = document.getElementById('lista-pontos');
+        let
