@@ -348,7 +348,7 @@
         projectId: "vipolextras",
         storageBucket: "vipolextras.firebasestorage.app",
         messagingSenderId: "1001511250504",
-        appId: "1:1001511250504:web:ea7bfab1a"
+        appId: "1:1001511250504:web:ea7bfab1a5f6e3c50979d0"
     };
 
     // Inicializa o Firebase
@@ -387,7 +387,7 @@
     function minutesParaTexto(minutos) {
         if (minutos <= 0) return "0:00";
         const h = Math.floor(minutos / 60);
-        const m = minutos % 60;
+        const m = minutes % 60;
         return `${h}:${m < 10 ? '0' : ''}${m}`;
     }
 
