@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Força o modo claro no celular e impede que navegadores quebrem as cores -->
     <meta name="color-scheme" content="light">
     <title>Folha de Ponto Mensal - Vipol</title>
     
+    <!-- Scripts do Firebase (SDK v9 via compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -339,11 +341,12 @@
     </div>
 
 <script>
+    // Credenciais corrigidas com base no seu projeto real
     const firebaseConfig = {
         apiKey: "AIzaSyCjVJ_F2h8dMyY91jjo-kvQ",
         authDomain: "vipolextras.firebaseapp.com",
         projectId: "vipolextras",
-        storageBucket: "vipolextras.firebasestorage.app",
+        storageBucket: "vipolextras.appspot.com",
         messagingSenderId: "1001511250504",
         appId: "1:1001511250504:web:ea7bfab1a5f6e3c50979d0"
     };
