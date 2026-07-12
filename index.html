@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- Força o modo claro no celular e impede que navegadores quebrem as cores -->
     <meta name="color-scheme" content="light">
     <title>Folha de Ponto Mensal - Vipol</title>
     
-    <!-- Scripts do Firebase (SDK v9 via compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -305,7 +303,7 @@
             <option value="Agosto">AGOSTO</option>
             <option value="Setembro">SETEMBRO</option>
             <option value="Outubro">OUTUBRO</option>
-            <option value="Novembro">NOVEMBRO</option>
+            <option value="Novembro">CONVENÇÃO</option>
             <option value="Dezembro">DEZEMBRO</option>
         </select>
         
@@ -341,7 +339,6 @@
     </div>
 
 <script>
-    // Configurações reais do seu Firebase registradas automaticamente
     const firebaseConfig = {
         apiKey: "AIzaSyCjVJ_F2h8dMyY91jjo-kvQ",
         authDomain: "vipolextras.firebaseapp.com",
@@ -351,7 +348,6 @@
         appId: "1:1001511250504:web:ea7bfab1a5f6e3c50979d0"
     };
 
-    // Inicializa o Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
@@ -387,7 +383,7 @@
     function minutesParaTexto(minutos) {
         if (minutos <= 0) return "0:00";
         const h = Math.floor(minutos / 60);
-        const m = minutes % 60;
+        const m = minutos % 60;
         return `${h}:${m < 10 ? '0' : ''}${m}`;
     }
 
@@ -486,7 +482,6 @@
 
         clearTimeout(timeoutSalvar);
         
-        // Salva automaticamente 1 segundo após você terminar de digitar
         timeoutSalvar = setTimeout(() => {
             const mesAtual = obterChaveAtual();
             const dadosMes = {
