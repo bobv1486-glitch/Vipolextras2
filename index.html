@@ -2,131 +2,581 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vipolextras - Registo de Horas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Força o modo claro no celular e impede que navegadores quebrem as cores -->
+    <meta name="color-scheme" content="light">
+    <title>Folha de Ponto Mensal - Vipol</title>
+    
+    <!-- Scripts do Firebase (SDK v9 via compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
-        body {
+        :root {
+            color-scheme: light;
+        }
+        
+        html, body {
+            background-color: #ffffff !important;
+            color: #1e293b !important;
             font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-            background-color: #f4f4f9;
+            margin: 0;
+            padding: 10px;
+            padding-bottom: 350px;
+            box-sizing: border-box;
+            -webkit-text-size-adjust: 100%;
         }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        .topo {
+            text-align: center;
+            margin: 10px 0 20px 0;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .titulo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a365d !important;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .month-select {
+            width: 200px;
+            border: none;
+            border-bottom: 2px solid #1a365d;
+            font-size: 18px;
+            text-align: center;
+            font-weight: bold;
+            outline: none;
+            background: #ffffff !important;
+            color: #1a365d !important;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .info-colaborador {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #f8fafc !important;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
-            box-shadow: 0 20px 25px rgba(0,0,0,0.1);
+            padding: 12px;
+            text-align: left;
+            margin-bottom: 15px;
         }
-        h2 { text-align: center; color: #333; }
-        label { display: block; margin: 10px 0 5px; font-weight: bold; }
-        input, select, button { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: #28a745; color: white; font-size: 16px; border: none; cursor: pointer; }
-        button:hover { background-color: #218838; }
-        .registro-item { background: #eee; padding: 10px; margin-top: 10px; border-radius: 4px; font-size: 14px; }
+
+        .info-campo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #475569 !important;
+        }
+
+        .info-campo input {
+            flex: 1;
+            border: none;
+            border-bottom: 1px dashed #cbd5e1;
+            background: transparent !important;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0f172a !important;
+            outline: none;
+            padding: 2px 4px;
+        }
+
+        .lista-pontos {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .card-dia {
+            background: #ffffff !important;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            border: 1px solid #cbd5e1;
+        }
+
+        .card-dia.dia-folga {
+            background: #f1f5f9 !important;
+            border-color: #94a3b8;
+            opacity: 0.85;
+        }
+
+        .card-dia.janta-reduzida {
+            background: #fff7ed !important;
+            border-color: #fdba74;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .dia-badge {
+            background: #1a365d !important;
+            color: #ffffff !important;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .card-dia.dia-folga .dia-badge { background: #64748b !important; }
+
+        .valores-dia {
+            display: flex;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .v-extra { color: #16a34a !important; }
+        .v-money { color: #1a365d !important; }
+
+        .inputs-row {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 8px;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .campo label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #64748b !important;
+            text-transform: uppercase;
+        }
+
+        .campo input {
+            width: 100%;
+            padding: 10px 5px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            background: #f8fafc !important;
+            font-weight: bold;
+            color: #334155 !important;
+        }
+
+        .campo input:focus {
+            border-color: #1a365d;
+            background: #ffffff !important;
+        }
+
+        .painel-resumo {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff !important;
+            border-top: 3px solid #1a365d;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            padding: 12px;
+            z-index: 999;
+        }
+
+        .resumo-conteudo {
+            max-width: 480px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+        }
+
+        .resumo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: bold;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 4px;
+            color: #0f172a !important;
+        }
+
+        .resumo-item span:first-child { color: #64748b !important; }
+
+        .resumo-item input {
+            width: 90px;
+            border: none;
+            text-align: right;
+            font-size: 13px;
+            font-weight: bold;
+            outline: none;
+            color: #1e293b !important;
+            background: transparent !important;
+        }
+
+        .resumo-item .editavel {
+            border: 1px solid #cbd5e1;
+            background: #f8fafc !important;
+            padding: 2px 4px;
+            border-radius: 4px;
+            width: 75px;
+        }
+
+        .caixa-total-final {
+            grid-column: span 2;
+            background: #1a365d !important;
+            color: #ffffff !important;
+            padding: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .caixa-total-final span:last-child { font-size: 17px; font-weight: 900; }
+
+        .status-nuvem {
+            grid-column: span 2;
+            font-size: 11px;
+            text-align: center;
+            color: #64748b;
+            font-weight: bold;
+            margin-top: -2px;
+        }
+
+        .btn-pdf-container { grid-column: span 2; margin-top: 2px; }
+
+        .btn-pdf {
+            width: 100%;
+            background-color: #16a34a !important;
+            color: #ffffff !important;
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        @media print {
+            body { padding-bottom: 0 !important; background: #ffffff !important; }
+            .info-colaborador { background: #ffffff !important; border: 1px solid #94a3b8 !important; }
+            .info-colaborador input { border-bottom: none !important; }
+            .painel-resumo { position: static !important; box-shadow: none !important; border-top: 2px solid #1a365d !important; margin-top: 30px !important; page-break-inside: avoid; }
+            .btn-pdf-container, .status-nuvem { display: none !important; }
+            .card-dia { page-break-inside: avoid !important; }
+            .ocultar-no-pdf { display: none !important; }
+            .month-select { border: none !important; appearance: none; -webkit-appearance: none; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Registo de Horas - Vipolextras</h2>
-    <form id="pontoForm">
-        <label for="data">Data:</label>
-        <input type="date" id="data" required>
+    <div class="topo">
+        <div class="titulo">Folha de Ponto Mensal</div>
+        
+        <select id="sel-mes" class="month-select" onchange="carregarMes()">
+            <option value="Janeiro">JANEIRO</option>
+            <option value="Fevereiro">FEVEREIRO</option>
+            <option value="Marco">MARÇO</option>
+            <option value="Abril">ABRIL</option>
+            <option value="Maio">MAIO</option>
+            <option value="Junho">JUNHO</option>
+            <option value="Julho" selected>JULHO</option>
+            <option value="Agosto">AGOSTO</option>
+            <option value="Setembro">SETEMBRO</option>
+            <option value="Outubro">OUTUBRO</option>
+            <option value="Novembro">NOVEMBRO</option>
+            <option value="Dezembro">DEZEMBRO</option>
+        </select>
+        
+        <div class="info-colaborador">
+            <div class="info-campo"><span>Empresa:</span><input type="text" value="Vipol" readonly></div>
+            <div class="info-campo"><span>Colaborador:</span><input type="text" value="Carlos Vinicius de Oliveira" readonly></div>
+            <div class="info-campo"><span>Registro (Chapa):</span><input type="text" value="17808" readonly></div>
+        </div>
+    </div>
 
-        <label for="entrada">Hora de Entrada:</label>
-        <input type="time" id="entrada" required>
+    <div class="lista-pontos" id="lista-pontos"></div>
 
-        <label for="saida">Hora de Saída:</label>
-        <input type="time" id="saida" required>
+    <div class="painel-resumo">
+        <div class="resumo-conteudo">
+            <div class="resumo-item"><span>Total Mês:</span><input type="text" id="total-dias-trab" readonly value="0 dias" style="color:#64748b !important;"></div>
+            <div class="resumo-item"><span>Salário Base:</span><input type="text" value="R$ 3143,00" readonly style="color:#64748b !important;"></div>
+            <div class="resumo-item"><span>Extras Totais:</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #16a34a !important;"></div>
+            <div class="resumo-item"><span>Vale (Dia 20 - 40%):</span><input type="text" value="R$ 1258,00" readonly style="color:#dc2626 !important; font-weight: bold;"></div>
+            <div class="resumo-item"><span>Passagens:</span><input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
+            <div class="resumo-item" style="background: #f8fafc !important; padding: 3px; border-radius: 4px;">
+                <span style="color: #1e3a8a !important;">A receber Dia 05:</span>
+                <input type="text" id="txt-receber-dia-05" readonly value="R$ 1.885,00" style="color: #1e3a8a !important; font-weight: bold;">
+            </div>
+            <div class="caixa-total-final">
+                <span>TOTAL BRUTO + BENEFÍCIOS:</span>
+                <span id="txt-total-final">R$ 3.143,00</span>
+            </div>
+            <div class="status-nuvem" id="txt-status-nuvem">Conectando ao Firebase ☁️</div>
+            <div class="btn-pdf-container">
+                <button class="btn-pdf" onclick="abrirTelaImpressaoPDF()">Gerar Relatório PDF</button>
+            </div>
+        </div>
+    </div>
 
-        <label for="obs">Observações (Opcional):</label>
-        <input type="text" id="obs" placeholder="Ex: Horas extras na linha 2">
-
-        <button type="submit">Salvar Registo</button>
-    </form>
-
-    <h3 style="margin-top:25px;">Registos Recentes (Nuvem)</h3>
-    <div id="historico">Carregando registos...</div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-    // Configuração do seu projeto Firebase obtida no console
+<script>
+    // Configurações reais do seu Firebase registradas automaticamente
     const firebaseConfig = {
         apiKey: "AIzaSyCjVJ_F2h8dMyY91jjo-kvQ",
         authDomain: "vipolextras.firebaseapp.com",
         projectId: "vipolextras",
         storageBucket: "vipolextras.firebasestorage.app",
         messagingSenderId: "1001511250504",
-        appId: "1:1001511250504:web:ea7bfab1a5f6e3c50979d0"
+        appId: "1:1001511250504:web:ea7bfab1a"
     };
 
     // Inicializa o Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    // Referência para a coleção de registos no banco de dados
-    const registosCollection = collection(db, "horas_trabalhadas");
+    let timeoutSalvar = null;
 
-    // Formatar data para exibição PT-BR
-    function formatarData(dataStr) {
-        const partes = dataStr.split('-');
-        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    function inicializarDias() {
+        const container = document.getElementById('lista-pontos');
+        let htmlDias = '';
+        for (let i = 1; i <= 31; i++) {
+            let d = i < 10 ? '0' + i : i;
+            htmlDias += `
+            <div class="card-dia linha-ponto" id="card-dia-${i}">
+                <div class="card-header">
+                    <span class="dia-badge">Dia ${d}</span>
+                    <div class="valores-dia"><span class="v-extra id-extra-relogio">0:00</span><span class="v-money id-extra-dinheiro">R$ 0,00</span></div>
+                </div>
+                <div class="inputs-row">
+                    <div class="campo"><label>Entrada</label><input type="text" class="in-entrada" placeholder="08:00" oninput="salvarEDigitar()"></div>
+                    <div class="campo"><label>Minutos Janta</label><input type="text" class="in-janta" placeholder="60" oninput="salvarEDigitar()"></div>
+                    <div class="campo"><label>Saída</label><input type="text" class="in-saida" placeholder="16:20" oninput="salvarEDigitar()"></div>
+                </div>
+            </div>`;
+        }
+        container.innerHTML = htmlDias;
     }
 
-    // Evento de envio do formulário para salvar no banco
-    document.getElementById('pontoForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    function textoParaMinutos(stringHora) {
+        if (!stringHora || !stringHora.includes(':')) return null;
+        const partes = stringHora.split(':');
+        return (parseInt(partes[0], 10) || 0) * 60 + (parseInt(partes[1], 10) || 0);
+    }
+
+    function minutesParaTexto(minutos) {
+        if (minutos <= 0) return "0:00";
+        const h = Math.floor(minutos / 60);
+        const m = minutos % 60;
+        return `${h}:${m < 10 ? '0' : ''}${m}`;
+    }
+
+    function calcularTudo() {
+        const todosOsCards = document.querySelectorAll('.linha-ponto');
+        let acumuladoMinutosExtrasMes = 0;
+        let ganhoTotalExtrasReais = 0;
+        let diasTrabalhadosContador = 0;
         
-        const data = document.getElementById('data').value;
-        const entrada = document.getElementById('entrada').value;
-        const saida = document.getElementById('saida').value;
-        const obs = document.getElementById('obs').value;
+        const JORNADA_CONTRATUAL_MINUTOS = 440; 
+        const SALARIO_BASE = 3143.00;
+        const VALE_FIXO = 1258.00;
+        const HORA_NORMAL = SALARIO_BASE / 220;
+        const VALOR_EXTRA_50 = HORA_NORMAL * 1.5; 
 
-        try {
-            await addDoc(registosCollection, {
-                data: data,
-                entrada: entrada,
-                saida: saida,
-                observacao: obs,
-                criadoEm: new Date().toISOString()
-            });
-            alert('Registo salvo com sucesso na nuvem!');
-            document.getElementById('pontoForm').reset();
-        } catch (error) {
-            console.error("Erro ao salvar:", error);
-            alert('Erro ao salvar no banco de dados. Verifique as regras do Firestore.');
-        }
-    });
+        todosOsCards.forEach(card => {
+            const entradaTxt = card.querySelector('.in-entrada').value.trim().toUpperCase();
+            const saidaTxt = card.querySelector('.in-saida').value.trim().toUpperCase();
+            const jantaTxt = card.querySelector('.in-janta').value.trim();
+            
+            const txtRelogio = card.querySelector('.id-extra-relogio');
+            const txtDinheiro = card.querySelector('.id-extra-dinheiro');
 
-    // Escutar atualizações do banco em tempo real para exibir na tela
-    const q = query(registosCollection, orderBy("criadoEm", "desc"));
-    onSnapshot(q, (snapshot) => {
-        const historicoDiv = document.getElementById('historico');
-        historicoDiv.innerHTML = '';
-        
-        if (snapshot.empty) {
-            historicoDiv.innerHTML = '<p>Nenhum registo encontrado.</p>';
-            return;
-        }
+            const checarFolga = (txt) => txt === 'F' || txt === 'FOLGA' || txt === 'FDS';
 
-        snapshot.forEach((doc) => {
-            const dados = doc.data();
-            const item = document.createElement('div');
-            item.className = 'registro-item';
-            item.innerHTML = `
-                <strong>Data:</strong> ${formatarData(dados.data)} <br>
-                <strong>Entrada:</strong> ${dados.entrada} | <strong>Saída:</strong> ${dados.saida} <br>
-                ${dados.observacao ? `<strong>Obs:</strong> ${dados.observacao}` : ''}
-            `;
-            historicoDiv.appendChild(item);
+            if (checarFolga(entradaTxt) || checarFolga(saidaTxt)) {
+                card.classList.add('dia-folga');
+                card.classList.remove('janta-reduzida');
+                txtRelogio.innerText = "Folga";
+                txtDinheiro.innerText = "R$ 0,00";
+                return;
+            } else {
+                card.classList.remove('dia-folga');
+            }
+
+            let minutesDeJantaDoDia = parseInt(jantaTxt, 10);
+            if (isNaN(minutesDeJantaDoDia)) { minutesDeJantaDoDia = 60; }
+
+            if (minutesDeJantaDoDia < 60 && jantaTxt !== "") {
+                card.classList.add('janta-reduzida');
+            } else {
+                card.classList.remove('janta-reduzida');
+            }
+
+            const entradaMin = textoParaMinutos(entradaTxt);
+            let saidaMin = textoParaMinutos(saidaTxt);
+
+            if (entradaMin !== null && saidaMin !== null) {
+                diasTrabalhadosContador++;
+                
+                if (saidaMin <= entradaMin) { saidaMin += 1440; }
+
+                let tempoTotalNaEmpresa = saidaMin - entradaMin;
+                let tempoTrabalhadoNoDia = tempoTotalNaEmpresa - minutesDeJantaDoDia;
+
+                if (tempoTrabalhadoNoDia > JORNADA_CONTRATUAL_MINUTOS) {
+                    const extraDoDiaMinutos = tempoTrabalhadoNoDia - JORNADA_CONTRATUAL_MINUTOS;
+                    acumuladoMinutosExtrasMes += extraDoDiaMinutos;
+                    
+                    txtRelogio.innerText = minutesParaTexto(extraDoDiaMinutos);
+                    
+                    const granaDoDia = (extraDoDiaMinutos / 60) * VALOR_EXTRA_50;
+                    ganhoTotalExtrasReais += granaDoDia;
+                    
+                    txtDinheiro.innerText = "R$ " + granaDoDia.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                } else {
+                    txtRelogio.innerText = "0:00";
+                    txtDinheiro.innerText = "R$ 0,00";
+                }
+            } else {
+                txtRelogio.innerText = "0:00";
+                txtDinheiro.innerText = "R$ 0,00";
+            }
         });
-    });
-</script>
 
+        document.getElementById('total-dias-trab').value = diasTrabalhadosContador + " dias";
+        document.getElementById('resumo-horas-banco').value = minutesParaTexto(acumuladoMinutosExtrasMes);
+        
+        let passagens = parseFloat(document.getElementById('input-passagem').value.replace(',', '.')) || 0;
+
+        const totalBrutoComExtrasEBeneficios = SALARIO_BASE + ganhoTotalExtrasReais + passagens;
+        const oQueRestaReceberDia05 = totalBrutoComExtrasEBeneficios - VALE_FIXO;
+
+        document.getElementById('txt-receber-dia-05').value = "R$ " + oQueRestaReceberDia05.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('txt-total-final').innerText = "R$ " + totalBrutoComExtrasEBeneficios.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function obterChaveAtual() {
+        return document.getElementById('sel-mes').value;
+    }
+
+    function salvarEDigitar() {
+        calcularTudo();
+        
+        document.getElementById('txt-status-nuvem').innerText = "Digitando... ⏳";
+
+        clearTimeout(timeoutSalvar);
+        
+        // Salva automaticamente 1 segundo após você terminar de digitar
+        timeoutSalvar = setTimeout(() => {
+            const mesAtual = obterChaveAtual();
+            const dadosMes = {
+                passagem: document.getElementById('input-passagem').value,
+                dias: []
+            };
+
+            for (let i = 1; i <= 31; i++) {
+                const card = document.getElementById(`card-dia-${i}`);
+                dadosMes.dias.push({
+                    ent: card.querySelector('.in-entrada').value,
+                    jan: card.querySelector('.in-janta').value,
+                    sai: card.querySelector('.in-saida').value
+                });
+            }
+
+            db.collection("pontos_carlos").doc(mesAtual).set(dadosMes)
+            .then(() => {
+                document.getElementById('txt-status-nuvem').innerText = "Alterações salvas na Nuvem! ✅";
+            })
+            .catch((error) => {
+                document.getElementById('txt-status-nuvem').innerText = "Erro ao salvar na Nuvem ❌";
+                console.error("Erro Firebase: ", error);
+            });
+        }, 1000);
+    }
+
+    function carregarMes() {
+        document.getElementById('txt-status-nuvem').innerText = "Carregando dados... 🔄";
+        const mesAtual = obterChaveAtual();
+
+        db.collection("pontos_carlos").doc(mesAtual).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const dados = doc.data();
+                document.getElementById('input-passagem').value = dados.passagem || "";
+                
+                for (let i = 1; i <= 31; i++) {
+                    const card = document.getElementById(`card-dia-${i}`);
+                    if (dados.dias && dados.dias[i-1]) {
+                        card.querySelector('.in-entrada').value = dados.dias[i-1].ent || "";
+                        card.querySelector('.in-janta').value = dados.dias[i-1].jan || "";
+                        card.querySelector('.in-saida').value = dados.dias[i-1].sai || "";
+                    } else {
+                        card.querySelector('.in-entrada').value = "";
+                        card.querySelector('.in-janta').value = "60";
+                        card.querySelector('.in-saida').value = "";
+                    }
+                }
+                document.getElementById('txt-status-nuvem').innerText = "Dados carregados da Nuvem! ☁️";
+            } else {
+                document.getElementById('input-passagem').value = "";
+                for (let i = 1; i <= 31; i++) {
+                    const card = document.getElementById(`card-dia-${i}`);
+                    card.querySelector('.in-entrada').value = "";
+                    card.querySelector('.in-janta').value = "60";
+                    card.querySelector('.in-saida').value = "";
+                }
+                document.getElementById('txt-status-nuvem').innerText = "Mês limpo ou sem registros na Nuvem! 📂";
+            }
+            calcularTudo();
+        })
+        .catch((error) => {
+            document.getElementById('txt-status-nuvem').innerText = "Erro ao conectar com a Nuvem ❌";
+            console.error("Erro ao carregar: ", error);
+        });
+    }
+
+    function abrirTelaImpressaoPDF() {
+        const todosOsCards = document.querySelectorAll('.linha-ponto');
+        
+        todosOsCards.forEach(card => {
+            const entrada = card.querySelector('.in-entrada').value.trim();
+            const saida = card.querySelector('.in-saida').value.trim();
+            if (entrada === "" && saida === "") {
+                card.classList.add('ocultar-no-pdf');
+            }
+        });
+
+        window.print();
+
+        setTimeout(() => {
+            todosOsCards.forEach(card => card.classList.remove('ocultar-no-pdf'));
+        }, 1000);
+    }
+
+    window.onload = function() {
+        inicializarDias();
+        carregarMes();
+    };
+</script>
 </body>
 </html>
