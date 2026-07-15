@@ -21,7 +21,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 10px;
-            padding-bottom: 420px; /* Espaço confortável para o celular */
+            padding-bottom: 500px; /* Espaço confortável para o painel de resumo estendido */
             box-sizing: border-box;
             -webkit-text-size-adjust: 100%;
         }
@@ -89,6 +89,18 @@
             color: #0f172a !important;
             outline: none;
             padding: 2px 4px;
+        }
+
+        .info-campo input.editavel-perfil {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 4px 8px;
+            width: 70px;
+            flex: none;
+            text-align: center;
+            font-size: 14px;
+            color: #1e293b !important;
         }
 
         .lista-pontos {
@@ -238,6 +250,10 @@
             width: 75px;
         }
 
+        .desconto-imposto {
+            color: #dc2626 !important;
+        }
+
         .caixa-total-final {
             grid-column: span 2;
             background: #1a365d !important;
@@ -312,6 +328,11 @@
             <div class="info-campo"><span>Empresa:</span><input type="text" value="Vipol" readonly></div>
             <div class="info-campo"><span>Colaborador:</span><input type="text" value="Carlos Vinicius de Oliveira" readonly></div>
             <div class="info-campo"><span>Registro (Chapa):</span><input type="text" value="17808" readonly></div>
+            <!-- Campo de filhos com sua linha própria para não espremer no celular -->
+            <div class="info-campo" style="margin-top: 4px; border-top: 1px dashed #cbd5e1; padding-top: 8px; display: flex; justify-content: space-between;">
+                <span>Filhos Dependentes (Dedução IR):</span>
+                <input type="number" id="pref-filhos" class="editavel-perfil" value="0" min="0" oninput="salvarEDigitar()">
+            </div>
         </div>
     </div>
 
@@ -324,11 +345,15 @@
             <div class="resumo-item"><span>Extras Totais (Real):</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #16a34a !important;" title="Horas reais de relógio para bater com a empresa"></div>
             <div class="resumo-item"><span>Vale (Dia 20 - 40%):</span><input type="text" value="R$ 1258,00" readonly style="color:#dc2626 !important; font-weight: bold;"></div>
             
-            <!-- Ganhos com Adicionais calculados de forma justa por trás -->
             <div class="resumo-item"><span>Horas Extras (R$):</span><input type="text" id="resumo-extras-reais" readonly value="R$ 0,00" style="color: #16a34a !important;"></div>
             <div class="resumo-item"><span>Adicional Noturno (R$):</span><input type="text" id="resumo-adicional-noturno" readonly value="R$ 0,00" style="color: #16a34a !important; font-weight: bold;"></div>
             
+            <!-- Novos campos integrados de Impostos -->
+            <div class="resumo-item"><span>Desconto INSS (R$):</span><input type="text" id="resumo-inss" readonly value="R$ 0,00" class="desconto-imposto"></div>
+            <div class="resumo-item"><span>Desconto IRRF (R$):</span><input type="text" id="resumo-irrf" readonly value="R$ 0,00" class="desconto-imposto"></div>
+            
             <div class="resumo-item"><span>Passagens:</span><input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
+            
             <div class="resumo-item" style="background: #f8fafc !important; padding: 3px; border-radius: 4px;">
                 <span style="color: #1e3a8a !important;">A Receber (Dia 05):</span>
                 <input type="text" id="txt-receber-dia-05" readonly value="R$ 0,00" style="color: #1e3a8a !important; font-weight: 900;">
@@ -395,7 +420,6 @@
         return `${h}:${m < 10 ? '0' : ''}${m}`;
     }
 
-    // Identifica e separa os minutos diurnos e noturnos de relógio comum (Período Noturno das 22h às 05h)
     function separarMinutosDiurnosENoturnos(entradaMin, saidaMin) {
         let diurnos = 0;
         let noturnos = 0;
@@ -413,14 +437,69 @@
         return { diurnos, noturnos };
     }
 
+    // Função de cálculo de impostos de 2026 com isenção de R$5.000,00 integrada
+    function calcularImpostos(salarioBruto, numFilhos) {
+        let inss = 0;
+        const tetoInss = 908.85;
+
+        if (salarioBruto <= 1412.00) {
+            inss = salarioBruto * 0.075;
+        } else if (salarioBruto <= 2666.68) {
+            inss = (1412.00 * 0.075) + ((salarioBruto - 1412.00) * 0.09);
+        } else if (salarioBruto <= 4000.03) {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((salarioBruto - 2666.68) * 0.12);
+        } else {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.03 - 2666.68) * 0.12) + ((salarioBruto - 4000.03) * 0.14);
+        }
+        
+        if (inss > tetoInss) {
+            inss = tetoInss;
+        }
+
+        const descontoDependentes = numFilhos * 189.59;
+        let baseIR = salarioBruto - inss - descontoDependentes;
+        if (baseIR < 0) baseIR = 0;
+
+        let irrfBruto = 0;
+
+        if (baseIR <= 2259.20) {
+            irrfBruto = 0;
+        } else if (baseIR <= 2828.65) {
+            irrfBruto = (baseIR * 0.075) - 169.44;
+        } else if (baseIR <= 3751.05) {
+            irrfBruto = (baseIR * 0.15) - 381.44;
+        } else if (baseIR <= 4664.68) {
+            irrfBruto = (baseIR * 0.225) - 662.77;
+        } else {
+            irrfBruto = (baseIR * 0.275) - 896.00;
+        }
+
+        if (irrfBruto < 0) irrfBruto = 0;
+
+        let irrfFinal = irrfBruto;
+
+        if (salarioBruto <= 5000.00) {
+            irrfFinal = 0; // Regra de Isenção total 2026
+        } else if (salarioBruto <= 7350.00) {
+            const redutor = 978.62 - (0.133145 * salarioBruto);
+            irrfFinal = irrfBruto - redutor;
+            if (irrfFinal < 0) irrfFinal = 0;
+        }
+
+        return {
+            inss: parseFloat(inss.toFixed(2)),
+            irrf: parseFloat(irrfFinal.toFixed(2))
+        };
+    }
+
     function calcularTudo() {
         const todosOsCards = document.querySelectorAll('.linha-ponto');
-        let acumuladoMinutosExtrasMesRelogio = 0; // Guardará as horas extras REAIS de relógio para bater com a empresa
+        let acumuladoMinutosExtrasMesRelogio = 0;
         let ganhoTotalExtrasReais = 0;
         let ganhoTotalAdicionalNoturnoReais = 0;
         let diasTrabalhadosContador = 0;
         
-        const JORNADA_CONTRATUAL_MINUTOS = 440; // 7 horas e 20 minutos de relógio
+        const JORNADA_CONTRATUAL_MINUTOS = 440; // 7 horas e 20 minutos
         const SALARIO_BASE = 3143.00;
         const VALE_FIXO = 1258.00;
         const HORA_NORMAL = SALARIO_BASE / 220;
@@ -462,18 +541,16 @@
             if (entradaMin !== null && saidaMin !== null) {
                 diasTrabalhadosContador++;
                 
-                if (saidaMin <= entradaMin) { saidaMin += 1440; } // Tratamento para virada de dia
+                if (saidaMin <= entradaMin) { saidaMin += 1440; }
 
                 let tempoTotalNaEmpresa = saidaMin - entradaMin;
                 let tempoTrabalhadoNoDiaRelogio = tempoTotalNaEmpresa - minutosDeJantaDoDia;
 
-                // 1. Separa o tempo bruto trabalhado entre Diurno e Noturno de relógio
                 let tempos = separarMinutosDiurnosENoturnos(entradaMin, saidaMin);
                 let diurnosBruto = tempos.diurnos;
                 let noturnosBruto = tempos.noturnos;
                 let totalBrutoMinutos = diurnosBruto + noturnosBruto;
 
-                // 2. Desconta a janta proporcionalmente de cada período
                 if (totalBrutoMinutos > 0) {
                     let proporcaoDiurna = diurnosBruto / totalBrutoMinutos;
                     let proporcaoNoturna = noturnosBruto / totalBrutoMinutos;
@@ -481,40 +558,33 @@
                     noturnosBruto = Math.max(0, noturnosBruto - (minutosDeJantaDoDia * proporcaoNoturna));
                 }
 
-                // 3. Aplicação do fator da hora noturna reduzida (Fator 1.142857) - APENAS NOS BASTIDORES DO DINHEIRO
                 let noturnosFicticios = noturnosBruto * 1.142857;
                 let totalEfetivoTrabalhadoNoDiaDinheiro = diurnosBruto + noturnosFicticios;
 
-                // 4. Verificação de Horas Extras REAIS de relógio para exibição visual (Evita dar divergência na Vipol)
                 if (tempoTrabalhadoNoDiaRelogio > JORNADA_CONTRATUAL_MINUTOS) {
                     const extraDoDiaRelogioMinutos = tempoTrabalhadoNoDiaRelogio - JORNADA_CONTRATUAL_MINUTOS;
                     acumuladoMinutosExtrasMesRelogio += extraDoDiaRelogioMinutos;
 
-                    // Mostra no cartão do dia o valor exato de relógio (sem a hora reduzida visível)
                     txtRelogio.innerText = minutesParaTexto(extraDoDiaRelogioMinutos);
 
-                    // Nos bastidores, calculamos o pagamento correto usando a hora reduzida fictícia:
                     let extrasDoDiaDinheiroMinutos = totalEfetivoTrabalhadoNoDiaDinheiro - JORNADA_CONTRATUAL_MINUTOS;
                     let proporcaoNoturnaEfetiva = noturnosFicticios / totalEfetivoTrabalhadoNoDiaDinheiro;
 
                     let extrasNoturnasMinutos = extrasDoDiaDinheiroMinutos * proporcaoNoturnaEfetiva;
                     let extrasDiurnasMinutos = extrasDoDiaDinheiroMinutos * (1 - proporcaoNoturnaEfetiva);
 
-                    // Pagamento correto das extras na conta:
                     let ganhoExtraDiurno = (extrasDiurnasMinutos / 60) * (HORA_NORMAL * 1.5);
-                    let ganhoExtraNoturno = (extrasNoturnasMinutos / 60) * (HORA_NORMAL * 1.8); // 50% + 20%
+                    let ganhoExtraNoturno = (extrasNoturnasMinutos / 60) * (HORA_NORMAL * 1.8);
                     let ganhoExtrasDia = ganhoExtraDiurno + ganhoExtraNoturno;
                     
                     ganhoTotalExtrasReais += ganhoExtrasDia;
 
-                    // Adicional Noturno Normal (sobre a jornada comum restante)
                     let noturnasComunsMinutos = noturnosFicticios - extrasNoturnasMinutos;
                     let ganhoNoturnoNormalDia = (noturnasComunsMinutos / 60) * VALOR_ADICIONAL_NOTURNO_HORA;
                     ganhoTotalAdicionalNoturnoReais += ganhoNoturnoNormalDia;
 
                     txtDinheiro.innerText = "R$ " + ganhoExtrasDia.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 } else {
-                    // Sem horas extras, apenas calcula o adicional noturno das horas comuns trabalhadas à noite
                     let ganhoNoturnoNormalDia = (noturnosFicticios / 60) * VALOR_ADICIONAL_NOTURNO_HORA;
                     ganhoTotalAdicionalNoturnoReais += ganhoNoturnoNormalDia;
 
@@ -527,22 +597,31 @@
             }
         });
 
+        // Valores Base para o cálculo de impostos
+        const baseCalculoImpostosBruto = SALARIO_BASE + ganhoTotalExtrasReais + ganhoTotalAdicionalNoturnoReais;
+        const numFilhos = parseInt(document.getElementById('pref-filhos').value) || 0;
+
+        // Cálculo dinâmico dos impostos
+        const impostos = calcularImpostos(baseCalculoImpostosBruto, numFilhos);
+
         // Atualização do painel de resumo
         document.getElementById('total-dias-trab').value = diasTrabalhadosContador + " dias";
-        
-        // Exibe o total acumulado das Extras em horas REAIS de relógio (baterá 100% com a folha da Vipol)
         document.getElementById('resumo-horas-banco').value = minutesParaTexto(acumuladoMinutosExtrasMesRelogio);
-        
-        // Exibe os valores em dinheiro com todas as leis calculadas perfeitamente por trás
         document.getElementById('resumo-extras-reais').value = "R$ " + ganhoTotalExtrasReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('resumo-adicional-noturno').value = "R$ " + ganhoTotalAdicionalNoturnoReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        // Exibição dos descontos nos novos inputs
+        document.getElementById('resumo-inss').value = "R$ " + impostos.inss.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('resumo-irrf').value = "R$ " + impostos.irrf.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         // Passagens
         let passagens = parseFloat(document.getElementById('input-passagem').value.replace(',', '.')) || 0;
 
         // Totais Finais
-        const totalBrutoComExtrasEBeneficios = SALARIO_BASE + ganhoTotalExtrasReais + ganhoTotalAdicionalNoturnoReais + passagens;
-        const oQueRestaReceberDia05 = totalBrutoComExtrasEBeneficios - VALE_FIXO;
+        const totalBrutoComExtrasEBeneficios = baseCalculoImpostosBruto + passagens;
+        
+        // Cálculo Líquido recebível (Descontando Vale + Impostos)
+        const oQueRestaReceberDia05 = totalBrutoComExtrasEBeneficios - VALE_FIXO - impostos.inss - impostos.irrf;
 
         document.getElementById('txt-receber-dia-05').value = "R$ " + oQueRestaReceberDia05.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('txt-total-final').innerText = "R$ " + totalBrutoComExtrasEBeneficios.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -563,6 +642,7 @@
             const mesAtual = obterChaveAtual();
             const dadosMes = {
                 passagem: document.getElementById('input-passagem').value,
+                filhos: document.getElementById('pref-filhos').value,
                 dias: []
             };
 
@@ -595,6 +675,7 @@
             if (doc.exists) {
                 const dados = doc.data();
                 document.getElementById('input-passagem').value = dados.passagem || "";
+                document.getElementById('pref-filhos').value = dados.filhos || "0";
                 
                 for (let i = 1; i <= 31; i++) {
                     const card = document.getElementById(`card-dia-${i}`);
@@ -611,6 +692,7 @@
                 document.getElementById('txt-status-nuvem').innerText = "Dados carregados da Nuvem! ☁️";
             } else {
                 document.getElementById('input-passagem').value = "";
+                document.getElementById('pref-filhos').value = "0";
                 for (let i = 1; i <= 31; i++) {
                     const card = document.getElementById(`card-dia-${i}`);
                     card.querySelector('.in-entrada').value = "";
