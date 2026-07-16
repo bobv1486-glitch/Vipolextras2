@@ -6,7 +6,6 @@
     <meta name="color-scheme" content="dark">
     <title>Folha de Ponto Mensal - Vipol</title>
     
-    <!-- Scripts do Firebase (SDK v9 via compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -21,7 +20,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 10px;
-            padding-bottom: 520px; /* Espaço para o painel de resumo */
+            padding-bottom: 540px; /* Espaço para o painel de resumo atualizado */
             box-sizing: border-box;
             -webkit-text-size-adjust: 100%;
         }
@@ -372,7 +371,7 @@
             <div class="resumo-item"><span>Desconto INSS (R$):</span><input type="text" id="resumo-inss" readonly value="R$ 0,00" class="desconto-imposto"></div>
             <div class="resumo-item"><span>Desconto IRRF (R$):</span><input type="text" id="resumo-irrf" readonly value="R$ 0,00" class="desconto-imposto"></div>
             
-            <div class="resumo-item"><span>Passagens:</span><input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
+            <div class="resumo-item"><span>Passagem (Dia 25):</span><input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
             
             <div class="resumo-item" style="background: #121214 !important; padding: 3px 6px; border-radius: 6px; border: 1px solid #2d2d34;">
                 <span style="color: #ffffff !important;">A Receber (Dia 05):</span>
@@ -677,8 +676,11 @@
 
         let passagens = parseFloat(document.getElementById('input-passagem').value.replace(',', '.')) || 0;
 
+        // TOTAL BRUTO + BENEFÍCIOS engloba tudo
         const totalBrutoComExtrasEBeneficios = baseCalculoImpostosBruto + passagens;
-        const oQueRestaReceberDia05 = totalBrutoComExtrasEBeneficios - VALE_FIXO - impostos.inss - impostos.irrf;
+        
+        // A Receber no Dia 05 EXCLUI a passagem (já que ela é paga em separado no dia 25)
+        const oQueRestaReceberDia05 = baseCalculoImpostosBruto - VALE_FIXO - impostos.inss - impostos.irrf;
 
         document.getElementById('txt-receber-dia-05').value = "R$ " + oQueRestaReceberDia05.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('txt-total-final').innerText = "R$ " + totalBrutoComExtrasEBeneficios.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -718,76 +720,3 @@
                 document.getElementById('txt-status-nuvem').innerText = "Erro ao salvar na Nuvem ❌";
                 console.error("Erro Firebase: ", error);
             });
-        }, 1000);
-    }
-
-    function carregarMes() {
-        document.getElementById('txt-status-nuvem').innerText = "Carregando dados... 🔄";
-        const mesAtual = obterChaveAtual();
-
-        atualizarCalendarioDiasSemana();
-
-        db.collection("pontos_carlos").doc(mesAtual).get()
-        .then((doc) => {
-            if (doc.exists) {
-                const dados = doc.data();
-                document.getElementById('input-passagem').value = dados.passagem || "";
-                document.getElementById('pref-filhos').value = dados.filhos || "0";
-                
-                for (let i = 1; i <= 31; i++) {
-                    const card = document.getElementById(`card-dia-${i}`);
-                    if (dados.dias && dados.dias[i-1]) {
-                        card.querySelector('.in-entrada').value = dados.dias[i-1].ent || "";
-                        card.querySelector('.in-janta').value = dados.dias[i-1].jan || "";
-                        card.querySelector('.in-saida').value = dados.dias[i-1].sai || "";
-                    } else {
-                        card.querySelector('.in-entrada').value = "";
-                        card.querySelector('.in-janta').value = "60";
-                        card.querySelector('.in-saida').value = "";
-                    }
-                }
-                document.getElementById('txt-status-nuvem').innerText = "Dados carregados da Nuvem! ☁️";
-            } else {
-                document.getElementById('input-passagem').value = "";
-                document.getElementById('pref-filhos').value = "0";
-                for (let i = 1; i <= 31; i++) {
-                    const card = document.getElementById(`card-dia-${i}`);
-                    card.querySelector('.in-entrada').value = "";
-                    card.querySelector('.in-janta').value = "60";
-                    card.querySelector('.in-saida').value = "";
-                }
-                document.getElementById('txt-status-nuvem').innerText = "Mês sem registros salvos 📂";
-            }
-            calcularTudo();
-        })
-        .catch((error) => {
-            document.getElementById('txt-status-nuvem').innerText = "Erro ao conectar com a Nuvem ❌";
-            console.error("Erro ao carregar: ", error);
-        });
-    }
-
-    function abrirTelaImpressaoPDF() {
-        const todosOsCards = document.querySelectorAll('.linha-ponto');
-        
-        todosOsCards.forEach(card => {
-            const entrada = card.querySelector('.in-entrada').value.trim();
-            const saida = card.querySelector('.in-saida').value.trim();
-            if (entrada === "" && saida === "") {
-                card.classList.add('ocultar-no-pdf');
-            }
-        });
-
-        window.print();
-
-        setTimeout(() => {
-            todosOsCards.forEach(card => card.classList.remove('ocultar-no-pdf'));
-        }, 1000);
-    }
-
-    window.onload = function() {
-        inicializarDias();
-        carregarMes();
-    };
-</script>
-</body>
-</html>
