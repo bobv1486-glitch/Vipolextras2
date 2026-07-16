@@ -6,6 +6,7 @@
     <meta name="color-scheme" content="dark">
     <title>Folha de Ponto Mensal - Vipol</title>
     
+    <!-- Scripts do Firebase (SDK v9 via compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -15,12 +16,12 @@
         }
         
         html, body {
-            background-color: #000000 !important; /* Fundo totalmente preto */
-            color: #f1f5f9 !important; /* Texto claro */
+            background-color: #121214 !important; /* Tom de cinza escuro idêntico ao print */
+            color: #e2e8f0 !important;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 10px;
-            padding-bottom: 500px; /* Espaço confortável para o painel de resumo estendido */
+            padding-bottom: 520px; /* Espaço para o painel de resumo */
             box-sizing: border-box;
             -webkit-text-size-adjust: 100%;
         }
@@ -29,42 +30,42 @@
 
         .topo {
             text-align: center;
-            margin: 10px 0 20px 0;
+            margin: 15px auto;
             max-width: 480px;
-            margin-left: auto;
-            margin-right: auto;
         }
 
         .titulo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #38bdf8 !important; /* Azul brilhante no tema escuro */
+            font-size: 24px;
+            font-weight: 800;
+            color: #dae5f0 !important;
             text-transform: uppercase;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
         }
 
         .month-select {
             width: 200px;
             border: none;
-            border-bottom: 2px solid #38bdf8;
-            font-size: 18px;
+            border-bottom: 2px solid #27272a;
+            font-size: 20px;
             text-align: center;
             font-weight: bold;
             outline: none;
-            background: #000000 !important;
-            color: #38bdf8 !important;
+            background: transparent !important;
+            color: #dae5f0 !important;
             margin-bottom: 15px;
             cursor: pointer;
+            text-transform: uppercase;
         }
 
         .info-colaborador {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            background: #121212 !important; /* Fundo cinza bem escuro */
-            border: 1px solid #27272a;
-            border-radius: 8px;
-            padding: 12px;
+            gap: 12px;
+            background: #18181c !important; /* Fundo levemente mais claro para os blocos */
+            border: 1px solid #2d2d34;
+            border-radius: 12px;
+            padding: 16px;
             text-align: left;
             margin-bottom: 15px;
         }
@@ -72,18 +73,22 @@
         .info-campo {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 13px;
+            gap: 8px;
+            font-size: 14px;
             font-weight: bold;
-            color: #94a3b8 !important; /* Cinza médio */
+            color: #94a3b8 !important;
+        }
+
+        .info-campo span {
+            white-space: nowrap;
         }
 
         .info-campo input {
             flex: 1;
             border: none;
-            border-bottom: 1px dashed #27272a;
+            border-bottom: 1px dashed #2d2d34;
             background: transparent !important;
-            font-size: 13px;
+            font-size: 15px;
             font-weight: bold;
             color: #ffffff !important;
             outline: none;
@@ -91,14 +96,14 @@
         }
 
         .info-campo input.editavel-perfil {
-            background: #1e1e1e !important;
-            border: 1px solid #3f3f46;
-            border-radius: 6px;
-            padding: 4px 8px;
+            background: #121214 !important;
+            border: 1px solid #2d2d34;
+            border-radius: 8px;
+            padding: 6px 12px;
             width: 70px;
             flex: none;
             text-align: center;
-            font-size: 14px;
+            font-size: 15px;
             color: #ffffff !important;
         }
 
@@ -112,98 +117,94 @@
         }
 
         .card-dia {
-            background: #121212 !important; /* Cartão escuro */
-            border-radius: 8px;
-            padding: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            border: 1px solid #27272a;
+            background: #18181c !important;
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2d2d34;
         }
 
         .card-dia.dia-folga {
-            background: #18181b !important;
-            border-color: #3f3f46;
-            opacity: 0.85;
+            background: #141416 !important;
+            border-color: #27272a;
+            opacity: 0.8;
         }
 
         .card-dia.janta-reduzida {
-            background: #2e1a05 !important; /* Tom discreto de laranja escuro */
-            border-color: #ea580c;
+            border-color: #b45309;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #27272a;
-            padding-bottom: 8px;
+            border-bottom: 1px solid #232329;
+            padding-bottom: 10px;
             margin-bottom: 12px;
         }
 
         .dia-badge {
-            background: #38bdf8 !important; /* Azul destacado no dia */
-            color: #000000 !important; /* Letra preta no crachá para máximo contraste */
-            padding: 4px 12px;
-            border-radius: 6px;
+            background: #1a365d !important; /* Azul escuro igual ao print */
+            color: #ffffff !important;
+            padding: 6px 14px;
+            border-radius: 8px;
             font-weight: bold;
             font-size: 14px;
         }
 
-        /* Fim de semana em cinza escuro */
         .card-dia.fim-de-semana .dia-badge {
-            background: #4b5563 !important;
-            color: #ffffff !important;
+            background: #27272a !important;
         }
 
-        .card-dia.dia-folga .dia-badge { 
-            background: #3f3f46 !important; 
-            color: #ffffff !important;
+        .card-dia.dia-folga .dia-badge {
+            background: #1e1e24 !important;
         }
 
         .valores-dia {
             display: flex;
-            gap: 10px;
-            font-size: 13px;
+            gap: 12px;
+            font-size: 14px;
             font-weight: bold;
         }
 
-        .v-extra { color: #4ade80 !important; /* Verde mais vivo para tema escuro */ }
-        .v-money { color: #38bdf8 !important; }
+        .v-extra { color: #22c55e !important; } /* Verde vivo do print */
+        .v-money { color: #ffffff !important; }
 
         .inputs-row {
             display: grid;
             grid-template-columns: 1fr 1.2fr 1fr;
-            gap: 8px;
+            gap: 10px;
         }
 
         .campo {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
         }
 
         .campo label {
             font-size: 11px;
             font-weight: bold;
-            color: #94a3b8 !important;
+            color: #71717a !important;
             text-transform: uppercase;
+            text-align: center;
         }
 
         .campo input {
             width: 100%;
-            padding: 10px 5px;
-            border: 1px solid #3f3f46;
-            border-radius: 6px;
-            font-size: 15px;
+            padding: 10px 6px;
+            border: 1px solid #2d2d34;
+            border-radius: 8px;
+            font-size: 16px;
             text-align: center;
             outline: none;
-            background: #1e1e1e !important;
+            background: #121214 !important;
             font-weight: bold;
             color: #ffffff !important;
         }
 
         .campo input:focus {
-            border-color: #38bdf8;
-            background: #27272a !important;
+            border-color: #3b82f6;
         }
 
         .painel-resumo {
@@ -211,9 +212,9 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: #121212 !important;
-            border-top: 3px solid #38bdf8;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+            background: #18181c !important;
+            border-top: 2px solid #2d2d34;
+            box-shadow: 0 -8px 24px rgba(0,0,0,0.5);
             padding: 12px;
             z-index: 999;
         }
@@ -223,18 +224,18 @@
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px 12px;
+            gap: 6px 16px;
         }
 
         .resumo-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
-            border-bottom: 1px dashed #27272a;
-            padding-bottom: 3px;
-            color: #f1f5f9 !important;
+            border-bottom: 1px dashed #232329;
+            padding-bottom: 4px;
+            color: #e2e8f0 !important;
         }
 
         .resumo-item span:first-child { color: #94a3b8 !important; }
@@ -243,7 +244,7 @@
             width: 90px;
             border: none;
             text-align: right;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             outline: none;
             color: #ffffff !important;
@@ -251,31 +252,33 @@
         }
 
         .resumo-item .editavel {
-            border: 1px solid #3f3f46;
-            background: #1e1e1e !important;
-            padding: 2px 4px;
-            border-radius: 4px;
+            border: 1px solid #2d2d34;
+            background: #121214 !important;
+            padding: 3px 6px;
+            border-radius: 6px;
             width: 75px;
             color: #ffffff !important;
+            text-align: right;
         }
 
         .desconto-imposto {
-            color: #f87171 !important; /* Vermelho claro no escuro */
+            color: #f1f5f9 !important;
         }
 
         .caixa-total-final {
             grid-column: span 2;
-            background: #38bdf8 !important; /* Caixa azul vibrante */
-            color: #000000 !important;
-            padding: 8px 10px;
-            border-radius: 6px;
+            background: #1a365d !important; /* Caixa azul escura do print */
+            color: #ffffff !important;
+            padding: 12px;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
-        .caixa-total-final span:last-child { font-size: 16px; font-weight: 950; }
+        .caixa-total-final span:first-child { font-size: 15px; font-weight: bold; }
+        .caixa-total-final span:last-child { font-size: 18px; font-weight: 950; text-align: right; }
 
         .status-nuvem {
             grid-column: span 2;
@@ -283,25 +286,24 @@
             text-align: center;
             color: #94a3b8;
             font-weight: bold;
-            margin-top: -2px;
+            margin: 2px 0;
         }
 
-        .btn-pdf-container { grid-column: span 2; margin-top: 2px; }
+        .btn-pdf-container { grid-column: span 2; }
 
         .btn-pdf {
             width: 100%;
-            background-color: #22c55e !important; /* Verde padrão */
+            background-color: #10b981 !important; /* Verde arredondado do print */
             color: #ffffff !important;
             border: none;
-            padding: 10px;
-            font-size: 13px;
+            padding: 12px;
+            font-size: 14px;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             text-transform: uppercase;
         }
 
-        /* GERAÇÃO DE PDF: Volta as cores originais (claro) para economizar tinta de impressora */
         @media print {
             html, body { background-color: #ffffff !important; color: #1e293b !important; padding-bottom: 0 !important; }
             .topo .titulo { color: #1a365d !important; }
@@ -347,7 +349,7 @@
             <div class="info-campo"><span>Empresa:</span><input type="text" value="Vipol" readonly></div>
             <div class="info-campo"><span>Colaborador:</span><input type="text" value="Carlos Vinicius de Oliveira" readonly></div>
             <div class="info-campo"><span>Registro (Chapa):</span><input type="text" value="17808" readonly></div>
-            <div class="info-campo" style="margin-top: 4px; border-top: 1px dashed #27272a; padding-top: 8px; display: flex; justify-content: space-between;">
+            <div class="info-campo" style="margin-top: 4px; border-top: 1px dashed #2d2d34; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
                 <span>Filhos Dependentes (Dedução IR):</span>
                 <input type="number" id="pref-filhos" class="editavel-perfil" value="0" min="0" oninput="salvarEDigitar()">
             </div>
@@ -358,29 +360,32 @@
 
     <div class="painel-resumo">
         <div class="resumo-conteudo">
-            <div class="resumo-item"><span>Total Mês:</span><input type="text" id="total-dias-trab" readonly value="0 dias" style="color:#94a3b8 !important;"></div>
-            <div class="resumo-item"><span>Salário Base:</span><input type="text" value="R$ 3143,00" readonly style="color:#94a3b8 !important;"></div>
-            <div class="resumo-item"><span>Extras Totais (Real):</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #4ade80 !important;" title="Horas reais de relógio para bater com a empresa"></div>
+            <div class="resumo-item"><span>Total Mês:</span><input type="text" id="total-dias-trab" readonly value="0 dias" style="color:#ffffff !important;"></div>
+            <div class="resumo-item"><span>Salário Base:</span><input type="text" value="R$ 3143,00" readonly style="color:#ffffff !important;"></div>
+            
+            <div class="resumo-item"><span>Extras Totais (Real):</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #22c55e !important;"></div>
             <div class="resumo-item"><span>Vale (Dia 20 - 40%):</span><input type="text" value="R$ 1258,00" readonly style="color:#f87171 !important; font-weight: bold;"></div>
             
-            <div class="resumo-item"><span>Horas Extras (R$):</span><input type="text" id="resumo-extras-reais" readonly value="R$ 0,00" style="color: #4ade80 !important;"></div>
-            <div class="resumo-item"><span>Adicional Noturno (R$):</span><input type="text" id="resumo-adicional-noturno" readonly value="R$ 0,00" style="color: #4ade80 !important; font-weight: bold;"></div>
+            <div class="resumo-item"><span>Horas Extras (R$):</span><input type="text" id="resumo-extras-reais" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>Adicional Noturno (R$):</span><input type="text" id="resumo-adicional-noturno" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
             
             <div class="resumo-item"><span>Desconto INSS (R$):</span><input type="text" id="resumo-inss" readonly value="R$ 0,00" class="desconto-imposto"></div>
             <div class="resumo-item"><span>Desconto IRRF (R$):</span><input type="text" id="resumo-irrf" readonly value="R$ 0,00" class="desconto-imposto"></div>
             
             <div class="resumo-item"><span>Passagens:</span><input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
             
-            <div class="resumo-item" style="background: #1e1e1e !important; padding: 3px; border-radius: 4px;">
-                <span style="color: #38bdf8 !important;">A Receber (Dia 05):</span>
-                <input type="text" id="txt-receber-dia-05" readonly value="R$ 0,00" style="color: #38bdf8 !important; font-weight: 900;">
+            <div class="resumo-item" style="background: #121214 !important; padding: 3px 6px; border-radius: 6px; border: 1px solid #2d2d34;">
+                <span style="color: #ffffff !important;">A Receber (Dia 05):</span>
+                <input type="text" id="txt-receber-dia-05" readonly value="R$ 0,00" style="color: #ffffff !important; font-weight: 900;">
             </div>
             
             <div class="caixa-total-final">
                 <span>TOTAL BRUTO + BENEFÍCIOS:</span>
                 <span id="txt-total-final">R$ 3.143,00</span>
             </div>
+            
             <div class="status-nuvem" id="txt-status-nuvem">Conectando ao Firebase ☁️</div>
+            
             <div class="btn-pdf-container">
                 <button class="btn-pdf" onclick="abrirTelaImpressaoPDF()">Gerar Relatório PDF</button>
             </div>
@@ -420,7 +425,10 @@
             <div class="card-dia linha-ponto" id="card-dia-${i}">
                 <div class="card-header">
                     <span class="dia-badge" id="lbl-badge-dia-${i}">Dia ${d}</span>
-                    <div class="valores-dia"><span class="v-extra id-extra-relogio">0:00</span><span class="v-money id-extra-dinheiro">R$ 0,00</span></div>
+                    <div class="valores-dia">
+                        <span class="v-extra id-extra-relogio">0:00</span>
+                        <span class="v-money id-extra-dinheiro">R$ 0,00</span>
+                    </div>
                 </div>
                 <div class="inputs-row">
                     <div class="campo"><label>Entrada</label><input type="text" class="in-entrada" placeholder="08:00" oninput="salvarEDigitar()"></div>
@@ -704,7 +712,7 @@
 
             db.collection("pontos_carlos").doc(mesAtual).set(dadosMes)
             .then(() => {
-                document.getElementById('txt-status-nuvem').innerText = "Alterações salvas na Nuvem! ✅";
+                document.getElementById('txt-status-nuvem').innerText = "Dados salvos na Nuvem! ✅";
             })
             .catch((error) => {
                 document.getElementById('txt-status-nuvem').innerText = "Erro ao salvar na Nuvem ❌";
@@ -748,7 +756,7 @@
                     card.querySelector('.in-janta').value = "60";
                     card.querySelector('.in-saida').value = "";
                 }
-                document.getElementById('txt-status-nuvem').innerText = "Mês limpo ou sem registros na Nuvem! 📂";
+                document.getElementById('txt-status-nuvem').innerText = "Mês sem registros salvos 📂";
             }
             calcularTudo();
         })
