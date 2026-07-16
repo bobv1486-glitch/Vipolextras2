@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="color-scheme" content="light">
+    <meta name="color-scheme" content="dark">
     <title>Folha de Ponto Mensal - Vipol</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -11,12 +11,12 @@
 
     <style>
         :root {
-            color-scheme: light;
+            color-scheme: dark;
         }
         
         html, body {
-            background-color: #ffffff !important;
-            color: #1e293b !important;
+            background-color: #000000 !important; /* Fundo totalmente preto */
+            color: #f1f5f9 !important; /* Texto claro */
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 10px;
@@ -38,7 +38,7 @@
         .titulo {
             font-size: 20px;
             font-weight: bold;
-            color: #1a365d !important;
+            color: #38bdf8 !important; /* Azul brilhante no tema escuro */
             text-transform: uppercase;
             margin-bottom: 12px;
         }
@@ -46,13 +46,13 @@
         .month-select {
             width: 200px;
             border: none;
-            border-bottom: 2px solid #1a365d;
+            border-bottom: 2px solid #38bdf8;
             font-size: 18px;
             text-align: center;
             font-weight: bold;
             outline: none;
-            background: #ffffff !important;
-            color: #1a365d !important;
+            background: #000000 !important;
+            color: #38bdf8 !important;
             margin-bottom: 15px;
             cursor: pointer;
         }
@@ -61,8 +61,8 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            background: #f8fafc !important;
-            border: 1px solid #cbd5e1;
+            background: #121212 !important; /* Fundo cinza bem escuro */
+            border: 1px solid #27272a;
             border-radius: 8px;
             padding: 12px;
             text-align: left;
@@ -75,31 +75,31 @@
             gap: 6px;
             font-size: 13px;
             font-weight: bold;
-            color: #475569 !important;
+            color: #94a3b8 !important; /* Cinza médio */
         }
 
         .info-campo input {
             flex: 1;
             border: none;
-            border-bottom: 1px dashed #cbd5e1;
+            border-bottom: 1px dashed #27272a;
             background: transparent !important;
             font-size: 13px;
             font-weight: bold;
-            color: #0f172a !important;
+            color: #ffffff !important;
             outline: none;
             padding: 2px 4px;
         }
 
         .info-campo input.editavel-perfil {
-            background: #ffffff !important;
-            border: 1px solid #cbd5e1;
+            background: #1e1e1e !important;
+            border: 1px solid #3f3f46;
             border-radius: 6px;
             padding: 4px 8px;
             width: 70px;
             flex: none;
             text-align: center;
             font-size: 14px;
-            color: #1e293b !important;
+            color: #ffffff !important;
         }
 
         .lista-pontos {
@@ -112,48 +112,52 @@
         }
 
         .card-dia {
-            background: #ffffff !important;
+            background: #121212 !important; /* Cartão escuro */
             border-radius: 8px;
             padding: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-            border: 1px solid #cbd5e1;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border: 1px solid #27272a;
         }
 
         .card-dia.dia-folga {
-            background: #f1f5f9 !important;
-            border-color: #94a3b8;
+            background: #18181b !important;
+            border-color: #3f3f46;
             opacity: 0.85;
         }
 
         .card-dia.janta-reduzida {
-            background: #fff7ed !important;
-            border-color: #fdba74;
+            background: #2e1a05 !important; /* Tom discreto de laranja escuro */
+            border-color: #ea580c;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid #27272a;
             padding-bottom: 8px;
             margin-bottom: 12px;
         }
 
         .dia-badge {
-            background: #1a365d !important;
-            color: #ffffff !important;
+            background: #38bdf8 !important; /* Azul destacado no dia */
+            color: #000000 !important; /* Letra preta no crachá para máximo contraste */
             padding: 4px 12px;
             border-radius: 6px;
             font-weight: bold;
             font-size: 14px;
         }
 
-        /* Cores diferenciadas para os fins de semana */
+        /* Fim de semana em cinza escuro */
         .card-dia.fim-de-semana .dia-badge {
-            background: #475569 !important;
+            background: #4b5563 !important;
+            color: #ffffff !important;
         }
 
-        .card-dia.dia-folga .dia-badge { background: #64748b !important; }
+        .card-dia.dia-folga .dia-badge { 
+            background: #3f3f46 !important; 
+            color: #ffffff !important;
+        }
 
         .valores-dia {
             display: flex;
@@ -162,8 +166,8 @@
             font-weight: bold;
         }
 
-        .v-extra { color: #16a34a !important; }
-        .v-money { color: #1a365d !important; }
+        .v-extra { color: #4ade80 !important; /* Verde mais vivo para tema escuro */ }
+        .v-money { color: #38bdf8 !important; }
 
         .inputs-row {
             display: grid;
@@ -180,26 +184,26 @@
         .campo label {
             font-size: 11px;
             font-weight: bold;
-            color: #64748b !important;
+            color: #94a3b8 !important;
             text-transform: uppercase;
         }
 
         .campo input {
             width: 100%;
             padding: 10px 5px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #3f3f46;
             border-radius: 6px;
             font-size: 15px;
             text-align: center;
             outline: none;
-            background: #f8fafc !important;
+            background: #1e1e1e !important;
             font-weight: bold;
-            color: #334155 !important;
+            color: #ffffff !important;
         }
 
         .campo input:focus {
-            border-color: #1a365d;
-            background: #ffffff !important;
+            border-color: #38bdf8;
+            background: #27272a !important;
         }
 
         .painel-resumo {
@@ -207,9 +211,9 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: #ffffff !important;
-            border-top: 3px solid #1a365d;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            background: #121212 !important;
+            border-top: 3px solid #38bdf8;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
             padding: 12px;
             z-index: 999;
         }
@@ -228,12 +232,12 @@
             align-items: center;
             font-size: 12px;
             font-weight: bold;
-            border-bottom: 1px dashed #e2e8f0;
+            border-bottom: 1px dashed #27272a;
             padding-bottom: 3px;
-            color: #0f172a !important;
+            color: #f1f5f9 !important;
         }
 
-        .resumo-item span:first-child { color: #64748b !important; }
+        .resumo-item span:first-child { color: #94a3b8 !important; }
 
         .resumo-item input {
             width: 90px;
@@ -242,26 +246,27 @@
             font-size: 12px;
             font-weight: bold;
             outline: none;
-            color: #1e293b !important;
+            color: #ffffff !important;
             background: transparent !important;
         }
 
         .resumo-item .editavel {
-            border: 1px solid #cbd5e1;
-            background: #f8fafc !important;
+            border: 1px solid #3f3f46;
+            background: #1e1e1e !important;
             padding: 2px 4px;
             border-radius: 4px;
             width: 75px;
+            color: #ffffff !important;
         }
 
         .desconto-imposto {
-            color: #dc2626 !important;
+            color: #f87171 !important; /* Vermelho claro no escuro */
         }
 
         .caixa-total-final {
             grid-column: span 2;
-            background: #1a365d !important;
-            color: #ffffff !important;
+            background: #38bdf8 !important; /* Caixa azul vibrante */
+            color: #000000 !important;
             padding: 8px 10px;
             border-radius: 6px;
             display: flex;
@@ -276,7 +281,7 @@
             grid-column: span 2;
             font-size: 11px;
             text-align: center;
-            color: #64748b;
+            color: #94a3b8;
             font-weight: bold;
             margin-top: -2px;
         }
@@ -285,7 +290,7 @@
 
         .btn-pdf {
             width: 100%;
-            background-color: #16a34a !important;
+            background-color: #22c55e !important; /* Verde padrão */
             color: #ffffff !important;
             border: none;
             padding: 10px;
@@ -296,15 +301,25 @@
             text-transform: uppercase;
         }
 
+        /* GERAÇÃO DE PDF: Volta as cores originais (claro) para economizar tinta de impressora */
         @media print {
-            body { padding-bottom: 0 !important; background: #ffffff !important; }
-            .info-colaborador { background: #ffffff !important; border: 1px solid #94a3b8 !important; }
-            .info-colaborador input { border-bottom: none !important; }
-            .painel-resumo { position: static !important; box-shadow: none !important; border-top: 2px solid #1a365d !important; margin-top: 30px !important; page-break-inside: avoid; }
+            html, body { background-color: #ffffff !important; color: #1e293b !important; padding-bottom: 0 !important; }
+            .topo .titulo { color: #1a365d !important; }
+            .info-colaborador { background: #ffffff !important; border: 1px solid #94a3b8 !important; color: #1e293b !important; }
+            .info-colaborador input { border-bottom: none !important; color: #0f172a !important; }
+            .card-dia { background: #ffffff !important; border: 1px solid #cbd5e1 !important; color: #1e293b !important; }
+            .dia-badge { background: #1a365d !important; color: #ffffff !important; }
+            .valores-dia .v-extra { color: #16a34a !important; }
+            .valores-dia .v-money { color: #1a365d !important; }
+            .painel-resumo { position: static !important; box-shadow: none !important; border-top: 2px solid #1a365d !important; margin-top: 30px !important; page-break-inside: avoid; background: #ffffff !important; }
+            .resumo-item { color: #0f172a !important; border-bottom: 1px dashed #e2e8f0 !important; }
+            .resumo-item span:first-child { color: #64748b !important; }
+            .resumo-item input { color: #1e293b !important; }
+            .caixa-total-final { background: #1a365d !important; color: #ffffff !important; }
             .btn-pdf-container, .status-nuvem { display: none !important; }
             .card-dia { page-break-inside: avoid !important; }
             .ocultar-no-pdf { display: none !important; }
-            .month-select { border: none !important; appearance: none; -webkit-appearance: none; }
+            .month-select { border: none !important; appearance: none; -webkit-appearance: none; color: #1a365d !important; background: transparent !important; }
         }
     </style>
 </head>
@@ -332,7 +347,7 @@
             <div class="info-campo"><span>Empresa:</span><input type="text" value="Vipol" readonly></div>
             <div class="info-campo"><span>Colaborador:</span><input type="text" value="Carlos Vinicius de Oliveira" readonly></div>
             <div class="info-campo"><span>Registro (Chapa):</span><input type="text" value="17808" readonly></div>
-            <div class="info-campo" style="margin-top: 4px; border-top: 1px dashed #cbd5e1; padding-top: 8px; display: flex; justify-content: space-between;">
+            <div class="info-campo" style="margin-top: 4px; border-top: 1px dashed #27272a; padding-top: 8px; display: flex; justify-content: space-between;">
                 <span>Filhos Dependentes (Dedução IR):</span>
                 <input type="number" id="pref-filhos" class="editavel-perfil" value="0" min="0" oninput="salvarEDigitar()">
             </div>
@@ -343,22 +358,22 @@
 
     <div class="painel-resumo">
         <div class="resumo-conteudo">
-            <div class="resumo-item"><span>Total Mês:</span><input type="text" id="total-dias-trab" readonly value="0 dias" style="color:#64748b !important;"></div>
-            <div class="resumo-item"><span>Salário Base:</span><input type="text" value="R$ 3143,00" readonly style="color:#64748b !important;"></div>
-            <div class="resumo-item"><span>Extras Totais (Real):</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #16a34a !important;" title="Horas reais de relógio para bater com a empresa"></div>
-            <div class="resumo-item"><span>Vale (Dia 20 - 40%):</span><input type="text" value="R$ 1258,00" readonly style="color:#dc2626 !important; font-weight: bold;"></div>
+            <div class="resumo-item"><span>Total Mês:</span><input type="text" id="total-dias-trab" readonly value="0 dias" style="color:#94a3b8 !important;"></div>
+            <div class="resumo-item"><span>Salário Base:</span><input type="text" value="R$ 3143,00" readonly style="color:#94a3b8 !important;"></div>
+            <div class="resumo-item"><span>Extras Totais (Real):</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #4ade80 !important;" title="Horas reais de relógio para bater com a empresa"></div>
+            <div class="resumo-item"><span>Vale (Dia 20 - 40%):</span><input type="text" value="R$ 1258,00" readonly style="color:#f87171 !important; font-weight: bold;"></div>
             
-            <div class="resumo-item"><span>Horas Extras (R$):</span><input type="text" id="resumo-extras-reais" readonly value="R$ 0,00" style="color: #16a34a !important;"></div>
-            <div class="resumo-item"><span>Adicional Noturno (R$):</span><input type="text" id="resumo-adicional-noturno" readonly value="R$ 0,00" style="color: #16a34a !important; font-weight: bold;"></div>
+            <div class="resumo-item"><span>Horas Extras (R$):</span><input type="text" id="resumo-extras-reais" readonly value="R$ 0,00" style="color: #4ade80 !important;"></div>
+            <div class="resumo-item"><span>Adicional Noturno (R$):</span><input type="text" id="resumo-adicional-noturno" readonly value="R$ 0,00" style="color: #4ade80 !important; font-weight: bold;"></div>
             
             <div class="resumo-item"><span>Desconto INSS (R$):</span><input type="text" id="resumo-inss" readonly value="R$ 0,00" class="desconto-imposto"></div>
             <div class="resumo-item"><span>Desconto IRRF (R$):</span><input type="text" id="resumo-irrf" readonly value="R$ 0,00" class="desconto-imposto"></div>
             
             <div class="resumo-item"><span>Passagens:</span><input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
             
-            <div class="resumo-item" style="background: #f8fafc !important; padding: 3px; border-radius: 4px;">
-                <span style="color: #1e3a8a !important;">A Receber (Dia 05):</span>
-                <input type="text" id="txt-receber-dia-05" readonly value="R$ 0,00" style="color: #1e3a8a !important; font-weight: 900;">
+            <div class="resumo-item" style="background: #1e1e1e !important; padding: 3px; border-radius: 4px;">
+                <span style="color: #38bdf8 !important;">A Receber (Dia 05):</span>
+                <input type="text" id="txt-receber-dia-05" readonly value="R$ 0,00" style="color: #38bdf8 !important; font-weight: 900;">
             </div>
             
             <div class="caixa-total-final">
@@ -388,7 +403,6 @@
 
     let timeoutSalvar = null;
 
-    // Mapeamento de nomes de meses para números correspondentes do objeto Date do JavaScript (0 = Janeiro, 11 = Dezembro)
     const MAPEAMENTO_MESES = {
         "Janeiro": 0, "Fevereiro": 1, "Marco": 2, "Abril": 3,
         "Maio": 4, "Junho": 5, "Julho": 6, "Agosto": 7,
@@ -418,37 +432,31 @@
         container.innerHTML = htmlDias;
     }
 
-    // Atualiza os dias da semana na interface baseado no mês selecionado
     function atualizarCalendarioDiasSemana() {
         const mesSelecionado = document.getElementById('sel-mes').value;
         const indiceMes = MAPEAMENTO_MESES[mesSelecionado];
-        const anoAtual = 2026; // Mantém o ano corrente das regras fiscais
+        const anoAtual = 2026;
 
         for (let i = 1; i <= 31; i++) {
             const card = document.getElementById(`card-dia-${i}`);
             const badge = document.getElementById(`lbl-badge-dia-${i}`);
-            
-            // Verifica se o dia é válido para o mês selecionado (Ex: Fevereiro tem 28 dias)
             const dataObjeto = new Date(anoAtual, indiceMes, i);
             
-            // Se o dia lido extrapolar o mês (Ex: 31 de Abril vai transbordar para 1 de Maio), ocultamos ou controlamos o card
             if (dataObjeto.getMonth() !== indiceMes) {
-                card.style.display = 'none'; // Esconde dias inexistentes (Ex: 29, 30, 31 em Fevereiro)
+                card.style.display = 'none';
                 continue;
             } else {
                 card.style.display = 'block';
             }
 
-            const diaSemanaIndex = dataObjeto.getDay(); // Retorna de 0 (Domingo) a 6 (Sábado)
+            const diaSemanaIndex = dataObjeto.getDay();
             const nomeDiaSemana = DIAS_DA_SEMANA_NOMES[diaSemanaIndex];
             
             let d = i < 10 ? '0' + i : i;
             badge.innerText = `Dia ${d} - ${nomeDiaSemana}`;
 
-            // Remove classes antigas de fim de semana
             card.classList.remove('fim-de-semana');
 
-            // Caso queira dar um visual diferente para Sábados e Domingos
             if (diaSemanaIndex === 0 || diaSemanaIndex === 6) {
                 card.classList.add('fim-de-semana');
             }
@@ -485,7 +493,6 @@
         return { diurnos, noturnos };
     }
 
-    // Função de cálculo de impostos de 2026 com isenção de R$5.000,00 integrada
     function calcularImpostos(salarioBruto, numFilhos) {
         let inss = 0;
         const tetoInss = 908.85;
@@ -527,7 +534,7 @@
         let irrfFinal = irrfBruto;
 
         if (salarioBruto <= 5000.00) {
-            irrfFinal = 0; // Regra de Isenção total 2026
+            irrfFinal = 0;
         } else if (salarioBruto <= 7350.00) {
             const redutor = 978.62 - (0.133145 * salarioBruto);
             irrfFinal = irrfBruto - redutor;
@@ -547,7 +554,7 @@
         let ganhoTotalAdicionalNoturnoReais = 0;
         let diasTrabalhadosContador = 0;
         
-        const JORNADA_CONTRATUAL_MINUTOS = 440; // 7 horas e 20 minutos
+        const JORNADA_CONTRATUAL_MINUTOS = 440;
         const SALARIO_BASE = 3143.00;
         const VALE_FIXO = 1258.00;
         const HORA_NORMAL = SALARIO_BASE / 220;
@@ -555,7 +562,6 @@
         const VALOR_ADICIONAL_NOTURNO_HORA = HORA_NORMAL * 0.20;
 
         todosOsCards.forEach(card => {
-            // Ignorar cartões que estão ocultos por conta do número de dias no mês
             if (card.style.display === 'none') return;
 
             const entradaTxt = card.querySelector('.in-entrada').value.trim().toUpperCase();
@@ -648,30 +654,22 @@
             }
         });
 
-        // Valores Base para o cálculo de impostos
         const baseCalculoImpostosBruto = SALARIO_BASE + ganhoTotalExtrasReais + ganhoTotalAdicionalNoturnoReais;
         const numFilhos = parseInt(document.getElementById('pref-filhos').value) || 0;
 
-        // Cálculo dinâmico dos impostos
         const impostos = calcularImpostos(baseCalculoImpostosBruto, numFilhos);
 
-        // Atualização do painel de resumo
         document.getElementById('total-dias-trab').value = diasTrabalhadosContador + " dias";
         document.getElementById('resumo-horas-banco').value = minutesParaTexto(acumuladoMinutosExtrasMesRelogio);
         document.getElementById('resumo-extras-reais').value = "R$ " + ganhoTotalExtrasReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('resumo-adicional-noturno').value = "R$ " + ganhoTotalAdicionalNoturnoReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         
-        // Exibição dos descontos nos novos inputs
         document.getElementById('resumo-inss').value = "R$ " + impostos.inss.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('resumo-irrf').value = "R$ " + impostos.irrf.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        // Passagens
         let passagens = parseFloat(document.getElementById('input-passagem').value.replace(',', '.')) || 0;
 
-        // Totais Finais
         const totalBrutoComExtrasEBeneficios = baseCalculoImpostosBruto + passagens;
-        
-        // Cálculo Líquido recebível (Descontando Vale + Impostos)
         const oQueRestaReceberDia05 = totalBrutoComExtrasEBeneficios - VALE_FIXO - impostos.inss - impostos.irrf;
 
         document.getElementById('txt-receber-dia-05').value = "R$ " + oQueRestaReceberDia05.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -684,9 +682,7 @@
 
     function salvarEDigitar() {
         calcularTudo();
-        
         document.getElementById('txt-status-nuvem').innerText = "Digitando... ⏳";
-
         clearTimeout(timeoutSalvar);
         
         timeoutSalvar = setTimeout(() => {
@@ -721,7 +717,6 @@
         document.getElementById('txt-status-nuvem').innerText = "Carregando dados... 🔄";
         const mesAtual = obterChaveAtual();
 
-        // 1. Atualizar os dias da semana na interface antes de trazer os dados digitados
         atualizarCalendarioDiasSemana();
 
         db.collection("pontos_carlos").doc(mesAtual).get()
