@@ -6,7 +6,6 @@
     <meta name="color-scheme" content="light">
     <title>Folha de Ponto Mensal - Vipol</title>
     
-    <!-- Scripts do Firebase (SDK v9 via compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -147,6 +146,11 @@
             border-radius: 6px;
             font-weight: bold;
             font-size: 14px;
+        }
+
+        /* Cores diferenciadas para os fins de semana */
+        .card-dia.fim-de-semana .dia-badge {
+            background: #475569 !important;
         }
 
         .card-dia.dia-folga .dia-badge { background: #64748b !important; }
@@ -328,7 +332,6 @@
             <div class="info-campo"><span>Empresa:</span><input type="text" value="Vipol" readonly></div>
             <div class="info-campo"><span>Colaborador:</span><input type="text" value="Carlos Vinicius de Oliveira" readonly></div>
             <div class="info-campo"><span>Registro (Chapa):</span><input type="text" value="17808" readonly></div>
-            <!-- Campo de filhos com sua linha própria para não espremer no celular -->
             <div class="info-campo" style="margin-top: 4px; border-top: 1px dashed #cbd5e1; padding-top: 8px; display: flex; justify-content: space-between;">
                 <span>Filhos Dependentes (Dedução IR):</span>
                 <input type="number" id="pref-filhos" class="editavel-perfil" value="0" min="0" oninput="salvarEDigitar()">
@@ -348,7 +351,6 @@
             <div class="resumo-item"><span>Horas Extras (R$):</span><input type="text" id="resumo-extras-reais" readonly value="R$ 0,00" style="color: #16a34a !important;"></div>
             <div class="resumo-item"><span>Adicional Noturno (R$):</span><input type="text" id="resumo-adicional-noturno" readonly value="R$ 0,00" style="color: #16a34a !important; font-weight: bold;"></div>
             
-            <!-- Novos campos integrados de Impostos -->
             <div class="resumo-item"><span>Desconto INSS (R$):</span><input type="text" id="resumo-inss" readonly value="R$ 0,00" class="desconto-imposto"></div>
             <div class="resumo-item"><span>Desconto IRRF (R$):</span><input type="text" id="resumo-irrf" readonly value="R$ 0,00" class="desconto-imposto"></div>
             
@@ -386,6 +388,15 @@
 
     let timeoutSalvar = null;
 
+    // Mapeamento de nomes de meses para números correspondentes do objeto Date do JavaScript (0 = Janeiro, 11 = Dezembro)
+    const MAPEAMENTO_MESES = {
+        "Janeiro": 0, "Fevereiro": 1, "Marco": 2, "Abril": 3,
+        "Maio": 4, "Junho": 5, "Julho": 6, "Agosto": 7,
+        "Setembro": 8, "Outubro": 9, "Novembro": 10, "Dezembro": 11
+    };
+
+    const DIAS_DA_SEMANA_NOMES = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+
     function inicializarDias() {
         const container = document.getElementById('lista-pontos');
         let htmlDias = '';
@@ -394,7 +405,7 @@
             htmlDias += `
             <div class="card-dia linha-ponto" id="card-dia-${i}">
                 <div class="card-header">
-                    <span class="dia-badge">Dia ${d}</span>
+                    <span class="dia-badge" id="lbl-badge-dia-${i}">Dia ${d}</span>
                     <div class="valores-dia"><span class="v-extra id-extra-relogio">0:00</span><span class="v-money id-extra-dinheiro">R$ 0,00</span></div>
                 </div>
                 <div class="inputs-row">
@@ -405,6 +416,43 @@
             </div>`;
         }
         container.innerHTML = htmlDias;
+    }
+
+    // Atualiza os dias da semana na interface baseado no mês selecionado
+    function atualizarCalendarioDiasSemana() {
+        const mesSelecionado = document.getElementById('sel-mes').value;
+        const indiceMes = MAPEAMENTO_MESES[mesSelecionado];
+        const anoAtual = 2026; // Mantém o ano corrente das regras fiscais
+
+        for (let i = 1; i <= 31; i++) {
+            const card = document.getElementById(`card-dia-${i}`);
+            const badge = document.getElementById(`lbl-badge-dia-${i}`);
+            
+            // Verifica se o dia é válido para o mês selecionado (Ex: Fevereiro tem 28 dias)
+            const dataObjeto = new Date(anoAtual, indiceMes, i);
+            
+            // Se o dia lido extrapolar o mês (Ex: 31 de Abril vai transbordar para 1 de Maio), ocultamos ou controlamos o card
+            if (dataObjeto.getMonth() !== indiceMes) {
+                card.style.display = 'none'; // Esconde dias inexistentes (Ex: 29, 30, 31 em Fevereiro)
+                continue;
+            } else {
+                card.style.display = 'block';
+            }
+
+            const diaSemanaIndex = dataObjeto.getDay(); // Retorna de 0 (Domingo) a 6 (Sábado)
+            const nomeDiaSemana = DIAS_DA_SEMANA_NOMES[diaSemanaIndex];
+            
+            let d = i < 10 ? '0' + i : i;
+            badge.innerText = `Dia ${d} - ${nomeDiaSemana}`;
+
+            // Remove classes antigas de fim de semana
+            card.classList.remove('fim-de-semana');
+
+            // Caso queira dar um visual diferente para Sábados e Domingos
+            if (diaSemanaIndex === 0 || diaSemanaIndex === 6) {
+                card.classList.add('fim-de-semana');
+            }
+        }
     }
 
     function textoParaMinutos(stringHora) {
@@ -507,6 +555,9 @@
         const VALOR_ADICIONAL_NOTURNO_HORA = HORA_NORMAL * 0.20;
 
         todosOsCards.forEach(card => {
+            // Ignorar cartões que estão ocultos por conta do número de dias no mês
+            if (card.style.display === 'none') return;
+
             const entradaTxt = card.querySelector('.in-entrada').value.trim().toUpperCase();
             const saidaTxt = card.querySelector('.in-saida').value.trim().toUpperCase();
             const jantaTxt = card.querySelector('.in-janta').value.trim();
@@ -669,6 +720,9 @@
     function carregarMes() {
         document.getElementById('txt-status-nuvem').innerText = "Carregando dados... 🔄";
         const mesAtual = obterChaveAtual();
+
+        // 1. Atualizar os dias da semana na interface antes de trazer os dados digitados
+        atualizarCalendarioDiasSemana();
 
         db.collection("pontos_carlos").doc(mesAtual).get()
         .then((doc) => {
