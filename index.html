@@ -16,12 +16,12 @@
         }
         
         html, body {
-            background-color: #121214 !important; /* Tom de cinza escuro idêntico ao print */
+            background-color: #121214 !important;
             color: #e2e8f0 !important;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 10px;
-            padding-bottom: 520px; /* Espaço para o painel de resumo */
+            padding-bottom: 280px; /* Reduzido o recuo pois o painel encolheu pela metade */
             box-sizing: border-box;
             -webkit-text-size-adjust: 100%;
         }
@@ -30,30 +30,30 @@
 
         .topo {
             text-align: center;
-            margin: 15px auto;
+            margin: 10px auto;
             max-width: 480px;
         }
 
         .titulo {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 800;
             color: #dae5f0 !important;
             text-transform: uppercase;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             letter-spacing: 0.5px;
         }
 
         .month-select {
-            width: 200px;
+            width: 180px;
             border: none;
             border-bottom: 2px solid #27272a;
-            font-size: 20px;
+            font-size: 18px;
             text-align: center;
             font-weight: bold;
             outline: none;
             background: transparent !important;
             color: #dae5f0 !important;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             cursor: pointer;
             text-transform: uppercase;
         }
@@ -61,56 +61,54 @@
         .info-colaborador {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            background: #18181c !important; /* Fundo levemente mais claro para os blocos */
+            gap: 6px;
+            background: #18181c !important;
             border: 1px solid #2d2d34;
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 10px;
+            padding: 10px;
             text-align: left;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .info-campo {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
+            gap: 6px;
+            font-size: 13px;
             font-weight: bold;
             color: #94a3b8 !important;
         }
 
-        .info-campo span {
-            white-space: nowrap;
-        }
+        .info-campo span { white-space: nowrap; }
 
         .info-campo input {
             flex: 1;
             border: none;
             border-bottom: 1px dashed #2d2d34;
             background: transparent !important;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: bold;
             color: #ffffff !important;
             outline: none;
-            padding: 2px 4px;
+            padding: 1px 2px;
         }
 
         .info-campo input.editavel-perfil {
             background: #121214 !important;
             border: 1px solid #2d2d34;
-            border-radius: 8px;
-            padding: 6px 12px;
-            width: 70px;
+            border-radius: 6px;
+            padding: 3px 8px;
+            width: 55px;
             flex: none;
             text-align: center;
-            font-size: 15px;
+            font-size: 13px;
             color: #ffffff !important;
         }
 
         .lista-pontos {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
             max-width: 480px;
             margin: 0 auto;
@@ -118,8 +116,8 @@
 
         .card-dia {
             background: #18181c !important;
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: 10px;
+            padding: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             border: 1px solid #2d2d34;
         }
@@ -130,60 +128,53 @@
             opacity: 0.8;
         }
 
-        .card-dia.janta-reduzida {
-            border-color: #b45309;
-        }
+        .card-dia.janta-reduzida { border-color: #b45309; }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #232329;
-            padding-bottom: 10px;
-            margin-bottom: 12px;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .dia-badge {
-            background: #1a365d !important; /* Azul escuro igual ao print */
+            background: #1a365d !important;
             color: #ffffff !important;
-            padding: 6px 14px;
-            border-radius: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .card-dia.fim-de-semana .dia-badge {
-            background: #27272a !important;
-        }
-
-        .card-dia.dia-folga .dia-badge {
-            background: #1e1e24 !important;
-        }
+        .card-dia.fim-de-semana .dia-badge { background: #27272a !important; }
+        .card-dia.dia-folga .dia-badge { background: #1e1e24 !important; }
 
         .valores-dia {
             display: flex;
-            gap: 12px;
-            font-size: 14px;
+            gap: 10px;
+            font-size: 13px;
             font-weight: bold;
         }
 
-        .v-extra { color: #22c55e !important; } /* Verde vivo do print */
+        .v-extra { color: #22c55e !important; }
         .v-money { color: #ffffff !important; }
 
         .inputs-row {
             display: grid;
             grid-template-columns: 1fr 1.2fr 1fr;
-            gap: 10px;
+            gap: 8px;
         }
 
         .campo {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
 
         .campo label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             color: #71717a !important;
             text-transform: uppercase;
@@ -192,10 +183,10 @@
 
         .campo input {
             width: 100%;
-            padding: 10px 6px;
+            padding: 8px 4px;
             border: 1px solid #2d2d34;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 15px;
             text-align: center;
             outline: none;
             background: #121214 !important;
@@ -203,19 +194,18 @@
             color: #ffffff !important;
         }
 
-        .campo input:focus {
-            border-color: #3b82f6;
-        }
+        .campo input:focus { border-color: #3b82f6; }
 
+        /* PAINEL COMPACTADO - SOLUÇÃO PARA FALTA DE ESPAÇO */
         .painel-resumo {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: #18181c !important;
+            background: #161619 !important;
             border-top: 2px solid #2d2d34;
-            box-shadow: 0 -8px 24px rgba(0,0,0,0.5);
-            padding: 12px;
+            box-shadow: 0 -6px 20px rgba(0,0,0,0.6);
+            padding: 8px;
             z-index: 999;
         }
 
@@ -223,83 +213,102 @@
             max-width: 480px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px 16px;
+            grid-template-columns: 1fr 1fr 1fr; /* Mudado para 3 colunas para economizar altura */
+            gap: 4px 10px;
         }
 
         .resumo-item {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
+            flex-direction: column; /* Rótulo em cima, valor embaixo para espremer horizontalmente */
+            align-items: flex-start;
+            font-size: 11px;
             font-weight: bold;
-            border-bottom: 1px dashed #232329;
-            padding-bottom: 4px;
+            border-bottom: 1px solid #232329;
+            padding-bottom: 2px;
             color: #e2e8f0 !important;
         }
 
-        .resumo-item span:first-child { color: #94a3b8 !important; }
+        .resumo-item span:first-child { 
+            color: #94a3b8 !important; 
+            font-size: 10px;
+            text-transform: uppercase;
+        }
 
         .resumo-item input {
-            width: 90px;
+            width: 100%;
             border: none;
-            text-align: right;
-            font-size: 13px;
+            text-align: left;
+            font-size: 12px;
             font-weight: bold;
             outline: none;
             color: #ffffff !important;
             background: transparent !important;
+            margin-top: 1px;
         }
 
         .resumo-item .editavel {
             border: 1px solid #2d2d34;
             background: #121214 !important;
-            padding: 3px 6px;
-            border-radius: 6px;
-            width: 75px;
+            padding: 1px 4px;
+            border-radius: 4px;
+            width: 100%;
             color: #ffffff !important;
-            text-align: right;
+            text-align: left;
+            font-size: 11px;
         }
 
-        .desconto-imposto {
-            color: #f1f5f9 !important;
+        .desconto-imposto { color: #cbd5e1 !important; }
+
+        .item-dia05 {
+            grid-column: span 3;
+            display: flex;
+            flex-direction: row !important;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e1e24 !important; 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            border: 1px solid #2d2d34;
+            margin-top: 2px;
         }
+        .item-dia05 span:first-child { font-size: 12px !important; color: #ffffff !important; }
+        .item-dia05 input { font-size: 13px !important; font-weight: 900 !important; text-align: right !important; width: auto !important; }
 
         .caixa-total-final {
-            grid-column: span 2;
-            background: #1a365d !important; /* Caixa azul escura do print */
+            grid-column: span 3;
+            background: #1a365d !important;
             color: #ffffff !important;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
-        .caixa-total-final span:first-child { font-size: 15px; font-weight: bold; }
-        .caixa-total-final span:last-child { font-size: 18px; font-weight: 950; text-align: right; }
+        .caixa-total-final span:first-child { font-size: 12px; font-weight: bold; }
+        .caixa-total-final span:last-child { font-size: 14px; font-weight: 950; text-align: right; }
 
         .status-nuvem {
-            grid-column: span 2;
-            font-size: 11px;
+            grid-column: span 3;
+            font-size: 10px;
             text-align: center;
             color: #94a3b8;
             font-weight: bold;
-            margin: 2px 0;
+            margin: 1px 0;
         }
 
-        .btn-pdf-container { grid-column: span 2; }
+        .btn-pdf-container { grid-column: span 3; }
 
         .btn-pdf {
             width: 100%;
-            background-color: #10b981 !important; /* Verde arredondado do print */
+            background-color: #10b981 !important;
             color: #ffffff !important;
             border: none;
-            padding: 12px;
-            font-size: 14px;
+            padding: 8px;
+            font-size: 12px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             text-transform: uppercase;
         }
@@ -313,11 +322,13 @@
             .dia-badge { background: #1a365d !important; color: #ffffff !important; }
             .valores-dia .v-extra { color: #16a34a !important; }
             .valores-dia .v-money { color: #1a365d !important; }
-            .painel-resumo { position: static !important; box-shadow: none !important; border-top: 2px solid #1a365d !important; margin-top: 30px !important; page-break-inside: avoid; background: #ffffff !important; }
-            .resumo-item { color: #0f172a !important; border-bottom: 1px dashed #e2e8f0 !important; }
-            .resumo-item span:first-child { color: #64748b !important; }
-            .resumo-item input { color: #1e293b !important; }
-            .caixa-total-final { background: #1a365d !important; color: #ffffff !important; }
+            .painel-resumo { position: static !important; box-shadow: none !important; border-top: 2px solid #1a365d !important; margin-top: 20px !important; page-break-inside: avoid; background: #ffffff !important; }
+            .resumo-conteudo { grid-template-columns: 1fr 1fr; }
+            .resumo-item { color: #0f172a !important; border-bottom: 1px dashed #e2e8f0 !important; flex-direction: row; justify-content: space-between; }
+            .resumo-item span:first-child { color: #64748b !important; font-size: 11px; }
+            .resumo-item input { color: #1e293b !important; text-align: right; }
+            .item-dia05 { grid-column: span 2; }
+            .caixa-total-final { background: #1a365d !important; color: #ffffff !important; grid-column: span 2; }
             .btn-pdf-container, .status-nuvem { display: none !important; }
             .card-dia { page-break-inside: avoid !important; }
             .ocultar-no-pdf { display: none !important; }
@@ -349,8 +360,8 @@
             <div class="info-campo"><span>Empresa:</span><input type="text" value="Vipol" readonly></div>
             <div class="info-campo"><span>Colaborador:</span><input type="text" value="Carlos Vinicius de Oliveira" readonly></div>
             <div class="info-campo"><span>Registro (Chapa):</span><input type="text" value="17808" readonly></div>
-            <div class="info-campo" style="margin-top: 4px; border-top: 1px dashed #2d2d34; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
-                <span>Filhos Dependentes (Dedução IR):</span>
+            <div class="info-campo" style="margin-top: 2px; border-top: 1px dashed #2d2d34; padding-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Filhos Dependentes (IR):</span>
                 <input type="number" id="pref-filhos" class="editavel-perfil" value="0" min="0" oninput="salvarEDigitar()">
             </div>
         </div>
@@ -360,23 +371,26 @@
 
     <div class="painel-resumo">
         <div class="resumo-conteudo">
-            <div class="resumo-item"><span>Total Mês:</span><input type="text" id="total-dias-trab" readonly value="0 dias" style="color:#ffffff !important;"></div>
-            <div class="resumo-item"><span>Salário Base:</span><input type="text" value="R$ 3143,00" readonly style="color:#ffffff !important;"></div>
+            <div class="resumo-item"><span>Total Mês</span><input type="text" id="total-dias-trab" readonly value="0 dias"></div>
+            <div class="resumo-item"><span>Salário Base</span><input type="text" value="R$ 3143,00" readonly></div>
+            <div class="resumo-item"><span>Vale (Dia 20)</span><input type="text" value="R$ 1258,00" readonly style="color:#f87171 !important;"></div>
             
-            <div class="resumo-item"><span>Extras Totais (Real):</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #22c55e !important;"></div>
-            <div class="resumo-item"><span>Vale (Dia 20 - 40%):</span><input type="text" value="R$ 1258,00" readonly style="color:#f87171 !important; font-weight: bold;"></div>
+            <div class="resumo-item"><span>Extras (Relógio)</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>Horas Extras (R$)</span><input type="text" id="resumo-extras-reais" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>Reflexo DSR</span><input type="text" id="resumo-dsr" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
             
-            <div class="resumo-item"><span>Horas Extras (R$):</span><input type="text" id="resumo-extras-reais" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
-            <div class="resumo-item"><span>Adicional Noturno (R$):</span><input type="text" id="resumo-adicional-noturno" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>Adic. Noturno</span><input type="text" id="resumo-adicional-noturno" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>INSS (Desconto)</span><input type="text" id="resumo-inss" readonly value="R$ 0,00" class="desconto-imposto"></div>
+            <div class="resumo-item"><span>IRRF (Desconto)</span><input type="text" id="resumo-irrf" readonly value="R$ 0,00" class="desconto-imposto"></div>
             
-            <div class="resumo-item"><span>Desconto INSS (R$):</span><input type="text" id="resumo-inss" readonly value="R$ 0,00" class="desconto-imposto"></div>
-            <div class="resumo-item"><span>Desconto IRRF (R$):</span><input type="text" id="resumo-irrf" readonly value="R$ 0,00" class="desconto-imposto"></div>
+            <div class="resumo-item" style="grid-column: span 3; border-bottom: none; padding-bottom: 0; margin-top: 2px;">
+                <span style="font-size: 10px; margin-bottom: 2px;">Passagens (Dia 25)</span>
+                <input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()">
+            </div>
             
-            <div class="resumo-item"><span>Passagens (Dia 25):</span><input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
-            
-            <div class="resumo-item" style="background: #121214 !important; padding: 3px 6px; border-radius: 6px; border: 1px solid #2d2d34;">
-                <span style="color: #ffffff !important;">A Receber (Dia 05):</span>
-                <input type="text" id="txt-receber-dia-05" readonly value="R$ 0,00" style="color: #ffffff !important; font-weight: 900;">
+            <div class="resumo-item item-dia05">
+                <span>A Receber (Dia 05):</span>
+                <input type="text" id="txt-receber-dia-05" readonly value="R$ 0,00">
             </div>
             
             <div class="caixa-total-final">
@@ -439,6 +453,28 @@
             </div>`;
         }
         container.innerHTML = htmlDias;
+    }
+
+    function obterDiasUteisEDomingosDoMes() {
+        const mesSelecionado = document.getElementById('sel-mes').value;
+        const indiceMes = MAPEAMENTO_MESES[mesSelecionado];
+        const anoAtual = 2026;
+        
+        let diasUteis = 0;
+        let domingos = 0;
+
+        for (let i = 1; i <= 31; i++) {
+            const dataObjeto = new Date(anoAtual, indiceMes, i);
+            if (dataObjeto.getMonth() !== indiceMes) break;
+
+            const diaSemana = dataObjeto.getDay();
+            if (diaSemana === 0) {
+                domingos++;
+            } else {
+                diasUteis++;
+            }
+        }
+        return { diasUteis, domingos };
     }
 
     function atualizarCalendarioDiasSemana() {
@@ -516,9 +552,7 @@
             inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.03 - 2666.68) * 0.12) + ((salarioBruto - 4000.03) * 0.14);
         }
         
-        if (inss > tetoInss) {
-            inss = tetoInss;
-        }
+        if (inss > tetoInss) inss = tetoInss;
 
         const descontoDependentes = numFilhos * 189.59;
         let baseIR = salarioBruto - inss - descontoDependentes;
@@ -539,7 +573,6 @@
         }
 
         if (irrfBruto < 0) irrfBruto = 0;
-
         let irrfFinal = irrfBruto;
 
         if (salarioBruto <= 5000.00) {
@@ -663,8 +696,13 @@
             }
         });
 
-        // Base bruta de salário e extras para calcular os impostos
-        const baseCalculoImpostosBruto = SALARIO_BASE + ganhoTotalExtrasReais + ganhoTotalAdicionalNoturnoReais;
+        const calendarioProporcao = obterDiasUteisEDomingosDoMes();
+        let valorDsrCalculado = 0;
+        if (calendarioProporcao.diasUteis > 0) {
+            valorDsrCalculado = ((ganhoTotalExtrasReais + ganhoTotalAdicionalNoturnoReais) / calendarioProporcao.diasUteis) * calendarioProporcao.domingos;
+        }
+
+        const baseCalculoImpostosBruto = SALARIO_BASE + ganhoTotalExtrasReais + ganhoTotalAdicionalNoturnoReais + valorDsrCalculado;
         const numFilhos = parseInt(document.getElementById('pref-filhos').value) || 0;
 
         const impostos = calcularImpostos(baseCalculoImpostosBruto, numFilhos);
@@ -672,20 +710,15 @@
         document.getElementById('total-dias-trab').value = diasTrabalhadosContador + " dias";
         document.getElementById('resumo-horas-banco').value = minutesParaTexto(acumuladoMinutosExtrasMesRelogio);
         document.getElementById('resumo-extras-reais').value = "R$ " + ganhoTotalExtrasReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('resumo-dsr').value = "R$ " + valorDsrCalculado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('resumo-adicional-noturno').value = "R$ " + ganhoTotalAdicionalNoturnoReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         
         document.getElementById('resumo-inss').value = "R$ " + impostos.inss.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('resumo-irrf').value = "R$ " + impostos.irrf.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        // Coleta o valor da passagem digitado
         let passagens = parseFloat(document.getElementById('input-passagem').value.replace(',', '.')) || 0;
 
-        // CORREÇÃO AQUI: 
-        // O Dia 05 calcula rigidamente apenas Salário + Extras - Vale - Impostos. 
-        // Passagens foram completamente isoladas dessa equação matemática.
         const oQueRestaReceberDia05 = baseCalculoImpostosBruto - VALE_FIXO - impostos.inss - impostos.irrf;
-
-        // O Acumulado Bruto Geral do mês exibe o montante de tudo incluindo a passagem
         const totalBrutoComExtrasEBeneficios = baseCalculoImpostosBruto + passagens;
 
         document.getElementById('txt-receber-dia-05').value = "R$ " + oQueRestaReceberDia05.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
