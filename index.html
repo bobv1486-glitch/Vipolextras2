@@ -372,7 +372,7 @@
             <div class="resumo-item"><span>Desconto INSS (R$):</span><input type="text" id="resumo-inss" readonly value="R$ 0,00" class="desconto-imposto"></div>
             <div class="resumo-item"><span>Desconto IRRF (R$):</span><input type="text" id="resumo-irrf" readonly value="R$ 0,00" class="desconto-imposto"></div>
             
-            <div class="resumo-item"><span>Passagens:</span><input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
+            <div class="resumo-item"><span>Passagens (Dia 25):</span><input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
             
             <div class="resumo-item" style="background: #121214 !important; padding: 3px 6px; border-radius: 6px; border: 1px solid #2d2d34;">
                 <span style="color: #ffffff !important;">A Receber (Dia 05):</span>
@@ -407,6 +407,7 @@
     const db = firebase.firestore();
 
     let timeoutSalvar = null;
+    let carregandoDados = false;
 
     const MAPEAMENTO_MESES = {
         "Janeiro": 0, "Fevereiro": 1, "Marco": 2, "Abril": 3,
@@ -591,10 +592,10 @@
                 card.classList.remove('dia-folga');
             }
 
-            let minutosDeJantaDoDia = parseInt(jantaTxt, 10);
-            if (isNaN(minutosDeJantaDoDia)) { minutosDeJantaDoDia = 60; }
+            let minutesDeJantaDoDia = parseInt(jantaTxt, 10);
+            if (isNaN(minutesDeJantaDoDia)) { minutesDeJantaDoDia = 60; }
 
-            if (minutosDeJantaDoDia < 60 && jantaTxt !== "") {
+            if (minutesDeJantaDoDia < 60 && jantaTxt !== "") {
                 card.classList.add('janta-reduzida');
             } else {
                 card.classList.remove('janta-reduzida');
@@ -609,7 +610,7 @@
                 if (saidaMin <= entradaMin) { saidaMin += 1440; }
 
                 let tempoTotalNaEmpresa = saidaMin - entradaMin;
-                let tempoTrabalhadoNoDiaRelogio = tempoTotalNaEmpresa - minutosDeJantaDoDia;
+                let tempoTrabalhadoNoDiaRelogio = tempoTotalNaEmpresa - minutesDeJantaDoDia;
 
                 let tempos = separarMinutosDiurnosENoturnos(entradaMin, saidaMin);
                 let diurnosBruto = tempos.diurnos;
@@ -619,8 +620,8 @@
                 if (totalBrutoMinutos > 0) {
                     let proporcaoDiurna = diurnosBruto / totalBrutoMinutos;
                     let proporcaoNoturna = noturnosBruto / totalBrutoMinutos;
-                    diurnosBruto = Math.max(0, diurnosBruto - (minutosDeJantaDoDia * proporcaoDiurna));
-                    noturnosBruto = Math.max(0, noturnosBruto - (minutosDeJantaDoDia * proporcaoNoturna));
+                    diurnosBruto = Math.max(0, diurnosBruto - (minutesDeJantaDoDia * proporcaoDiurna));
+                    noturnosBruto = Math.max(0, noturnosBruto - (minutesDeJantaDoDia * proporcaoNoturna));
                 }
 
                 let noturnosFicticios = noturnosBruto * 1.142857;
@@ -662,6 +663,7 @@
             }
         });
 
+        // Base bruta de salário e extras para calcular os impostos
         const baseCalculoImpostosBruto = SALARIO_BASE + ganhoTotalExtrasReais + ganhoTotalAdicionalNoturnoReais;
         const numFilhos = parseInt(document.getElementById('pref-filhos').value) || 0;
 
@@ -675,10 +677,16 @@
         document.getElementById('resumo-inss').value = "R$ " + impostos.inss.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('resumo-irrf').value = "R$ " + impostos.irrf.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+        // Coleta o valor da passagem digitado
         let passagens = parseFloat(document.getElementById('input-passagem').value.replace(',', '.')) || 0;
 
+        // CORREÇÃO AQUI: 
+        // O Dia 05 calcula rigidamente apenas Salário + Extras - Vale - Impostos. 
+        // Passagens foram completamente isoladas dessa equação matemática.
+        const oQueRestaReceberDia05 = baseCalculoImpostosBruto - VALE_FIXO - impostos.inss - impostos.irrf;
+
+        // O Acumulado Bruto Geral do mês exibe o montante de tudo incluindo a passagem
         const totalBrutoComExtrasEBeneficios = baseCalculoImpostosBruto + passagens;
-        const oQueRestaReceberDia05 = totalBrutoComExtrasEBeneficios - VALE_FIXO - impostos.inss - impostos.irrf;
 
         document.getElementById('txt-receber-dia-05').value = "R$ " + oQueRestaReceberDia05.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('txt-total-final').innerText = "R$ " + totalBrutoComExtrasEBeneficios.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -690,6 +698,8 @@
 
     function salvarEDigitar() {
         calcularTudo();
+        if (carregandoDados) return;
+
         document.getElementById('txt-status-nuvem').innerText = "Digitando... ⏳";
         clearTimeout(timeoutSalvar);
         
@@ -722,6 +732,7 @@
     }
 
     function carregarMes() {
+        carregandoDados = true;
         document.getElementById('txt-status-nuvem').innerText = "Carregando dados... 🔄";
         const mesAtual = obterChaveAtual();
 
@@ -759,10 +770,15 @@
                 document.getElementById('txt-status-nuvem').innerText = "Mês sem registros salvos 📂";
             }
             calcularTudo();
+            
+            setTimeout(() => {
+                carregandoDados = false;
+            }, 300);
         })
         .catch((error) => {
             document.getElementById('txt-status-nuvem').innerText = "Erro ao conectar com a Nuvem ❌";
             console.error("Erro ao carregar: ", error);
+            carregandoDados = false;
         });
     }
 
