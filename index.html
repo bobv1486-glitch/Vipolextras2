@@ -21,13 +21,94 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 10px;
-            padding-bottom: 280px; /* Reduzido o recuo pois o painel encolheu pela metade */
+            padding-bottom: 280px;
             box-sizing: border-box;
             -webkit-text-size-adjust: 100%;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* TELA DE LOGIN / IDENTIFICAÇÃO PROFISSIONAL */
+        .tela-login {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #121214;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 9999;
+        }
+
+        .box-login {
+            background: #18181c;
+            border: 1px solid #2d2d34;
+            border-radius: 12px;
+            padding: 24px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .box-login h2 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            color: #dae5f0;
+        }
+
+        .box-login p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .campo-login {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+            margin-bottom: 14px;
+        }
+
+        .campo-login label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #71717a;
+            text-transform: uppercase;
+        }
+
+        .campo-login input {
+            padding: 12px;
+            background: #121214;
+            border: 1px solid #2d2d34;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .campo-login input:focus { border-color: #3b82f6; }
+
+        .btn-acessar {
+            width: 100%;
+            background: #1a365d;
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        /* CONTEÚDO PRINCIPAL DO APP */
         .topo {
             text-align: center;
             margin: 10px auto;
@@ -84,7 +165,6 @@
         .info-campo input {
             flex: 1;
             border: none;
-            border-bottom: 1px dashed #2d2d34;
             background: transparent !important;
             font-size: 13px;
             font-weight: bold;
@@ -103,6 +183,19 @@
             text-align: center;
             font-size: 13px;
             color: #ffffff !important;
+        }
+
+        .btn-logout {
+            background: transparent;
+            color: #f87171;
+            border: 1px solid #7f1d1d;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-left: auto;
         }
 
         .lista-pontos {
@@ -196,7 +289,7 @@
 
         .campo input:focus { border-color: #3b82f6; }
 
-        /* PAINEL COMPACTADO - SOLUÇÃO PARA FALTA DE ESPAÇO */
+        /* PAINEL COMPACTADO */
         .painel-resumo {
             position: fixed;
             bottom: 0;
@@ -213,13 +306,13 @@
             max-width: 480px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr; /* Mudado para 3 colunas para economizar altura */
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 4px 10px;
         }
 
         .resumo-item {
             display: flex;
-            flex-direction: column; /* Rótulo em cima, valor embaixo para espremer horizontalmente */
+            flex-direction: column;
             align-items: flex-start;
             font-size: 11px;
             font-weight: bold;
@@ -333,11 +426,33 @@
             .card-dia { page-break-inside: avoid !important; }
             .ocultar-no-pdf { display: none !important; }
             .month-select { border: none !important; appearance: none; -webkit-appearance: none; color: #1a365d !important; background: transparent !important; }
+            .btn-logout { display: none !important; }
         }
     </style>
 </head>
 <body>
 
+    <!-- TELA DE LOGIN DINÂMICA -->
+    <div id="tela-login" class="tela-login">
+        <div class="box-login">
+            <h2>Acesso ao Cartão</h2>
+            <p>Identifique-se para carregar suas horas</p>
+            
+            <div class="campo-login">
+                <label>Nome Completo</label>
+                <input type="text" id="login-nome" placeholder="Ex: Sergio Silva">
+            </div>
+            
+            <div class="campo-login">
+                <label>Registro (Chapa)</label>
+                <input type="number" id="login-chapa" placeholder="Ex: 12345">
+            </div>
+            
+            <button class="btn-acessar" onclick="realizarLogin()">Acessar Painel</button>
+        </div>
+    </div>
+
+    <!-- PAINEL PRINCIPAL -->
     <div class="topo">
         <div class="titulo">Folha de Ponto Mensal</div>
         
@@ -358,8 +473,11 @@
         
         <div class="info-colaborador">
             <div class="info-campo"><span>Empresa:</span><input type="text" value="Vipol" readonly></div>
-            <div class="info-campo"><span>Colaborador:</span><input type="text" value="Carlos Vinicius de Oliveira" readonly></div>
-            <div class="info-campo"><span>Registro (Chapa):</span><input type="text" value="17808" readonly></div>
+            <div class="info-campo"><span>Colaborador:</span><input type="text" id="txt-nome-colaborador" readonly></div>
+            <div class="info-campo">
+                <span>Registro (Chapa):</span><input type="text" id="txt-chapa-colaborador" readonly>
+                <button class="btn-logout" onclick="fazerLogout()">Trocar Usuário</button>
+            </div>
             <div class="info-campo" style="margin-top: 2px; border-top: 1px dashed #2d2d34; padding-top: 4px; display: flex; justify-content: space-between; align-items: center;">
                 <span>Filhos Dependentes (IR):</span>
                 <input type="number" id="pref-filhos" class="editavel-perfil" value="0" min="0" oninput="salvarEDigitar()">
@@ -422,6 +540,8 @@
 
     let timeoutSalvar = null;
     let carregandoDados = false;
+    let usuarioChapaAtivo = "";
+    let usuarioNomeAtivo = "";
 
     const MAPEAMENTO_MESES = {
         "Janeiro": 0, "Fevereiro": 1, "Marco": 2, "Abril": 3,
@@ -430,6 +550,49 @@
     };
 
     const DIAS_DA_SEMANA_NOMES = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+
+    // SISTEMA DE CONTROLE DE SESSÃO PROFISSIONAL
+    function verificarSessao() {
+        const chapaSalva = localStorage.getItem("vipol_chapa");
+        const nomeSalvo = localStorage.getItem("vipol_nome");
+
+        if (chapaSalva && nomeSalvo) {
+            usuarioChapaAtivo = chapaSalva;
+            usuarioNomeAtivo = nomeSalvo;
+            
+            document.getElementById("txt-nome-colaborador").value = usuarioNomeAtivo;
+            document.getElementById("txt-chapa-colaborador").value = usuarioChapaAtivo;
+            document.getElementById("tela-login").style.display = "none";
+            
+            inicializarDias();
+            carregarMes();
+        } else {
+            document.getElementById("tela-login").style.display = "flex";
+        }
+    }
+
+    function realizarLogin() {
+        const nomeInput = document.getElementById("login-nome").value.trim();
+        const chapaInput = document.getElementById("login-chapa").value.trim();
+
+        if (!nomeInput || !chapaInput) {
+            alert("Por favor, preencha o Nome e o número da Chapa!");
+            return;
+        }
+
+        localStorage.setItem("vipol_chapa", chapaInput);
+        localStorage.setItem("vipol_nome", nomeInput);
+        
+        verificarSessao();
+    }
+
+    function fazerLogout() {
+        if(confirm("Deseja desconectar e trocar de funcionário?")) {
+            localStorage.removeItem("vipol_chapa");
+            localStorage.removeItem("vipol_nome");
+            location.reload();
+        }
+    }
 
     function inicializarDias() {
         const container = document.getElementById('lista-pontos');
@@ -488,22 +651,23 @@
             const dataObjeto = new Date(anoAtual, indiceMes, i);
             
             if (dataObjeto.getMonth() !== indiceMes) {
-                card.style.display = 'none';
+                if(card) card.style.display = 'none';
                 continue;
             } else {
-                card.style.display = 'block';
+                if(card) card.style.display = 'block';
             }
 
             const diaSemanaIndex = dataObjeto.getDay();
             const nomeDiaSemana = DIAS_DA_SEMANA_NOMES[diaSemanaIndex];
             
             let d = i < 10 ? '0' + i : i;
-            badge.innerText = `Dia ${d} - ${nomeDiaSemana}`;
+            if(badge) badge.innerText = `Dia ${d} - ${nomeDiaSemana}`;
 
-            card.classList.remove('fim-de-semana');
-
-            if (diaSemanaIndex === 0 || diaSemanaIndex === 6) {
-                card.classList.add('fim-de-semana');
+            if(card) {
+                card.classList.remove('fim-de-semana');
+                if (diaSemanaIndex === 0 || diaSemanaIndex === 6) {
+                    card.classList.add('fim-de-semana');
+                }
             }
         }
     }
@@ -591,6 +755,8 @@
 
     function calcularTudo() {
         const todosOsCards = document.querySelectorAll('.linha-ponto');
+        if(todosOsCards.length === 0) return;
+
         let acumuladoMinutosExtrasMesRelogio = 0;
         let ganhoTotalExtrasReais = 0;
         let ganhoTotalAdicionalNoturnoReais = 0;
@@ -731,7 +897,7 @@
 
     function salvarEDigitar() {
         calcularTudo();
-        if (carregandoDados) return;
+        if (carregandoDados || !usuarioChapaAtivo) return;
 
         document.getElementById('txt-status-nuvem').innerText = "Digitando... ⏳";
         clearTimeout(timeoutSalvar);
@@ -739,6 +905,8 @@
         timeoutSalvar = setTimeout(() => {
             const mesAtual = obterChaveAtual();
             const dadosMes = {
+                nome: usuarioNomeAtivo,
+                chapa: usuarioChapaAtivo,
                 passagem: document.getElementById('input-passagem').value,
                 filhos: document.getElementById('pref-filhos').value,
                 dias: []
@@ -746,14 +914,17 @@
 
             for (let i = 1; i <= 31; i++) {
                 const card = document.getElementById(`card-dia-${i}`);
-                dadosMes.dias.push({
-                    ent: card.querySelector('.in-entrada').value,
-                    jan: card.querySelector('.in-janta').value,
-                    sai: card.querySelector('.in-saida').value
-                });
+                if(card) {
+                    dadosMes.dias.push({
+                        ent: card.querySelector('.in-entrada').value,
+                        jan: card.querySelector('.in-janta').value,
+                        sai: card.querySelector('.in-saida').value
+                    });
+                }
             }
 
-            db.collection("pontos_carlos").doc(mesAtual).set(dadosMes)
+            // SALVAMENTO SEPARADO AUTOMATICAMENTE POR CHAPA
+            db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${mesAtual}`).set(dadosMes)
             .then(() => {
                 document.getElementById('txt-status-nuvem').innerText = "Dados salvos na Nuvem! ✅";
             })
@@ -765,13 +936,14 @@
     }
 
     function carregarMes() {
+        if (!usuarioChapaAtivo) return;
         carregandoDados = true;
         document.getElementById('txt-status-nuvem').innerText = "Carregando dados... 🔄";
         const mesAtual = obterChaveAtual();
 
         atualizarCalendarioDiasSemana();
 
-        db.collection("pontos_carlos").doc(mesAtual).get()
+        db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${mesAtual}`).get()
         .then((doc) => {
             if (doc.exists) {
                 const dados = doc.data();
@@ -780,14 +952,16 @@
                 
                 for (let i = 1; i <= 31; i++) {
                     const card = document.getElementById(`card-dia-${i}`);
-                    if (dados.dias && dados.dias[i-1]) {
-                        card.querySelector('.in-entrada').value = dados.dias[i-1].ent || "";
-                        card.querySelector('.in-janta').value = dados.dias[i-1].jan || "";
-                        card.querySelector('.in-saida').value = dados.dias[i-1].sai || "";
-                    } else {
-                        card.querySelector('.in-entrada').value = "";
-                        card.querySelector('.in-janta').value = "60";
-                        card.querySelector('.in-saida').value = "";
+                    if(card) {
+                        if (dados.dias && dados.dias[i-1]) {
+                            card.querySelector('.in-entrada').value = dados.dias[i-1].ent || "";
+                            card.querySelector('.in-janta').value = dados.dias[i-1].jan || "";
+                            card.querySelector('.in-saida').value = dados.dias[i-1].sai || "";
+                        } else {
+                            card.querySelector('.in-entrada').value = "";
+                            card.querySelector('.in-janta').value = "60";
+                            card.querySelector('.in-saida').value = "";
+                        }
                     }
                 }
                 document.getElementById('txt-status-nuvem').innerText = "Dados carregados da Nuvem! ☁️";
@@ -796,9 +970,11 @@
                 document.getElementById('pref-filhos').value = "0";
                 for (let i = 1; i <= 31; i++) {
                     const card = document.getElementById(`card-dia-${i}`);
-                    card.querySelector('.in-entrada').value = "";
-                    card.querySelector('.in-janta').value = "60";
-                    card.querySelector('.in-saida').value = "";
+                    if(card) {
+                        card.querySelector('.in-entrada').value = "";
+                        card.querySelector('.in-janta').value = "60";
+                        card.querySelector('.in-saida').value = "";
+                    }
                 }
                 document.getElementById('txt-status-nuvem').innerText = "Mês sem registros salvos 📂";
             }
@@ -834,8 +1010,7 @@
     }
 
     window.onload = function() {
-        inicializarDias();
-        carregarMes();
+        verificarSessao();
     };
 </script>
 </body>
