@@ -456,15 +456,15 @@
     <div class="topo">
         <div class="titulo">Folha de Ponto Mensal</div>
         
-        <select id="sel-mes" class="month-select" onchange="carregarMes()">
+        <select id="sel-mes" class="month-select" onchange="mudarMes()">
             <option value="Janeiro">JANEIRO</option>
             <option value="Fevereiro">FEVEREIRO</option>
             <option value="Marco">MARÇO</option>
             <option value="Abril">ABRIL</option>
             <option value="Maio">MAIO</option>
             <option value="Junho">JUNHO</option>
-            <option value="Julho" selected>JULHO</option>
-            <option value="Agosto">AGOSTO</option>
+            <option value="Julho">JULHO</option>
+            <option value="Agosto" selected>AGOSTO</option>
             <option value="Setembro">SETEMBRO</option>
             <option value="Outubro">OUTUBRO</option>
             <option value="Novembro">CONVENÇÃO</option>
@@ -555,6 +555,7 @@
     function verificarSessao() {
         const chapaSalva = localStorage.getItem("vipol_chapa");
         const nomeSalvo = localStorage.getItem("vipol_nome");
+        const mesSalvo = localStorage.getItem("vipol_mes");
 
         if (chapaSalva && nomeSalvo) {
             usuarioChapaAtivo = chapaSalva;
@@ -564,6 +565,10 @@
             document.getElementById("txt-chapa-colaborador").value = usuarioChapaAtivo;
             document.getElementById("tela-login").style.display = "none";
             
+            if (mesSalvo) {
+                document.getElementById("sel-mes").value = mesSalvo;
+            }
+
             inicializarDias();
             carregarMes();
         } else {
@@ -590,8 +595,15 @@
         if(confirm("Deseja desconectar e trocar de funcionário?")) {
             localStorage.removeItem("vipol_chapa");
             localStorage.removeItem("vipol_nome");
+            localStorage.removeItem("vipol_mes");
             location.reload();
         }
+    }
+
+    function mudarMes() {
+        const mesSelecionado = document.getElementById("sel-mes").value;
+        localStorage.setItem("vipol_mes", mesSelecionado);
+        carregarMes();
     }
 
     function inicializarDias() {
