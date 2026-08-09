@@ -4,122 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="dark">
-    <title>Check-list de Frota - Vipol</title>
+    <title>Folha de Ponto Mensal - Vipol</title>
     
     <!-- Scripts do Firebase (SDK v9 via compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
-
-    <!-- Biblioteca jsPDF para geração de relatórios em PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        :root { 
-            color-scheme: dark; 
-            --bg-principal: #0f1117;
-            --bg-card: #181c24;
-            --bg-input: #12151c;
-            --borda-card: #262c38;
-            --azul-vipol: #1d4ed8;
-            --azul-hover: #2563eb;
-            --texto-principal: #f8fafc;
-            --texto-secundario: #94a3b8;
-            --sucesso: #059669;
-            --alerta: #d97706;
-            --perigo: #dc2626;
+        :root {
+            color-scheme: dark;
         }
         
         html, body {
-            background-color: var(--bg-principal) !important;
-            color: var(--texto-principal) !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #121214 !important;
+            color: #e2e8f0 !important;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 12px;
-            padding-bottom: 120px;
+            padding: 10px;
+            padding-bottom: 280px;
             box-sizing: border-box;
             -webkit-text-size-adjust: 100%;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* Sistema de Toasts Modernos */
-        #toast-container {
-            position: fixed;
-            top: 64px; right: 14px; left: 14px;
-            z-index: 100000;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            pointer-events: none;
-        }
-        .toast {
-            background: #1e2430;
-            border-left: 4px solid #3b82f6;
-            color: #fff;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-            pointer-events: auto;
-            transition: opacity 0.3s ease;
-        }
-        .toast.sucesso { border-left-color: var(--sucesso); }
-        .toast.erro { border-left-color: var(--perigo); }
-        .toast.aviso { border-left-color: var(--alerta); }
-
-        .barra-navegacao-sistema {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            background: rgba(15, 17, 23, 0.95);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid var(--borda-card);
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px;
-            z-index: 10000;
-            overflow-x: auto;
-        }
-
-        .btn-navegacao {
-            background: #181c24;
-            color: var(--texto-secundario);
-            border: 1px solid var(--borda-card);
-            padding: 8px 14px;
-            font-size: 11px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            white-space: nowrap;
-            display: none;
-            transition: all 0.2s ease;
-        }
-
-        .btn-navegacao.ativo {
-            background: var(--azul-vipol);
-            color: #ffffff;
-            border-color: #3b82f6;
-            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4);
-        }
-
-        body { padding-top: 56px; }
-
-        .tela-login, .painel-geral-container, .painel-oficina-container, .area-escala-container {
-            display: none;
-        }
-
-        .ativo-tela {
-            display: flex !important;
-        }
-
+        /* TELA DE LOGIN / IDENTIFICAÇÃO PROFISSIONAL */
         .tela-login {
             position: fixed;
-            top: 56px; left: 0; right: 0; bottom: 0;
-            background: var(--bg-principal);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #121214;
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -128,29 +42,28 @@
         }
 
         .box-login {
-            background: var(--bg-card);
-            border: 1px solid var(--borda-card);
-            border-radius: 16px;
-            padding: 30px 24px;
+            background: #18181c;
+            border: 1px solid #2d2d34;
+            border-radius: 12px;
+            padding: 24px;
             width: 100%;
-            max-width: 380px;
-            box-shadow: 0 16px 32px rgba(0,0,0,0.6);
+            max-width: 360px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             text-align: center;
         }
 
         .box-login h2 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #ffffff;
+            color: #dae5f0;
         }
 
         .box-login p {
             font-size: 13px;
-            color: var(--texto-secundario);
-            margin-bottom: 24px;
+            color: #94a3b8;
+            margin-bottom: 20px;
         }
 
         .campo-login {
@@ -159,2107 +72,958 @@
             gap: 6px;
             text-align: left;
             margin-bottom: 14px;
-            width: 100%;
         }
 
         .campo-login label {
             font-size: 11px;
-            font-weight: 700;
-            color: var(--texto-secundario);
+            font-weight: bold;
+            color: #71717a;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .campo-login input, .campo-login select {
-            padding: 12px 14px;
-            background: var(--bg-input);
-            border: 1px solid var(--borda-card);
-            border-radius: 10px;
+        .campo-login input {
+            padding: 12px;
+            background: #121214;
+            border: 1px solid #2d2d34;
+            border-radius: 8px;
             color: #ffffff;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: bold;
             outline: none;
-            width: 100%;
-            transition: border-color 0.2s;
         }
 
-        .campo-login input:focus, .campo-login select:focus {
-            border-color: var(--azul-vipol);
-        }
+        .campo-login input:focus { border-color: #3b82f6; }
 
         .btn-acessar {
             width: 100%;
-            background: var(--azul-vipol);
+            background: #1a365d;
             color: #ffffff;
             border: none;
-            padding: 14px;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             margin-top: 10px;
-            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
-            transition: background 0.2s;
         }
-        .btn-acessar:hover { background: var(--azul-hover); }
 
+        /* CONTEÚDO PRINCIPAL DO APP */
         .topo {
             text-align: center;
-            margin: 12px auto;
+            margin: 10px auto;
             max-width: 480px;
         }
 
         .titulo {
             font-size: 20px;
             font-weight: 800;
-            color: #ffffff !important;
+            color: #dae5f0 !important;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             margin-bottom: 4px;
+            letter-spacing: 0.5px;
         }
 
-        .subtitulo {
-            font-size: 12px;
-            color: var(--texto-secundario);
-            margin-bottom: 12px;
+        .month-select {
+            width: 180px;
+            border: none;
+            border-bottom: 2px solid #27272a;
+            font-size: 18px;
+            text-align: center;
+            font-weight: bold;
+            outline: none;
+            background: transparent !important;
+            color: #dae5f0 !important;
+            margin-bottom: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
         }
 
         .info-colaborador {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            background: var(--bg-card) !important;
-            border: 1px solid var(--borda-card);
-            border-radius: 14px;
-            padding: 14px;
+            gap: 6px;
+            background: #18181c !important;
+            border: 1px solid #2d2d34;
+            border-radius: 10px;
+            padding: 10px;
             text-align: left;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
         }
 
         .info-campo {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-size: 13px;
-            font-weight: 600;
-            color: var(--texto-secundario) !important;
+            font-weight: bold;
+            color: #94a3b8 !important;
         }
 
-        .info-campo span {
-            width: 110px;
-            min-width: 110px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .info-campo span { white-space: nowrap; }
 
-        .info-campo input, .info-campo select {
+        .info-campo input {
             flex: 1;
-            min-width: 0;
-            background: var(--bg-input) !important;
-            border: 1px solid var(--borda-card);
-            border-radius: 8px;
+            border: none;
+            background: transparent !important;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: bold;
             color: #ffffff !important;
             outline: none;
-            padding: 8px 10px;
+            padding: 1px 2px;
         }
 
-        .grupo-input-btn {
-            display: flex;
-            flex: 1;
-            gap: 6px;
-            min-width: 0;
-        }
-
-        .grupo-input-btn input {
-            flex: 1;
-            min-width: 0;
+        .info-campo input.editavel-perfil {
+            background: #121214 !important;
+            border: 1px solid #2d2d34;
+            border-radius: 6px;
+            padding: 3px 8px;
+            width: 55px;
+            flex: none;
+            text-align: center;
+            font-size: 13px;
+            color: #ffffff !important;
         }
 
         .btn-logout {
             background: transparent;
             color: #f87171;
-            border: 1px solid rgba(220, 38, 38, 0.4);
-            padding: 6px 10px;
-            border-radius: 6px;
+            border: 1px solid #7f1d1d;
+            padding: 2px 8px;
+            border-radius: 4px;
             font-size: 10px;
-            font-weight: 700;
+            font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
-            transition: background 0.2s;
-        }
-        .btn-logout:hover { background: rgba(220, 38, 38, 0.1); }
-
-        .alerta-turno-anterior {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto 15px auto;
-            background: var(--bg-card);
-            border: 1px solid var(--alerta);
-            border-radius: 12px;
-            padding: 14px;
-            display: none;
+            margin-left: auto;
         }
 
-        .secao-checklist {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto 15px auto;
-        }
-
-        .titulo-secao {
-            font-size: 12px;
-            font-weight: 800;
-            color: #60a5fa;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 8px;
-            padding-left: 4px;
-        }
-
-        .lista-itens {
+        .lista-pontos {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
         }
 
-        .card-item {
-            background: var(--bg-card) !important;
-            border-radius: 12px;
-            padding: 12px 14px;
-            border: 1px solid var(--borda-card);
+        .card-dia {
+            background: #18181c !important;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2d2d34;
+        }
+
+        .card-dia.dia-folga {
+            background: #141416 !important;
+            border-color: #27272a;
+            opacity: 0.8;
+        }
+
+        .card-dia.janta-reduzida { border-color: #b45309; }
+
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border-bottom: 1px solid #232329;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
         }
 
-        .nome-item {
+        .dia-badge {
+            background: #1a365d !important;
+            color: #ffffff !important;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: bold;
             font-size: 13px;
-            font-weight: 600;
-            color: #e2e8f0;
-            flex: 1;
-            padding-right: 10px;
         }
 
-        .grupo-status {
+        .card-dia.fim-de-semana .dia-badge { background: #27272a !important; }
+        .card-dia.dia-folga .dia-badge { background: #1e1e24 !important; }
+
+        .valores-dia {
             display: flex;
-            gap: 6px;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: bold;
         }
 
-        .btn-status {
-            background: var(--bg-input);
-            border: 1px solid var(--borda-card);
-            color: var(--texto-secundario);
-            padding: 8px 14px;
-            font-size: 11px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.2s;
-        }
+        .v-extra { color: #22c55e !important; }
+        .v-money { color: #ffffff !important; }
 
-        .btn-status.ativo-ok {
-            background: #065f46;
-            border-color: var(--sucesso);
-            color: #ffffff;
-            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4);
-        }
-
-        .btn-status.ativo-defeito {
-            background: #7f1d1d;
-            border-color: var(--perigo);
-            color: #ffffff;
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
-        }
-
-        .box-obs {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto 15px auto;
-            display: flex;
-            flex-direction: column;
+        .inputs-row {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
             gap: 8px;
         }
 
-        .box-obs textarea {
-            width: 100%;
-            background: var(--bg-card);
-            border: 1px solid var(--borda-card);
-            border-radius: 12px;
-            padding: 12px;
-            color: #ffffff;
-            font-size: 13px;
-            outline: none;
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .container-upload-foto {
+        .campo {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            background: var(--bg-card);
-            border: 1px solid var(--borda-card);
-            border-radius: 12px;
-            padding: 14px;
+            gap: 4px;
         }
 
-        .btn-foto {
-            background: var(--azul-vipol);
-            color: #ffffff;
-            border: none;
-            padding: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
+        .campo label {
+            font-size: 10px;
+            font-weight: bold;
+            color: #71717a !important;
             text-transform: uppercase;
             text-align: center;
-            display: block;
+        }
+
+        .campo input {
             width: 100%;
+            padding: 8px 4px;
+            border: 1px solid #2d2d34;
+            border-radius: 6px;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            background: #121214 !important;
+            font-weight: bold;
+            color: #ffffff !important;
         }
 
-        .preview-fotos {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 6px;
-        }
+        .campo input:focus { border-color: #3b82f6; }
 
-        .miniatura-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .miniatura-foto {
-            width: 70px;
-            height: 70px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid var(--azul-vipol);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .miniatura-foto:hover {
-            transform: scale(1.05);
-        }
-
-        .btn-remover-foto {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: var(--perigo);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-size: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .box-oficina {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto 15px auto;
-            background: var(--bg-card);
-            border: 1px solid rgba(220, 38, 38, 0.4);
-            border-radius: 12px;
-            padding: 14px;
-        }
-
-        .btn-enviar-oficina {
-            width: 100%;
-            background-color: var(--perigo);
-            color: #ffffff;
-            border: none;
-            padding: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-top: 10px;
-        }
-
+        /* PAINEL COMPACTADO */
         .painel-resumo {
             position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: rgba(15, 17, 23, 0.95);
-            backdrop-filter: blur(8px);
-            border-top: 1px solid var(--borda-card);
-            padding: 12px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #161619 !important;
+            border-top: 2px solid #2d2d34;
+            box-shadow: 0 -6px 20px rgba(0,0,0,0.6);
+            padding: 8px;
             z-index: 999;
         }
 
         .resumo-conteudo {
             max-width: 480px;
             margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px 10px;
         }
 
-        .status-nuvem {
+        .resumo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
             font-size: 11px;
-            text-align: center;
-            color: var(--texto-secundario);
-            font-weight: 600;
+            font-weight: bold;
+            border-bottom: 1px solid #232329;
+            padding-bottom: 2px;
+            color: #e2e8f0 !important;
         }
 
-        .btn-enviar {
-            width: 100%;
-            background-color: var(--sucesso) !important;
-            color: #ffffff !important;
-            border: none;
-            padding: 14px;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 10px;
-            cursor: pointer;
+        .resumo-item span:first-child { 
+            color: #94a3b8 !important; 
+            font-size: 10px;
             text-transform: uppercase;
-            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
         }
 
-        .painel-geral-container, .painel-oficina-container, .area-escala-container {
+        .resumo-item input {
             width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            flex-direction: column;
-            gap: 14px;
-            padding: 0 4px;
+            border: none;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+            outline: none;
+            color: #ffffff !important;
+            background: transparent !important;
+            margin-top: 1px;
         }
 
-        .card-painel {
-            background: var(--bg-card);
-            border: 1px solid var(--borda-card);
-            border-radius: 12px;
-            padding: 14px;
+        .resumo-item .editavel {
+            border: 1px solid #2d2d34;
+            background: #121214 !important;
+            padding: 1px 4px;
+            border-radius: 4px;
             width: 100%;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: transform 0.15s ease, border-color 0.15s ease;
+            color: #ffffff !important;
+            text-align: left;
+            font-size: 11px;
         }
 
-        .card-clicavel {
-            cursor: pointer;
-        }
-        .card-clicavel:hover {
-            transform: scale(1.02);
-            border-color: #3b82f6;
-        }
-        .card-clicavel:active {
-            transform: scale(0.98);
-        }
+        .desconto-imposto { color: #cbd5e1 !important; }
 
-        .grupo-inputs-duplos {
+        .item-dia05 {
+            grid-column: span 3;
             display: flex;
-            gap: 10px;
-            width: 100%;
+            flex-direction: row !important;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e1e24 !important; 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            border: 1px solid #2d2d34;
+            margin-top: 2px;
         }
+        .item-dia05 span:first-child { font-size: 12px !important; color: #ffffff !important; }
+        .item-dia05 input { font-size: 13px !important; font-weight: 900 !important; text-align: right !important; width: auto !important; }
 
-        .grupo-inputs-duplos .campo-login {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .painel-header-flex {
+        .caixa-total-final {
+            grid-column: span 3;
+            background: #1a365d !important;
+            color: #ffffff !important;
+            padding: 6px 10px;
+            border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-top: 2px;
         }
 
-        .painel-tabela {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            margin-top: 8px;
-        }
+        .caixa-total-final span:first-child { font-size: 12px; font-weight: bold; }
+        .caixa-total-final span:last-child { font-size: 14px; font-weight: 950; text-align: right; }
 
-        .painel-tabela th, .painel-tabela td {
-            text-align: left;
-            padding: 8px 10px;
-            border-bottom: 1px solid var(--borda-card);
-        }
-
-        .painel-tabela th {
-            color: var(--texto-secundario);
-            text-transform: uppercase;
+        .status-nuvem {
+            grid-column: span 3;
             font-size: 10px;
-            letter-spacing: 0.5px;
+            text-align: center;
+            color: #94a3b8;
+            font-weight: bold;
+            margin: 1px 0;
         }
 
-        .linha-tabela-clicavel {
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-        .linha-tabela-clicavel:hover {
-            background: rgba(255, 255, 255, 0.04);
-        }
+        .btn-pdf-container { grid-column: span 3; }
 
-        /* Modais */
-        #modal-detalhe-checklist, #modal-detalhe-manutencao {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px);
-            z-index: 100001;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .conteudo-modal {
-            background: var(--bg-card);
-            border: 1px solid var(--borda-card);
-            border-radius: 16px;
+        .btn-pdf {
             width: 100%;
-            max-width: 440px;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+            border: none;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
         }
 
-        #modal-zoom-foto {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.92);
-            z-index: 200000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-        }
-        .conteudo-zoom {
-            position: relative;
-            max-width: 100%;
-            max-height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .imagem-ampliada {
-            max-width: 95vw;
-            max-height: 85vh;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        @media print {
+            html, body { background-color: #ffffff !important; color: #1e293b !important; padding-bottom: 0 !important; }
+            .topo .titulo { color: #1a365d !important; }
+            .info-colaborador { background: #ffffff !important; border: 1px solid #94a3b8 !important; color: #1e293b !important; }
+            .info-colaborador input { border-bottom: none !important; color: #0f172a !important; }
+            .card-dia { background: #ffffff !important; border: 1px solid #cbd5e1 !important; color: #1e293b !important; }
+            .dia-badge { background: #1a365d !important; color: #ffffff !important; }
+            .valores-dia .v-extra { color: #16a34a !important; }
+            .valores-dia .v-money { color: #1a365d !important; }
+            .painel-resumo { position: static !important; box-shadow: none !important; border-top: 2px solid #1a365d !important; margin-top: 20px !important; page-break-inside: avoid; background: #ffffff !important; }
+            .resumo-conteudo { grid-template-columns: 1fr 1fr; }
+            .resumo-item { color: #0f172a !important; border-bottom: 1px dashed #e2e8f0 !important; flex-direction: row; justify-content: space-between; }
+            .resumo-item span:first-child { color: #64748b !important; font-size: 11px; }
+            .resumo-item input { color: #1e293b !important; text-align: right; }
+            .item-dia05 { grid-column: span 2; }
+            .caixa-total-final { background: #1a365d !important; color: #ffffff !important; grid-column: span 2; }
+            .btn-pdf-container, .status-nuvem { display: none !important; }
+            .card-dia { page-break-inside: avoid !important; }
+            .ocultar-no-pdf { display: none !important; }
+            .month-select { border: none !important; appearance: none; -webkit-appearance: none; color: #1a365d !important; background: transparent !important; }
+            .btn-logout { display: none !important; }
         }
     </style>
 </head>
 <body>
 
-    <div id="toast-container"></div>
-
-    <!-- Modal para ver detalhes do Check-list com Defeito -->
-    <div id="modal-detalhe-checklist">
-        <div class="conteudo-modal">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                <div style="font-size: 15px; font-weight: 800; color: #60a5fa;" id="modal-titulo-carro">Detalhes da Vistoria</div>
-                <button onclick="fecharModalDetalhes()" style="background: transparent; border: none; color: #f87171; font-weight: 800; font-size: 16px; cursor: pointer;">✕</button>
-            </div>
-            <div id="modal-corpo-detalhes" style="font-size: 13px; line-height: 1.5; color: #e2e8f0;">
-                Carregando...
-            </div>
-            <button class="btn-acessar" style="margin-top: 16px;" onclick="fecharModalDetalhes()">Fechar</button>
-        </div>
-    </div>
-
-    <!-- Modal para ver detalhes da Manutenção -->
-    <div id="modal-detalhe-manutencao">
-        <div class="conteudo-modal">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                <div style="font-size: 15px; font-weight: 800; color: #34d399;" id="modal-manutencao-titulo">Detalhes da Manutenção</div>
-                <button onclick="fecharModalManutencao()" style="background: transparent; border: none; color: #f87171; font-weight: 800; font-size: 16px; cursor: pointer;">✕</button>
-            </div>
-            <div id="modal-manutencao-corpo" style="font-size: 13px; line-height: 1.6; color: #e2e8f0;">
-                Carregando...
-            </div>
-            <button class="btn-acessar" style="margin-top: 16px;" onclick="fecharModalManutencao()">Fechar</button>
-        </div>
-    </div>
-
-    <!-- Modal para Ampliar Foto (Zoom) -->
-    <div id="modal-zoom-foto" onclick="fecharZoomFoto()">
-        <div class="conteudo-zoom" onclick="event.stopPropagation()">
-            <button onclick="fecharZoomFoto()" style="position: absolute; top: -40px; right: 0; background: transparent; border: none; color: #fff; font-size: 24px; font-weight: 800; cursor: pointer;">✕ Fechar</button>
-            <img id="img-zoom-exibicao" class="imagem-ampliada" src="" alt="Foto Ampliada">
-        </div>
-    </div>
-
-    <div class="barra-navegacao-sistema" id="barra-nav">
-        <button class="btn-navegacao" id="tab-escala" onclick="mudarVisao('escala')">📅 Escala</button>
-        <button class="btn-navegacao" id="tab-motorista" onclick="mudarVisao('motorista')">📱 Check-list</button>
-        <button class="btn-navegacao" id="tab-oficina" onclick="mudarVisao('oficina')">🔧 Oficina</button>
-        <button class="btn-navegacao" id="tab-controlador" onclick="mudarVisao('controlador')">📊 Painel</button>
-    </div>
-
+    <!-- TELA DE LOGIN DINÂMICA -->
     <div id="tela-login" class="tela-login">
         <div class="box-login">
-            <h2>Vipol Transportes</h2>
-            <p>Sistema Corporativo de Frota</p>
+            <h2>Acesso ao Cartão</h2>
+            <p>Identifique-se para carregar suas horas</p>
+            
             <div class="campo-login">
                 <label>Nome Completo</label>
                 <input type="text" id="login-nome" placeholder="Ex: Sergio Silva">
             </div>
+            
             <div class="campo-login">
-                <label>Matrícula / Chapa</label>
+                <label>Registro (Chapa)</label>
                 <input type="number" id="login-chapa" placeholder="Ex: 12345">
             </div>
-            <div class="campo-login">
-                <label>WhatsApp (Opcional)</label>
-                <input type="text" id="login-whatsapp" placeholder="Ex: 11999999999">
-            </div>
-            <div class="campo-login">
-                <label>Cargo / Função</label>
-                <select id="login-cargo">
-                    <option value="motorista">Motorista</option>
-                    <option value="escalante">Escalante</option>
-                    <option value="oficina">Mecânico / Oficina</option>
-                    <option value="controlador">Controlador / Gestor</option>
-                </select>
-            </div>
-            <button class="btn-acessar" onclick="realizarLogin()">Entrar no Sistema</button>
+            
+            <button class="btn-acessar" onclick="realizarLogin()">Acessar Painel</button>
         </div>
     </div>
 
-    <div id="area-escala" class="area-escala-container">
-        <div style="text-align: right; padding-top: 5px;">
-            <button class="btn-logout" onclick="fazerLogout()">Trocar Usuário</button>
-        </div>
-        <div class="topo" style="margin-top: 2px;">
-            <div class="titulo">Painel de Escalas</div>
-            <div class="subtitulo">Gestão e consulta de jornadas</div>
-        </div>
-
-        <div class="card-painel" id="bloco-minha-escala" style="border-left: 4px solid var(--azul-vipol);">
-            <div class="titulo-secao">📋 Minhas Próximas Escalas</div>
-            <div id="dados-minha-escala" style="font-size: 13px; color: #e2e8f0; margin-top: 10px; line-height: 1.6;">
-                Carregando suas escalas...
+    <!-- PAINEL PRINCIPAL -->
+    <div class="topo">
+        <div class="titulo">Folha de Ponto Mensal</div>
+        
+        <select id="sel-mes" class="month-select" onchange="mudarMes()">
+            <option value="Janeiro">JANEIRO</option>
+            <option value="Fevereiro">FEVEREIRO</option>
+            <option value="Marco">MARÇO</option>
+            <option value="Abril">ABRIL</option>
+            <option value="Maio">MAIO</option>
+            <option value="Junho">JUNHO</option>
+            <option value="Julho">JULHO</option>
+            <option value="Agosto" selected>AGOSTO</option>
+            <option value="Setembro">SETEMBRO</option>
+            <option value="Outubro">OUTUBRO</option>
+            <option value="Novembro">CONVENÇÃO</option>
+            <option value="Dezembro">DEZEMBRO</option>
+        </select>
+        
+        <div class="info-colaborador">
+            <div class="info-campo"><span>Empresa:</span><input type="text" value="Vipol" readonly></div>
+            <div class="info-campo"><span>Colaborador:</span><input type="text" id="txt-nome-colaborador" readonly></div>
+            <div class="info-campo">
+                <span>Registro (Chapa):</span><input type="text" id="txt-chapa-colaborador" readonly>
+                <button class="btn-logout" onclick="fazerLogout()">Trocar Usuário</button>
             </div>
-        </div>
-
-        <!-- BLOCO DE LANÇAR ESCALA -->
-        <div class="card-painel" id="bloco-cadastro-escala" style="display:none; border-left: 4px solid var(--sucesso); margin-top: 6px;">
-            <div class="titulo-secao" style="color: #34d399;">✏️ Lançar Escala (Data Específica)</div>
-            
-            <div class="grupo-inputs-duplos" style="margin-top: 10px;">
-                <div class="campo-login" style="flex: 0.7;">
-                    <label>Matrícula (Chapa)</label>
-                    <input type="text" id="escala-chapa-motorista" placeholder="Ex: 12345" oninput="buscarMotoristaPorChapaEscala()">
-                </div>
-                <div class="campo-login" style="flex: 1.3;">
-                    <label>Nome do Motorista</label>
-                    <input type="text" id="escala-nome-motorista" placeholder="Nome automático..." style="background: rgba(255,255,255,0.03); color: #34d399;">
-                </div>
-            </div>
-
-            <div class="campo-login">
-                <label>Local da Pegada</label>
-                <select id="escala-pegada">
-                    <option value="Garagem">Garagem</option>
-                    <option value="Vila Any">Vila Any</option>
-                    <option value="São Miguel">São Miguel</option>
-                    <option value="CECAP">CECAP</option>
-                    <option value="Dom Bosco">Dom Bosco</option>
-                    <option value="Bonsucesso">Bonsucesso</option>
-                </select>
-            </div>
-
-            <div class="campo-login">
-                <label>Número da Linha</label>
-                <input type="text" id="escala-linha-num" placeholder="Ex: 596, 077..." oninput="buscarNomeLinhaAutomatico()">
-            </div>
-
-            <div class="campo-login">
-                <label>Nome da Linha / Itinerário</label>
-                <input type="text" id="escala-linha-nome" placeholder="Preenchimento automático..." readonly style="background: rgba(255,255,255,0.03); color: #34d399;">
-            </div>
-
-            <div class="campo-login">
-                <label>Data da Escala</label>
-                <input type="date" id="escala-data">
-            </div>
-
-            <div class="campo-login">
-                <label>Horário de Apresentação</label>
-                <input type="text" id="escala-horario" placeholder="Ex: 04:30">
-            </div>
-
-            <div class="campo-login">
-                <label>Observações</label>
-                <textarea id="escala-obs" placeholder="Ex: Escala especial..." style="width:100%; background:var(--bg-input); border:1px solid var(--borda-card); border-radius:8px; padding:10px; color:#fff; font-size:13px; outline:none; resize:vertical; min-height:60px;"></textarea>
-            </div>
-
-            <button class="btn-acessar" style="background:var(--sucesso);" onclick="salvarEscalaIndividual()">Salvar Escala</button>
-        </div>
-
-        <!-- BLOCO DE CADASTRAR ITINERÁRIO / LINHA -->
-        <div class="card-painel" id="bloco-cadastro-linha" style="display:none; border-left: 4px solid var(--alerta); margin-top: 6px;">
-            <div class="titulo-secao" style="color: #fbbf24;">🗺️ Cadastrar Novo Itinerário / Linha</div>
-            
-            <div class="campo-login" style="margin-top: 10px;">
-                <label>Número da Linha</label>
-                <input type="text" id="nova-linha-num" placeholder="Ex: 888">
-            </div>
-
-            <div class="campo-login">
-                <label>Nome Completo / Descrição do Itinerário</label>
-                <input type="text" id="nova-linha-nome" placeholder="Ex: 888 - Terminal X Bairro">
-            </div>
-
-            <button class="btn-acessar" style="background:var(--alerta);" onclick="salvarNovoItinerario()">Salvar Nova Linha</button>
-        </div>
-
-        <div class="card-painel" id="bloco-todas-escalas" style="display:none; margin-top: 6px;">
-            <div class="titulo-secao">📅 Escalas Cadastradas (Geral)</div>
-            <div id="lista-todas-escalas" style="margin-top: 8px; max-height: 250px; overflow-y: auto;">Carregando escalas...</div>
-        </div>
-    </div>
-
-    <div id="area-motorista" style="display:none;">
-        <div class="topo">
-            <div class="titulo">Check-list de Frota</div>
-            <div class="subtitulo">Vistoria diária de segurança</div>
-            
-            <div class="info-colaborador">
-                <div class="info-campo"><span>Motorista:</span><input type="text" id="txt-nome-motorista" readonly></div>
-                
-                <div class="info-campo">
-                    <span>Matrícula:</span>
-                    <div class="grupo-input-btn">
-                        <input type="text" id="txt-chapa-motorista" readonly>
-                        <button class="btn-logout" onclick="fazerLogout()">Trocar</button>
-                    </div>
-                </div>
-                
-                <div class="info-campo">
-                    <span>Prefixo:</span>
-                    <input type="text" id="txt-prefixo" placeholder="Ex: 36.159" oninput="verificarHistoricoCarro(); salvarChecklist();">
-                </div>
-                <div class="info-campo">
-                    <span>Linha:</span>
-                    <input type="text" id="txt-linha" placeholder="Ex: 077" oninput="salvarChecklist()">
-                </div>
-                <div class="info-campo">
-                    <span>Km Inicial:</span>
-                    <input type="number" id="txt-km-inicial" placeholder="Ex: 45200" oninput="salvarChecklist()">
-                </div>
-                <div class="info-campo">
-                    <span>Turno:</span>
-                    <select id="sel-turno" onchange="salvarChecklist()">
-                        <option value="" disabled selected>Selecione...</option>
-                        <option value="Manhã">Manhã</option>
-                        <option value="Tarde">Tarde</option>
-                        <option value="Noite">Noite</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div id="alerta-turno-anterior" class="alerta-turno-anterior">
-            <div style="font-size:11px; font-weight:700; color:#fbbf24; text-transform:uppercase; margin-bottom:4px;">⚠️ Relato do Turno Anterior</div>
-            <div id="texto-relato-anterior" style="font-size:12px; color:#e2e8f0;">Nenhum relato recente.</div>
-        </div>
-
-        <div id="container-checklist"></div>
-
-        <div class="box-obs">
-            <div class="titulo-secao">Observações / Defeitos</div>
-            <textarea id="txt-observacoes" placeholder="Descreva falhas mecânicas..." oninput="salvarChecklist()"></textarea>
-            
-            <div class="container-upload-foto">
-                <label for="input-foto" class="btn-foto">📸 Tirar Foto da Avaria</label>
-                <input type="file" id="input-foto" accept="image/*" capture="environment" style="display: none;" onchange="processarFoto(this)">
-                <div class="preview-fotos" id="preview-fotos"></div>
-            </div>
-        </div>
-
-        <div class="box-oficina">
-            <div class="titulo-secao" style="color: #f87171;">🚨 Chamado Urgente / Pane na Rua</div>
-            <div class="campo-login" style="margin-bottom: 8px;">
-                <label>Tipo do Problema</label>
-                <select id="sel-tipo-pane" style="width:100%; padding:10px; background:var(--bg-input); border:1px solid var(--borda-card); border-radius:8px; color:#fff; font-weight:600;">
-                    <option value="Mecânica">Mecânica (Motor / Câmbio)</option>
-                    <option value="Freios">Sistema de Freios</option>
-                    <option value="Elétrica">Elétrica / Faróis / Painel</option>
-                    <option value="Pneus">Pneu Furado / Danificado</option>
-                    <option value="Outros">Outro Problema</option>
-                </select>
-            </div>
-            <textarea id="txt-obs-oficina" placeholder="Descreva o que aconteceu..." style="width: 100%; background: var(--bg-input); border: 1px solid var(--borda-card); border-radius: 8px; padding: 10px; color: #ffffff; font-size: 13px; outline: none; resize: vertical; min-height: 60px; margin-bottom: 6px;"></textarea>
-            
-            <div class="container-upload-foto" style="background: var(--bg-input);">
-                <label for="input-foto-oficina" class="btn-foto" style="background: #991b1b;">📸 Foto da Pane</label>
-                <input type="file" id="input-foto-oficina" accept="image/*" capture="environment" style="display: none;" onchange="processarFotoOficina(this)">
-                <div class="preview-fotos" id="preview-fotos-oficina"></div>
-            </div>
-
-            <button class="btn-enviar-oficina" onclick="enviarChamadoOficina()">🚨 Enviar com GPS</button>
-        </div>
-
-        <div class="painel-resumo">
-            <div class="resumo-conteudo">
-                <div class="status-nuvem" id="txt-status-nuvem">Pronto para iniciar vistoria ☁️</div>
-                <button class="btn-enviar" onclick="finalizarEEnviar()">Finalizar e Enviar Check-list</button>
+            <div class="info-campo" style="margin-top: 2px; border-top: 1px dashed #2d2d34; padding-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Filhos Dependentes (IR):</span>
+                <input type="number" id="pref-filhos" class="editavel-perfil" value="0" min="0" oninput="salvarEDigitar()">
             </div>
         </div>
     </div>
 
-    <div id="painel-oficina" class="painel-oficina-container">
-        <div style="text-align: right; padding-top: 5px;">
-            <button class="btn-logout" onclick="fazerLogout()">Trocar Usuário</button>
-        </div>
-        <div class="titulo" style="margin-top: 5px; text-align: center;">Módulo Oficina</div>
-        <div class="subtitulo" style="text-align: center;">Controle Preventivo e Vistorias da Frota</div>
+    <div class="lista-pontos" id="lista-pontos"></div>
 
-        <div class="card-painel" style="border-left: 4px solid var(--azul-vipol);">
-            <div class="painel-header-flex">
-                <div class="titulo-secao" style="color: #60a5fa; margin-bottom:0;">📱 Check-lists dos Motoristas</div>
-                <button onclick="carregarChecklistsPainelOficina()" style="background:transparent; border:1px solid var(--borda-card); color:var(--texto-secundario); padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">🔄 Atualizar</button>
-            </div>
-            <div style="font-size: 11px; color: var(--texto-secundario); margin-top: 2px; margin-bottom: 6px;">💡 Dica: Itens em <span style="color:#f87171; font-weight:700;">vermelho</span> possuem defeitos. Clique na linha para inspecionar.</div>
-            <div class="campo-login" style="margin-bottom: 6px;">
-                <input type="text" id="filtro-checklist-oficina" placeholder="Filtrar por Prefixo (Ex: 36.159)" oninput="carregarChecklistsPainelOficina()">
-            </div>
-            <div id="lista-checklists-oficina" style="margin-top: 8px; max-height: 260px; overflow-y: auto;">Carregando check-lists...</div>
-        </div>
-
-        <div class="card-painel" style="border-left: 4px solid var(--alerta);">
-            <div class="titulo-secao" style="color: #fbbf24;">⚠️ Alertas Preventivos</div>
-            <div id="lista-alertas-preventivos" style="font-size:12px; color:#e2e8f0; margin-top:6px;">Calculando quilometragens...</div>
-        </div>
-
-        <!-- FORMULÁRIO DE MANUTENÇÃO COM SUPORTE A FOTOS -->
-        <div class="card-painel" style="border-left: 4px solid var(--azul-vipol);">
-            <div class="titulo-secao" style="color: #60a5fa;">🔧 Registrar Manutenção Detalhada</div>
+    <div class="painel-resumo">
+        <div class="resumo-conteudo">
+            <div class="resumo-item"><span>Total Mês</span><input type="text" id="total-dias-trab" readonly value="0 dias"></div>
+            <div class="resumo-item"><span>Salário Base</span><input type="text" value="R$ 3143,00" readonly></div>
+            <div class="resumo-item"><span>Vale (Dia 20)</span><input type="text" value="R$ 1258,00" readonly style="color:#f87171 !important;"></div>
             
-            <div class="campo-login" style="margin-top: 10px;">
-                <label>Prefixo do Carro</label>
-                <input type="text" id="oficina-prefixo" placeholder="Ex: 36.159">
+            <div class="resumo-item"><span>Extras (Relógio)</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>Horas Extras (R$)</span><input type="text" id="resumo-extras-reais" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>Reflexo DSR</span><input type="text" id="resumo-dsr" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
+            
+            <div class="resumo-item"><span>Adic. Noturno</span><input type="text" id="resumo-adicional-noturno" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>INSS (Desconto)</span><input type="text" id="resumo-inss" readonly value="R$ 0,00" class="desconto-imposto"></div>
+            <div class="resumo-item"><span>IRRF (Desconto)</span><input type="text" id="resumo-irrf" readonly value="R$ 0,00" class="desconto-imposto"></div>
+            
+            <div class="resumo-item" style="grid-column: span 3; border-bottom: none; padding-bottom: 0; margin-top: 2px;">
+                <span style="font-size: 10px; margin-bottom: 2px;">Passagens (Dia 25)</span>
+                <input type="text" id="input-passagem" class="editavel" placeholder="0.00" oninput="salvarEDigitar()">
             </div>
-
-            <div class="campo-login">
-                <label>Tipo de Serviço</label>
-                <select id="oficina-servico">
-                    <option value="Preventiva">Manutenção Preventiva</option>
-                    <option value="Corretiva">Manutenção Corretiva</option>
-                    <option value="Troca de Óleo">Troca de Óleo e Filtros</option>
-                    <option value="Freios">Sistema de Freios</option>
-                    <option value="Pneus">Pneus / Rodagem</option>
-                </select>
+            
+            <div class="resumo-item item-dia05">
+                <span>A Receber (Dia 05):</span>
+                <input type="text" id="txt-receber-dia-05" readonly value="R$ 0,00">
             </div>
-
-            <div class="campo-login">
-                <label>Descrição do que foi feito (Serviços)</label>
-                <textarea id="oficina-descricao" placeholder="Ex: Substituição das lonas de freio traseiras e regulagem do sistema..." style="width:100%; background:var(--bg-input); border:1px solid var(--borda-card); border-radius:8px; padding:10px; color:#fff; font-size:13px; outline:none; resize:vertical; min-height:60px;"></textarea>
+            
+            <div class="caixa-total-final">
+                <span>TOTAL BRUTO + BENEFÍCIOS:</span>
+                <span id="txt-total-final">R$ 3.143,00</span>
             </div>
-
-            <div class="campo-login">
-                <label>Peças Substituídas / Utilizadas</label>
-                <input type="text" id="oficina-pecas" placeholder="Ex: Jogo de lonas, graxa, retentor...">
+            
+            <div class="status-nuvem" id="txt-status-nuvem">Conectando ao Firebase ☁️</div>
+            
+            <div class="btn-pdf-container">
+                <button class="btn-pdf" onclick="abrirTelaImpressaoPDF()">Gerar Relatório PDF</button>
             </div>
-
-            <div class="grupo-inputs-duplos">
-                <div class="campo-login">
-                    <label>Quilometragem (Km)</label>
-                    <input type="number" id="oficina-km" placeholder="Ex: 48500">
-                </div>
-                <div class="campo-login">
-                    <label>Custo Total (R$)</label>
-                    <input type="number" step="0.01" id="oficina-custo" placeholder="Ex: 350.00">
-                </div>
-            </div>
-
-            <div class="campo-login">
-                <label>Responsável / Oficina</label>
-                <input type="text" id="oficina-responsavel" placeholder="Ex: Mecânico João / Oficina Central">
-            </div>
-
-            <div class="container-upload-foto" style="margin-bottom: 14px;">
-                <label for="input-foto-manutencao" class="btn-foto" style="background: #3b82f6;">📸 Anexar Foto da Manutenção (Opcional)</label>
-                <input type="file" id="input-foto-manutencao" accept="image/*" capture="environment" style="display: none;" onchange="processarFotoManutencao(this)">
-                <div class="preview-fotos" id="preview-fotos-manutencao"></div>
-            </div>
-
-            <button class="btn-acessar" style="background:var(--azul-vipol);" onclick="salvarManutencaoOficina()">Salvar no Histórico</button>
-            <button class="btn-acessar" style="background: var(--sucesso); margin-top: 10px;" onclick="gerarRelatorioIndividualPDF()">📄 Baixar Histórico do Carro em PDF</button>
-        </div>
-
-        <div class="card-painel">
-            <div class="painel-header-flex">
-                <div class="titulo-secao" style="margin-bottom:0;">📋 Histórico Detalhado</div>
-                <button onclick="carregarHistoricoOficina()" style="background:transparent; border:1px solid var(--borda-card); color:var(--texto-secundario); padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">🔄 Atualizar</button>
-            </div>
-            <div style="font-size: 11px; color: var(--texto-secundario); margin-top: 2px; margin-bottom: 6px;">💡 Clique em qualquer linha do histórico para abrir todos os detalhes.</div>
-            <div class="campo-login" style="margin-top: 4px; margin-bottom: 6px;">
-                <input type="text" id="filtro-busca-oficina" placeholder="Filtrar por Prefixo" oninput="carregarHistoricoOficina()">
-            </div>
-            <div id="lista-manutencoes-oficina" style="margin-top: 8px; max-height: 280px; overflow-y: auto;">Carregando histórico...</div>
-        </div>
-    </div>
-
-    <div id="painel-geral" class="painel-geral-container">
-        <div style="text-align: right; padding-top: 5px;">
-            <button class="btn-logout" onclick="fazerLogout()">Trocar Usuário</button>
-        </div>
-        <div class="titulo" style="margin-top: 5px; text-align: center;">Painel de Controle</div>
-        <div class="subtitulo" style="text-align: center;">Monitoramento em Tempo Real</div>
-
-        <div style="display: flex; gap: 8px;">
-            <div class="card-painel card-clicavel" onclick="clicarCardChamados()" style="flex: 1; padding: 10px; text-align: center; border-left: 4px solid var(--perigo);">
-                <div style="font-size: 10px; color: var(--texto-secundario); text-transform: uppercase;">Chamados Pendentes</div>
-                <div id="kpi-chamados" style="font-size: 18px; font-weight: 800; color: #f87171; margin-top: 2px;">0</div>
-            </div>
-            <div class="card-painel card-clicavel" onclick="clicarCardChecklists()" style="flex: 1; padding: 10px; text-align: center; border-left: 4px solid var(--sucesso);">
-                <div style="font-size: 10px; color: var(--texto-secundario); text-transform: uppercase;">Check-lists Hoje</div>
-                <div id="kpi-checklists" style="font-size: 18px; font-weight: 800; color: #34d399; margin-top: 2px;">0</div>
-            </div>
-        </div>
-
-        <button class="btn-acessar" style="background: var(--azul-vipol); margin-top: 4px;" onclick="gerarRelatorioGeralPDF()">📄 Baixar Relatório Geral em PDF</button>
-
-        <div class="card-painel" id="secao-chamados-painel" style="border-left: 4px solid var(--perigo);">
-            <div class="painel-header-flex">
-                <div class="titulo-secao" style="color: #f87171; margin-bottom:0;">🚨 Chamados Urgentes com GPS</div>
-                <span id="badge-contador-chamados" style="font-size: 10px; background: rgba(220,38,38,0.2); border: 1px solid var(--perigo); color: #f87171; padding: 2px 6px; border-radius: 6px; font-weight: 700;">0 pendentes</span>
-            </div>
-            <div id="lista-chamados-painel" style="margin-top: 8px; font-size: 12px; color: #cbd5e1;">Carregando chamados...</div>
-        </div>
-
-        <div class="card-painel" id="secao-checklists-painel" style="border-left: 4px solid var(--azul-vipol);">
-            <div class="painel-header-flex">
-                <div class="titulo-secao" style="color: #60a5fa; margin-bottom:0;">📱 Histórico de Check-lists Recentes</div>
-                <button onclick="carregarChecklistsPainelControlador()" style="background:transparent; border:1px solid var(--borda-card); color:var(--texto-secundario); padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">🔄 Atualizar</button>
-            </div>
-            <div style="font-size: 11px; color: var(--texto-secundario); margin-top: 2px; margin-bottom: 6px;">💡 Dica: Itens em <span style="color:#f87171; font-weight:700;">vermelho</span> possuem defeitos. Clique na linha para inspecionar.</div>
-            <div class="campo-login" style="margin-bottom: 6px;">
-                <input type="text" id="filtro-checklist-controlador" placeholder="Filtrar por Prefixo (Ex: 36.159)" oninput="carregarChecklistsPainelControlador()">
-            </div>
-            <div id="lista-checklists-controlador" style="margin-top: 8px; max-height: 260px; overflow-y: auto;">Carregando check-lists...</div>
-        </div>
-
-        <div class="card-painel" style="border-left: 4px solid var(--sucesso);">
-            <div class="titulo-secao" style="color: #34d399;">🔄 Remanejamento Rápido</div>
-            <div class="campo-login" style="margin-bottom:8px;">
-                <label>Motorista Afetado</label>
-                <input type="text" id="remaneja-motorista" placeholder="Nome">
-            </div>
-            <div class="grupo-inputs-duplos" style="margin-bottom:8px;">
-                <div class="campo-login">
-                    <label>Carro Antigo</label>
-                    <input type="text" id="remaneja-antigo" placeholder="Ex: 36.159">
-                </div>
-                <div class="campo-login">
-                    <label>Carro Reserva</label>
-                    <input type="text" id="remaneja-novo" placeholder="Ex: 36.999">
-                </div>
-            </div>
-            <button class="btn-acessar" style="background:var(--sucesso); margin-top:0;" onclick="executarRemanejamento()">Confirmar Remanejamento</button>
         </div>
     </div>
 
 <script>
+    // Credenciais do Firebase
     const firebaseConfig = {
-      apiKey: "AIzaSyAcnlxdhZbAt9wtpVBhtSYGfMmvXBBMkRE",
-      authDomain: "checklistvipol.firebaseapp.com",
-      projectId: "checklistvipol",
-      storageBucket: "checklistvipol.firebasestorage.app",
-      messagingSenderId: "1083183148599",
-      appId: "1:1083183148599:web:c3f6fcc48a72a8f03719b2"
+        apiKey: "AIzaSyCjVJ_F2h8dMyY91jjo-kvQ",
+        authDomain: "vipolextras.firebaseapp.com",
+        projectId: "vipolextras",
+        storageBucket: "vipolextras.appspot.com",
+        messagingSenderId: "1001511250504",
+        appId: "1:1001511250504:web:ea7bfab1a5f6e3c50979d0"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const messaging = firebase.messaging();
-
-    let dicionarioLinhas = {
-        "077": "077 - Vila Any X Metrô Brás",
-        "319": "319 - Tupinambá X Metrô Itaquera",
-        "596": "596 - Vila Any X São Miguel",
-        "139": "139 - São Miguel X Cecap",
-        "825": "825 - São Miguel X Guarulhos (Centro)",
-        "073": "073 - São Miguel X Bonsucesso",
-        "849": "849 - Parque das Nações X São Miguel",
-        "252": "252 - Jardim Cumbica X Metrô Carrão",
-        "499": "499 - Dom Bosco X Cecap"
-    };
-
-    function carregarDicionarioLinhas() {
-        db.collection("dicionario_linhas").get().then((snapshot) => {
-            snapshot.forEach((doc) => {
-                let d = doc.data();
-                if (d.numero && d.nome) {
-                    dicionarioLinhas[d.numero] = d.nome;
-                }
-            });
-        }).catch(e => console.log("Erro ao carregar linhas:", e));
-    }
-
-    function salvarNovoItinerario() {
-        const num = document.getElementById('nova-linha-num').value.trim();
-        const nome = document.getElementById('nova-linha-nome').value.trim();
-
-        if (!num || !nome) {
-            mostrarToast("Preencha o número e o nome da linha!", "aviso");
-            return;
-        }
-
-        db.collection("dicionario_linhas").doc(num).set({
-            numero: num,
-            nome: nome
-        }).then(() => {
-            dicionarioLinhas[num] = nome;
-            mostrarToast("Itinerário cadastrado com sucesso!", "sucesso");
-            document.getElementById('nova-linha-num').value = "";
-            document.getElementById('nova-linha-nome').value = "";
-        }).catch(error => {
-            console.error(error);
-            mostrarToast("Erro ao salvar novo itinerário.", "erro");
-        });
-    }
-
-    const nomeAmigavelItens = {
-        "item_0_0": "Faróis e Lanternas",
-        "item_0_1": "Setas e Pisca-alerta",
-        "item_0_2": "Luz de Ré e Buzina",
-        "item_0_3": "Estado dos Pneus e Estepe",
-        "item_0_4": "Retrovisores e Limpadores",
-        "item_1_0": "Nível de Óleo e Água",
-        "item_1_1": "Freios (Principal e Maneco)",
-        "item_1_2": "Ausência de Vazamentos"
-    };
-
-    function formatarDataBR(dataStr) {
-        if (!dataStr) return "";
-        let partes = dataStr.split('-');
-        if (partes.length === 3) {
-            return `${partes[2]}/${partes[1]}/${partes[0]}`;
-        }
-        return dataStr;
-    }
-
-    function buscarNomeLinhaAutomatico() {
-        let inputNum = document.getElementById('escala-linha-num').value.trim();
-        let inputNome = document.getElementById('escala-linha-nome');
-        
-        if (dicionarioLinhas[inputNum]) {
-            inputNome.value = dicionarioLinhas[inputNum];
-        } else {
-            inputNome.value = inputNum ? "Linha personalizada / Outra" : "";
-        }
-    }
 
     let timeoutSalvar = null;
+    let carregandoDados = false;
     let usuarioChapaAtivo = "";
     let usuarioNomeAtivo = "";
-    let usuarioCargoAtivo = "";
-    let listaFotosBase64 = [];
-    let listaFotosOficinaBase64 = [];
-    let listaFotosManutencaoBase64 = [];
-    let totalChamadosAnterior = -1;
-    let cacheChecklists = {};
-    let cacheManutencoes = {};
 
-    const itensChecklist = [
-        {
-            secao: "Parte Externa e Iluminação",
-            itens: ["Faróis e Lanternas", "Setas e Pisca-alerta", "Luz de Ré e Buzina", "Estado dos Pneus e Estepe", "Retrovisores e Limpadores"]
-        },
-        {
-            secao: "Mecânica Básica",
-            itens: ["Nível de Óleo e Água", "Freios (Principal e Maneco)", "Ausência de Vazamentos"]
-        }
-    ];
+    const MAPEAMENTO_MESES = {
+        "Janeiro": 0, "Fevereiro": 1, "Marco": 2, "Abril": 3,
+        "Maio": 4, "Junho": 5, "Julho": 6, "Agosto": 7,
+        "Setembro": 8, "Outubro": 9, "Novembro": 10, "Dezembro": 11
+    };
 
-    function mostrarToast(mensagem, tipo = 'normal') {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${tipo}`;
-        toast.innerText = mensagem;
-        container.appendChild(toast);
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 300);
-        }, 3500);
-    }
+    const DIAS_DA_SEMANA_NOMES = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
-    function tocarAlertaSonoro() {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
-            
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.4); 
-        } catch (e) {
-            console.log("Áudio bloqueado pelo navegador.");
-        }
-    }
-
-    async function solicitarPermissaoNotificacao() {
-        try {
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                const token = await messaging.getToken({ vapidKey: '' });
-                if (token && usuarioChapaAtivo) {
-                    db.collection("tokens_notificacao").doc(usuarioChapaAtivo).set({
-                        token: token,
-                        cargo: usuarioCargoAtivo,
-                        atualizadoEm: new Date().toISOString()
-                    }, { merge: true });
-                }
-            }
-        } catch (error) {
-            console.error("Erro ao configurar notificações:", error);
-        }
-    }
-
-    function mudarVisao(modo) {
-        document.querySelectorAll('.btn-navegacao').forEach(b => b.classList.remove('ativo'));
-        document.getElementById('tela-login').style.display = 'none';
-        document.getElementById('area-escala').classList.remove('ativo-tela');
-        document.getElementById('area-motorista').style.display = 'none';
-        document.getElementById('painel-oficina').classList.remove('ativo-tela');
-        document.getElementById('painel-geral').classList.remove('ativo-tela');
-
-        if (modo === 'escala') {
-            document.getElementById('tab-escala').classList.add('ativo');
-            document.getElementById('area-escala').classList.add('ativo-tela');
-            limparEscalasAntigas();
-            carregarMinhaEscala();
-            carregarTodasAsEscalas();
-        } else if (modo === 'motorista') {
-            document.getElementById('tab-motorista').classList.add('ativo');
-            document.getElementById('area-motorista').style.display = 'block';
-            construirInterfaceChecklist();
-        } else if (modo === 'oficina') {
-            document.getElementById('tab-oficina').classList.add('ativo');
-            document.getElementById('painel-oficina').classList.add('ativo-tela');
-            carregarHistoricoOficina();
-            carregarAlertasPreventivos();
-            carregarChecklistsPainelOficina();
-        } else if (modo === 'controlador') {
-            document.getElementById('tab-controlador').classList.add('ativo');
-            document.getElementById('painel-geral').classList.add('ativo-tela');
-            carregarDadosPainel();
-            carregarChecklistsPainelControlador();
-        }
-    }
-
-    function limparEscalasAntigas() {
-        let hoje = new Date();
-        hoje.setDate(hoje.getDate() - 5);
-        let limiteStr = hoje.toISOString().split('T')[0];
-
-        db.collection("escalas_motoristas").get().then((snapshot) => {
-            snapshot.forEach((doc) => {
-                let dados = doc.data();
-                if (dados.data && dados.data < limiteStr) {
-                    db.collection("escalas_motoristas").doc(doc.id).delete();
-                }
-            });
-        });
-    }
-
+    // SISTEMA DE CONTROLE DE SESSÃO PROFISSIONAL
     function verificarSessao() {
-        const chapaSalva = localStorage.getItem("vipol_chapa_usuario");
-        const nomeSalvo = localStorage.getItem("vipol_nome_usuario");
-        const cargoSalvo = localStorage.getItem("vipol_cargo_usuario");
+        const chapaSalva = localStorage.getItem("vipol_chapa");
+        const nomeSalvo = localStorage.getItem("vipol_nome");
+        const mesSalvo = localStorage.getItem("vipol_mes");
 
-        carregarDicionarioLinhas();
-
-        if (chapaSalva && nomeSalvo && cargoSalvo) {
+        if (chapaSalva && nomeSalvo) {
             usuarioChapaAtivo = chapaSalva;
             usuarioNomeAtivo = nomeSalvo;
-            usuarioCargoAtivo = cargoSalvo;
-
+            
+            document.getElementById("txt-nome-colaborador").value = usuarioNomeAtivo;
+            document.getElementById("txt-chapa-colaborador").value = usuarioChapaAtivo;
             document.getElementById("tela-login").style.display = "none";
             
-            if (cargoSalvo === 'motorista') {
-                document.getElementById('tab-escala').style.display = 'block';
-                document.getElementById('tab-motorista').style.display = 'block';
-                document.getElementById('bloco-minha-escala').style.display = 'block';
-                document.getElementById('bloco-cadastro-linha').style.display = 'none';
-                document.getElementById('bloco-cadastro-escala').style.display = 'none';
-                document.getElementById('bloco-todas-escalas').style.display = 'none';
-                document.getElementById("txt-nome-motorista").value = usuarioNomeAtivo;
-                document.getElementById("txt-chapa-motorista").value = usuarioChapaAtivo;
-                mudarVisao('escala');
-            } else if (cargoSalvo === 'escalante') {
-                document.getElementById('tab-escala').style.display = 'block';
-                document.getElementById('bloco-minha-escala').style.display = 'none';
-                document.getElementById('bloco-cadastro-linha').style.display = 'block';
-                document.getElementById('bloco-cadastro-escala').style.display = 'block';
-                document.getElementById('bloco-todas-escalas').style.display = 'block';
-                mudarVisao('escala');
-            } else if (cargoSalvo === 'oficina') {
-                document.getElementById('tab-oficina').style.display = 'block';
-                solicitarPermissaoNotificacao();
-                mudarVisao('oficina');
-            } else if (cargoSalvo === 'controlador') {
-                document.getElementById('tab-oficina').style.display = 'block';
-                document.getElementById('tab-controlador').style.display = 'block';
-                solicitarPermissaoNotificacao();
-                mudarVisao('controlador');
+            if (mesSalvo) {
+                document.getElementById("sel-mes").value = mesSalvo;
             }
+
+            inicializarDias();
+            carregarMes();
         } else {
             document.getElementById("tela-login").style.display = "flex";
-            if(chapaSalva) document.getElementById("login-chapa").value = chapaSalva;
-            if(nomeSalvo) document.getElementById("login-nome").value = nomeSalvo;
-            if(cargoSalvo) document.getElementById("login-cargo").value = cargoSalvo;
-            const whatsSalvo = localStorage.getItem("vipol_whatsapp_usuario");
-            if(whatsSalvo) document.getElementById("login-whatsapp").value = whatsSalvo;
         }
     }
 
     function realizarLogin() {
-        const nome = document.getElementById("login-nome").value.trim();
-        const chapa = document.getElementById("login-chapa").value.trim();
-        const whatsapp = document.getElementById("login-whatsapp").value.trim();
-        const cargo = document.getElementById("login-cargo").value;
+        const nomeInput = document.getElementById("login-nome").value.trim();
+        const chapaInput = document.getElementById("login-chapa").value.trim();
 
-        if (!nome || !chapa) {
-            mostrarToast("Preencha Nome e Chapa!", "aviso");
+        if (!nomeInput || !chapaInput) {
+            alert("Por favor, preencha o Nome e o número da Chapa!");
             return;
         }
 
-        localStorage.setItem("vipol_chapa_usuario", chapa);
-        localStorage.setItem("vipol_nome_usuario", nome);
-        localStorage.setItem("vipol_cargo_usuario", cargo);
-        if(whatsapp) localStorage.setItem("vipol_whatsapp_usuario", whatsapp);
-
-        if(cargo === 'motorista') {
-            db.collection("motoristas_cadastrados").doc(chapa).set({ chapa, nome, whatsapp: whatsapp || "" });
-        }
-
+        localStorage.setItem("vipol_chapa", chapaInput);
+        localStorage.setItem("vipol_nome", nomeInput);
+        
         verificarSessao();
-        mostrarToast("Login efetuado com sucesso!", "sucesso");
     }
 
     function fazerLogout() {
-        localStorage.clear();
-        location.reload();
-    }
-
-    function buscarMotoristaPorChapaEscala() {
-        let chapaInput = document.getElementById('escala-chapa-motorista').value.trim();
-        let nomeInput = document.getElementById('escala-nome-motorista');
-
-        if (!chapaInput) {
-            nomeInput.value = "";
-            return;
+        if(confirm("Deseja desconectar e trocar de funcionário?")) {
+            localStorage.removeItem("vipol_chapa");
+            localStorage.removeItem("vipol_nome");
+            localStorage.removeItem("vipol_mes");
+            location.reload();
         }
-
-        db.collection("motoristas_cadastrados").doc(chapaInput).get().then((doc) => {
-            if (doc.exists) {
-                let dados = doc.data();
-                nomeInput.value = dados.nome;
-            } else {
-                nomeInput.value = "";
-                nomeInput.placeholder = "Motorista novo! Digite o nome aqui...";
-            }
-        });
     }
 
-    function carregarMinhaEscala() {
-        const container = document.getElementById('dados-minha-escala');
-        if(!container) return;
-        container.innerHTML = "Buscando escalas...";
+    function mudarMes() {
+        const mesSelecionado = document.getElementById("sel-mes").value;
+        localStorage.setItem("vipol_mes", mesSelecionado);
+        carregarMes();
+    }
+
+    function inicializarDias() {
+        const container = document.getElementById('lista-pontos');
+        let htmlDias = '';
+        for (let i = 1; i <= 31; i++) {
+            let d = i < 10 ? '0' + i : i;
+            htmlDias += `
+            <div class="card-dia linha-ponto" id="card-dia-${i}">
+                <div class="card-header">
+                    <span class="dia-badge" id="lbl-badge-dia-${i}">Dia ${d}</span>
+                    <div class="valores-dia">
+                        <span class="v-extra id-extra-relogio">0:00</span>
+                        <span class="v-money id-extra-dinheiro">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="inputs-row">
+                    <div class="campo"><label>Entrada</label><input type="text" class="in-entrada" placeholder="08:00" oninput="salvarEDigitar()"></div>
+                    <div class="campo"><label>Minutos Janta</label><input type="text" class="in-janta" placeholder="60" oninput="salvarEDigitar()"></div>
+                    <div class="campo"><label>Saída</label><input type="text" class="in-saida" placeholder="16:20" oninput="salvarEDigitar()"></div>
+                </div>
+            </div>`;
+        }
+        container.innerHTML = htmlDias;
+    }
+
+    function obterDiasUteisEDomingosDoMes() {
+        const mesSelecionado = document.getElementById('sel-mes').value;
+        const indiceMes = MAPEAMENTO_MESES[mesSelecionado];
+        const anoAtual = 2026;
         
-        db.collection("escalas_motoristas").get().then((snapshot) => {
-            let minhasEscalas = [];
-            let agora = new Date();
-            let hojeStr = agora.getFullYear() + '-' + String(agora.getMonth() + 1).padStart(2, '0') + '-' + String(agora.getDate()).padStart(2, '0');
+        let diasUteis = 0;
+        let domingos = 0;
 
-            snapshot.forEach((doc) => {
-                let e = doc.data();
-                if (String(e.chapa) === String(usuarioChapaAtivo) && e.data >= hojeStr) {
-                    minhasEscalas.push(e);
-                }
-            });
+        for (let i = 1; i <= 31; i++) {
+            const dataObjeto = new Date(anoAtual, indiceMes, i);
+            if (dataObjeto.getMonth() !== indiceMes) break;
 
-            minhasEscalas.sort((a, b) => a.data.localeCompare(b.data));
-
-            if (minhasEscalas.length > 0) {
-                let html = "";
-                minhasEscalas.forEach(e => {
-                    let dataBR = formatarDataBR(e.data);
-                    let blocoObs = e.obs ? `<br><b>Obs:</b> <span style="color:#fbbf24; font-style:italic;">${e.obs}</span>` : '';
-                    html += `<div style="background:var(--bg-input); border:1px solid var(--borda-card); padding:10px; border-radius:8px; margin-bottom:8px;">
-                        <b>Data:</b> ${dataBR} | <b>Horário:</b> ${e.horario}<br>
-                        <b>Pegada:</b> <span style="color:#60a5fa;">${e.pegada || 'Garagem'}</span><br>
-                        <b>Linha:</b> <span style="color:#34d399; font-weight:700;">${e.linha}</span>
-                        ${blocoObs}
-                    </div>`;
-                });
-                container.innerHTML = html;
+            const diaSemana = dataObjeto.getDay();
+            if (diaSemana === 0) {
+                domingos++;
             } else {
-                container.innerHTML = `<span style="color:#fbbf24;">Nenhuma escala ativa para hoje ou dias futuros.</span>`;
+                diasUteis++;
+            }
+        }
+        return { diasUteis, domingos };
+    }
+
+    function atualizarCalendarioDiasSemana() {
+        const mesSelecionado = document.getElementById('sel-mes').value;
+        const indiceMes = MAPEAMENTO_MESES[mesSelecionado];
+        const anoAtual = 2026;
+
+        for (let i = 1; i <= 31; i++) {
+            const card = document.getElementById(`card-dia-${i}`);
+            const badge = document.getElementById(`lbl-badge-dia-${i}`);
+            const dataObjeto = new Date(anoAtual, indiceMes, i);
+            
+            if (dataObjeto.getMonth() !== indiceMes) {
+                if(card) card.style.display = 'none';
+                continue;
+            } else {
+                if(card) card.style.display = 'block';
+            }
+
+            const diaSemanaIndex = dataObjeto.getDay();
+            const nomeDiaSemana = DIAS_DA_SEMANA_NOMES[diaSemanaIndex];
+            
+            let d = i < 10 ? '0' + i : i;
+            if(badge) badge.innerText = `Dia ${d} - ${nomeDiaSemana}`;
+
+            if(card) {
+                card.classList.remove('fim-de-semana');
+                if (diaSemanaIndex === 0 || diaSemanaIndex === 6) {
+                    card.classList.add('fim-de-semana');
+                }
+            }
+        }
+    }
+
+    function textoParaMinutos(stringHora) {
+        if (!stringHora || !stringHora.includes(':')) return null;
+        const partes = stringHora.split(':');
+        return (parseInt(partes[0], 10) || 0) * 60 + (parseInt(partes[1], 10) || 0);
+    }
+
+    function minutesParaTexto(minutos) {
+        if (minutos <= 0) return "0:00";
+        const h = Math.floor(minutos / 60);
+        const m = Math.floor(minutos % 60);
+        return `${h}:${m < 10 ? '0' : ''}${m}`;
+    }
+
+    function separarMinutosDiurnosENoturnos(entradaMin, saidaMin) {
+        let diurnos = 0;
+        let noturnos = 0;
+        let atual = entradaMin;
+
+        while (atual < saidaMin) {
+            let minutoDoDia = atual % 1440;
+            if (minutoDoDia >= 1320 || minutoDoDia < 300) {
+                noturnos++;
+            } else {
+                diurnos++;
+            }
+            atual++;
+        }
+        return { diurnos, noturnos };
+    }
+
+    function calcularImpostos(salarioBruto, numFilhos) {
+        let inss = 0;
+        const tetoInss = 908.85;
+
+        if (salarioBruto <= 1412.00) {
+            inss = salarioBruto * 0.075;
+        } else if (salarioBruto <= 2666.68) {
+            inss = (1412.00 * 0.075) + ((salarioBruto - 1412.00) * 0.09);
+        } else if (salarioBruto <= 4000.03) {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((salarioBruto - 2666.68) * 0.12);
+        } else {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.03 - 2666.68) * 0.12) + ((salarioBruto - 4000.03) * 0.14);
+        }
+        
+        if (inss > tetoInss) inss = tetoInss;
+
+        const descontoDependentes = numFilhos * 189.59;
+        let baseIR = salarioBruto - inss - descontoDependentes;
+        if (baseIR < 0) baseIR = 0;
+
+        let irrfBruto = 0;
+
+        if (baseIR <= 2259.20) {
+            irrfBruto = 0;
+        } else if (baseIR <= 2828.65) {
+            irrfBruto = (baseIR * 0.075) - 169.44;
+        } else if (baseIR <= 3751.05) {
+            irrfBruto = (baseIR * 0.15) - 381.44;
+        } else if (baseIR <= 4664.68) {
+            irrfBruto = (baseIR * 0.225) - 662.77;
+        } else {
+            irrfBruto = (baseIR * 0.275) - 896.00;
+        }
+
+        if (irrfBruto < 0) irrfBruto = 0;
+        let irrfFinal = irrfBruto;
+
+        if (salarioBruto <= 5000.00) {
+            irrfFinal = 0;
+        } else if (salarioBruto <= 7350.00) {
+            const redutor = 978.62 - (0.133145 * salarioBruto);
+            irrfFinal = irrfBruto - redutor;
+            if (irrfFinal < 0) irrfFinal = 0;
+        }
+
+        return {
+            inss: parseFloat(inss.toFixed(2)),
+            irrf: parseFloat(irrfFinal.toFixed(2))
+        };
+    }
+
+    function calcularTudo() {
+        const todosOsCards = document.querySelectorAll('.linha-ponto');
+        if(todosOsCards.length === 0) return;
+
+        let acumuladoMinutosExtrasMesRelogio = 0;
+        let ganhoTotalExtrasReais = 0;
+        let ganhoTotalAdicionalNoturnoReais = 0;
+        let diasTrabalhadosContador = 0;
+        
+        const JORNADA_CONTRATUAL_MINUTOS = 440;
+        const SALARIO_BASE = 3143.00;
+        const VALE_FIXO = 1258.00;
+        const HORA_NORMAL = SALARIO_BASE / 220;
+        
+        const VALOR_ADICIONAL_NOTURNO_HORA = HORA_NORMAL * 0.20;
+
+        todosOsCards.forEach(card => {
+            if (card.style.display === 'none') return;
+
+            const entradaTxt = card.querySelector('.in-entrada').value.trim().toUpperCase();
+            const saidaTxt = card.querySelector('.in-saida').value.trim().toUpperCase();
+            const jantaTxt = card.querySelector('.in-janta').value.trim();
+            
+            const txtRelogio = card.querySelector('.id-extra-relogio');
+            const txtDinheiro = card.querySelector('.id-extra-dinheiro');
+
+            const checarFolga = (txt) => txt === 'F' || txt === 'FOLGA' || txt === 'FDS';
+
+            if (checarFolga(entradaTxt) || checarFolga(saidaTxt)) {
+                card.classList.add('dia-folga');
+                card.classList.remove('janta-reduzida');
+                txtRelogio.innerText = "Folga";
+                txtDinheiro.innerText = "R$ 0,00";
+                return;
+            } else {
+                card.classList.remove('dia-folga');
+            }
+
+            let minutesDeJantaDoDia = parseInt(jantaTxt, 10);
+            if (isNaN(minutesDeJantaDoDia)) { minutesDeJantaDoDia = 60; }
+
+            if (minutesDeJantaDoDia < 60 && jantaTxt !== "") {
+                card.classList.add('janta-reduzida');
+            } else {
+                card.classList.remove('janta-reduzida');
+            }
+
+            const entradaMin = textoParaMinutos(entradaTxt);
+            let saidaMin = textoParaMinutos(saidaTxt);
+
+            if (entradaMin !== null && saidaMin !== null) {
+                diasTrabalhadosContador++;
+                
+                if (saidaMin <= entradaMin) { saidaMin += 1440; }
+
+                let tempoTotalNaEmpresa = saidaMin - entradaMin;
+                let tempoTrabalhadoNoDiaRelogio = tempoTotalNaEmpresa - minutesDeJantaDoDia;
+
+                let tempos = separarMinutosDiurnosENoturnos(entradaMin, saidaMin);
+                let diurnosBruto = tempos.diurnos;
+                let noturnosBruto = tempos.noturnos;
+                let totalBrutoMinutos = diurnosBruto + noturnosBruto;
+
+                if (totalBrutoMinutos > 0) {
+                    let proporcaoDiurna = diurnosBruto / totalBrutoMinutos;
+                    let proporcaoNoturna = noturnosBruto / totalBrutoMinutos;
+                    diurnosBruto = Math.max(0, diurnosBruto - (minutesDeJantaDoDia * proporcaoDiurna));
+                    noturnosBruto = Math.max(0, noturnosBruto - (minutesDeJantaDoDia * proporcaoNoturna));
+                }
+
+                let noturnosFicticios = noturnosBruto * 1.142857;
+                let totalEfetivoTrabalhadoNoDiaDinheiro = diurnosBruto + noturnosFicticios;
+
+                if (tempoTrabalhadoNoDiaRelogio > JORNADA_CONTRATUAL_MINUTOS) {
+                    const extraDoDiaRelogioMinutos = tempoTrabalhadoNoDiaRelogio - JORNADA_CONTRATUAL_MINUTOS;
+                    acumuladoMinutosExtrasMesRelogio += extraDoDiaRelogioMinutos;
+
+                    txtRelogio.innerText = minutesParaTexto(extraDoDiaRelogioMinutos);
+
+                    let extrasDoDiaDinheiroMinutos = totalEfetivoTrabalhadoNoDiaDinheiro - JORNADA_CONTRATUAL_MINUTOS;
+                    let proporcaoNoturnaEfetiva = noturnosFicticios / totalEfetivoTrabalhadoNoDiaDinheiro;
+
+                    let extrasNoturnasMinutos = extrasDoDiaDinheiroMinutos * proporcaoNoturnaEfetiva;
+                    let extrasDiurnasMinutos = extrasDoDiaDinheiroMinutos * (1 - proporcaoNoturnaEfetiva);
+
+                    let ganhoExtraDiurno = (extrasDiurnasMinutos / 60) * (HORA_NORMAL * 1.5);
+                    let ganhoExtraNoturno = (extrasNoturnasMinutos / 60) * (HORA_NORMAL * 1.8);
+                    let ganhoExtrasDia = ganhoExtraDiurno + ganhoExtraNoturno;
+                    
+                    ganhoTotalExtrasReais += ganhoExtrasDia;
+
+                    let noturnasComunsMinutos = noturnosFicticios - extrasNoturnasMinutos;
+                    let ganhoNoturnoNormalDia = (noturnasComunsMinutos / 60) * VALOR_ADICIONAL_NOTURNO_HORA;
+                    ganhoTotalAdicionalNoturnoReais += ganhoNoturnoNormalDia;
+
+                    txtDinheiro.innerText = "R$ " + ganhoExtrasDia.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                } else {
+                    let ganhoNoturnoNormalDia = (noturnosFicticios / 60) * VALOR_ADICIONAL_NOTURNO_HORA;
+                    ganhoTotalAdicionalNoturnoReais += ganhoNoturnoNormalDia;
+
+                    txtRelogio.innerText = "0:00";
+                    txtDinheiro.innerText = "R$ 0,00";
+                }
+            } else {
+                txtRelogio.innerText = "0:00";
+                txtDinheiro.innerText = "R$ 0,00";
             }
         });
-    }
 
-    function carregarTodasAsEscalas() {
-        const listaDiv = document.getElementById('lista-todas-escalas');
-        if(!listaDiv) return;
-        db.collection("escalas_motoristas").get().then((snapshot) => {
-            let html = '<table class="painel-tabela"><tr><th>Motorista</th><th>Pegada</th><th>Linha</th><th>Data</th></tr>';
-            let escalasArr = [];
-            snapshot.forEach(doc => escalasArr.push(doc.data()));
-            escalasArr.sort((a, b) => b.data.localeCompare(a.data));
-
-            escalasArr.forEach((e) => {
-                let dataBR = formatarDataBR(e.data);
-                let obsResumo = e.obs ? `<br><span style="font-size:10px; color:#fbbf24;">Obs: ${e.obs}</span>` : '';
-                html += `<tr><td><b>${e.motorista}</b>${obsResumo}</td><td>${e.pegada || 'Garagem'}</td><td>${e.linha}</td><td>${dataBR}</td></tr>`;
-            });
-            listaDiv.innerHTML = html + '</table>';
-        });
-    }
-
-    function salvarEscalaIndividual() {
-        const chapa = document.getElementById('escala-chapa-motorista').value.trim();
-        const nome = document.getElementById('escala-nome-motorista').value.trim();
-        const pegada = document.getElementById('escala-pegada').value;
-        const linhaNum = document.getElementById('escala-linha-num').value.trim();
-        const linhaNome = document.getElementById('escala-linha-nome').value.trim();
-        const dataEscala = document.getElementById('escala-data').value;
-        const horario = document.getElementById('escala-horario').value.trim();
-        const obs = document.getElementById('escala-obs').value.trim();
-
-        if (!chapa || !nome || !linhaNum || !dataEscala) {
-            mostrarToast("Preencha a matrícula, nome, linha e data!", "aviso");
-            return;
+        const calendarioProporcao = obterDiasUteisEDomingosDoMes();
+        let valorDsrCalculado = 0;
+        if (calendarioProporcao.diasUteis > 0) {
+            valorDsrCalculado = ((ganhoTotalExtrasReais + ganhoTotalAdicionalNoturnoReais) / calendarioProporcao.diasUteis) * calendarioProporcao.domingos;
         }
 
-        const linhaCompleta = linhaNome ? linhaNome : linhaNum;
-        db.collection("motoristas_cadastrados").doc(chapa).set({ chapa, nome, whatsapp: "" });
-        const idDocumento = `${chapa}_${dataEscala}`;
+        const baseCalculoImpostosBruto = SALARIO_BASE + ganhoTotalExtrasReais + ganhoTotalAdicionalNoturnoReais + valorDsrCalculado;
+        const numFilhos = parseInt(document.getElementById('pref-filhos').value) || 0;
 
-        db.collection("escalas_motoristas").doc(idDocumento).set({
-            chapa,
-            motorista: nome,
-            pegada,
-            linha: linhaCompleta,
-            data: dataEscala,
-            horario,
-            obs
-        }).then(() => {
-            mostrarToast(`Escala para o dia ${formatarDataBR(dataEscala)} salva com sucesso!`, "sucesso");
-            carregarTodasAsEscalas();
-            document.getElementById('escala-linha-num').value = "";
-            document.getElementById('escala-linha-nome').value = "";
-            document.getElementById('escala-data').value = "";
-            document.getElementById('escala-horario').value = "";
-            document.getElementById('escala-obs').value = "";
-        });
+        const impostos = calcularImpostos(baseCalculoImpostosBruto, numFilhos);
+
+        document.getElementById('total-dias-trab').value = diasTrabalhadosContador + " dias";
+        document.getElementById('resumo-horas-banco').value = minutesParaTexto(acumuladoMinutosExtrasMesRelogio);
+        document.getElementById('resumo-extras-reais').value = "R$ " + ganhoTotalExtrasReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('resumo-dsr').value = "R$ " + valorDsrCalculado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('resumo-adicional-noturno').value = "R$ " + ganhoTotalAdicionalNoturnoReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        document.getElementById('resumo-inss').value = "R$ " + impostos.inss.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('resumo-irrf').value = "R$ " + impostos.irrf.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        let passagens = parseFloat(document.getElementById('input-passagem').value.replace(',', '.')) || 0;
+
+        const oQueRestaReceberDia05 = baseCalculoImpostosBruto - VALE_FIXO - impostos.inss - impostos.irrf;
+        const totalBrutoComExtrasEBeneficios = baseCalculoImpostosBruto + passagens;
+
+        document.getElementById('txt-receber-dia-05').value = "R$ " + oQueRestaReceberDia05.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('txt-total-final').innerText = "R$ " + totalBrutoComExtrasEBeneficios.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    function construirInterfaceChecklist() {
-        const container = document.getElementById('container-checklist');
-        if (container.innerHTML.trim() !== '') return;
-        let htmlGeral = '';
-        itensChecklist.forEach((s, sIndex) => {
-            htmlGeral += `<div class="secao-checklist"><div class="titulo-secao">${s.secao}</div><div class="lista-itens">`;
-            s.itens.forEach((item, iIndex) => {
-                htmlGeral += `<div class="card-item"><span class="nome-item">${item}</span><div class="grupo-status" data-id="item_${sIndex}_${iIndex}"><button class="btn-status ativo-ok" onclick="mudarStatus(this, 'OK')">OK</button><button class="btn-status" onclick="mudarStatus(this, 'DEFEITO')">Defeito</button></div></div>`;
-            });
-            htmlGeral += `</div></div>`;
-        });
-        container.innerHTML = htmlGeral;
+    function obterChaveAtual() {
+        return document.getElementById('sel-mes').value;
     }
 
-    function mudarStatus(botao, status) {
-        const grupo = botao.parentElement;
-        grupo.querySelectorAll('.btn-status').forEach(b => b.classList.remove('ativo-ok', 'ativo-defeito'));
-        botao.classList.add(status === 'OK' ? 'ativo-ok' : 'ativo-defeito');
-        salvarChecklist();
-    }
+    function salvarEDigitar() {
+        calcularTudo();
+        if (carregandoDados || !usuarioChapaAtivo) return;
 
-    function verificarHistoricoCarro() {
-        const prefixo = document.getElementById('txt-prefixo').value.trim();
-        if (!prefixo) return;
-        db.collection("checklists_onibus").get().then((snapshot) => {
-            snapshot.forEach((doc) => {
-                let d = doc.data();
-                if (d.prefixo && d.prefixo.toLowerCase() === prefixo.toLowerCase() && d.observacoes) {
-                    document.getElementById('texto-relato-anterior').innerHTML = `<b>Obs:</b> ${d.observacoes}`;
-                    document.getElementById('alerta-turno-anterior').style.display = 'block';
-                }
-            });
-        });
-    }
-
-    function processarFoto(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                listaFotosBase64.push(e.target.result);
-                atualizarPreviewFotos();
-                salvarChecklist();
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function atualizarPreviewFotos() {
-        const container = document.getElementById('preview-fotos');
-        container.innerHTML = "";
-        listaFotosBase64.forEach((foto, i) => {
-            container.innerHTML += `<div class="miniatura-container"><img src="${foto}" class="miniatura-foto" onclick="ampliarFoto('${foto}')"><button class="btn-remover-foto" onclick="listaFotosBase64.splice(${i},1);atualizarPreviewFotos()">X</button></div>`;
-        });
-    }
-
-    function processarFotoOficina(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                listaFotosOficinaBase64.push(e.target.result);
-                document.getElementById('preview-fotos-oficina').innerHTML = `<span style="font-size:11px; color:#10b981; font-weight:600;">Foto anexada com sucesso!</span>`;
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function processarFotoManutencao(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                listaFotosManutencaoBase64.push(e.target.result);
-                atualizarPreviewFotosManutencao();
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function atualizarPreviewFotosManutencao() {
-        const container = document.getElementById('preview-fotos-manutencao');
-        container.innerHTML = "";
-        listaFotosManutencaoBase64.forEach((foto, i) => {
-            container.innerHTML += `<div class="miniatura-container"><img src="${foto}" class="miniatura-foto" onclick="ampliarFoto('${foto}')"><button class="btn-remover-foto" onclick="listaFotosManutencaoBase64.splice(${i},1);atualizarPreviewFotosManutencao()">X</button></div>`;
-        });
-    }
-
-    function salvarChecklist() {
-        if (!usuarioChapaAtivo) return;
+        document.getElementById('txt-status-nuvem').innerText = "Digitando... ⏳";
         clearTimeout(timeoutSalvar);
+        
         timeoutSalvar = setTimeout(() => {
-            const prefixo = document.getElementById('txt-prefixo').value.trim();
-            if (!prefixo) return;
-            
-            let dados = {
-                motorista: usuarioNomeAtivo,
+            const mesAtual = obterChaveAtual();
+            const dadosMes = {
+                nome: usuarioNomeAtivo,
                 chapa: usuarioChapaAtivo,
-                prefixo: prefixo,
-                linha: document.getElementById('txt-linha').value,
-                kmInicial: document.getElementById('txt-km-inicial').value,
-                turno: document.getElementById('sel-turno').value,
-                observacoes: document.getElementById('txt-observacoes').value,
-                fotos: listaFotosBase64,
-                respostas: {},
-                dataHoraEnvio: new Date().toISOString()
+                passagem: document.getElementById('input-passagem').value,
+                filhos: document.getElementById('pref-filhos').value,
+                dias: []
             };
-            document.querySelectorAll('.grupo-status').forEach(g => {
-                dados.respostas[g.getAttribute('data-id')] = g.querySelector('.ativo-ok') ? "OK" : "DEFEITO";
-            });
 
-            db.collection("checklists_onibus").doc(`${usuarioChapaAtivo}_${new Date().toISOString().split('T')[0]}`).set(dados)
-            .then(() => document.getElementById('txt-status-nuvem').innerText = "Sincronizado na nuvem ☁️");
+            for (let i = 1; i <= 31; i++) {
+                const card = document.getElementById(`card-dia-${i}`);
+                if(card) {
+                    dadosMes.dias.push({
+                        ent: card.querySelector('.in-entrada').value,
+                        jan: card.querySelector('.in-janta').value,
+                        sai: card.querySelector('.in-saida').value
+                    });
+                }
+            }
+
+            // SALVAMENTO SEPARADO AUTOMATICAMENTE POR CHAPA
+            db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${mesAtual}`).set(dadosMes)
+            .then(() => {
+                document.getElementById('txt-status-nuvem').innerText = "Dados salvos na Nuvem! ✅";
+            })
+            .catch((error) => {
+                document.getElementById('txt-status-nuvem').innerText = "Erro ao salvar na Nuvem ❌";
+                console.error("Erro Firebase: ", error);
+            });
         }, 1000);
     }
 
-    function enviarChamadoOficina() {
-        const prefixo = document.getElementById('txt-prefixo').value.trim();
-        const descricao = document.getElementById('txt-obs-oficina').value.trim();
-        if (!prefixo || !descricao) {
-            mostrarToast("Preencha o prefixo e o relato da pane!", "aviso");
-            return;
-        }
+    function carregarMes() {
+        if (!usuarioChapaAtivo) return;
+        carregandoDados = true;
+        document.getElementById('txt-status-nuvem').innerText = "Carregando dados... 🔄";
+        const mesAtual = obterChaveAtual();
 
-        mostrarToast("Buscando localização GPS...", "aviso");
+        atualizarCalendarioDiasSemana();
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) => {
-                enviarDadosPane(prefixo, descricao, pos.coords.latitude, pos.coords.longitude);
-            }, () => {
-                enviarDadosPane(prefixo, descricao, null, null);
-            }, { timeout: 5000 });
-        } else {
-            enviarDadosPane(prefixo, descricao, null, null);
-        }
-    }
-
-    function enviarDadosPane(prefixo, descricao, lat, lon) {
-        const whatsappMotorista = localStorage.getItem("vipol_whatsapp_usuario") || "";
-        const fotoPane = (listaFotosOficinaBase64 && listaFotosOficinaBase64.length > 0) ? listaFotosOficinaBase64[0] : "";
-
-        db.collection("chamados_oficina").add({
-            motorista: usuarioNomeAtivo,
-            chapa: usuarioChapaAtivo,
-            whatsapp: whatsappMotorista,
-            prefixo,
-            descricao,
-            foto: fotoPane,
-            latitude: lat,
-            longitude: lon,
-            status: "PENDENTE",
-            dataHora: new Date().toISOString()
-        }).then(() => {
-            mostrarToast("Chamado urgente enviado para oficina!", "sucesso");
-            document.getElementById('txt-obs-oficina').value = "";
-            listaFotosOficinaBase64 = [];
-            document.getElementById('preview-fotos-oficina').innerHTML = "";
-        });
-    }
-
-    async function finalizarEEnviar() {
-        const prefixo = document.getElementById('txt-prefixo').value.trim();
-        const kmAtual = Number(document.getElementById('txt-km-inicial').value);
-
-        if (!prefixo || !kmAtual) {
-            mostrarToast("Informe o Prefixo e o Km Inicial!", "aviso");
-            return;
-        }
-
-        mostrarToast("Validando quilometragem...", "aviso");
-
-        try {
-            const snap = await db.collection("checklists_onibus").where("prefixo", "==", prefixo).get();
-            let ultimoKm = 0;
-            snap.forEach(doc => {
-                let val = Number(doc.data().kmInicial || 0);
-                if (val > ultimoKm) ultimoKm = val;
-            });
-
-            if (ultimoKm > 0 && kmAtual < ultimoKm) {
-                mostrarToast(`Erro: Km (${kmAtual}) é menor que o registro anterior (${ultimoKm} km)!`, "erro");
-                return;
-            }
-
-            salvarChecklist();
-            mostrarToast("Check-list finalizado com sucesso!", "sucesso");
-        } catch (e) {
-            salvarChecklist();
-            mostrarToast("Check-list salvo com sucesso!", "sucesso");
-        }
-    }
-
-    function salvarManutencaoOficina() {
-        const prefixo = document.getElementById('oficina-prefixo').value.trim();
-        const servico = document.getElementById('oficina-servico').value;
-        const descricao = document.getElementById('oficina-descricao').value.trim();
-        const pecas = document.getElementById('oficina-pecas').value.trim();
-        const km = document.getElementById('oficina-km').value.trim();
-        const custo = document.getElementById('oficina-custo').value.trim();
-        const responsavel = document.getElementById('oficina-responsavel').value.trim();
-
-        if (!prefixo || !km) {
-            mostrarToast("Preencha o Prefixo e a Quilometragem!", "aviso");
-            return;
-        }
-
-        db.collection("manutencoes_frota").add({
-            prefixo,
-            servico,
-            descricao: descricao || "Nenhuma descrição informada.",
-            pecas: pecas || "Nenhuma peça informada.",
-            km: Number(km),
-            custo: custo ? Number(custo) : 0,
-            responsavel: responsavel || "Não informado",
-            fotos: listaFotosManutencaoBase64,
-            data: new Date().toISOString()
-        }).then(() => {
-            mostrarToast("Manutenção detalhada salva com sucesso!", "sucesso");
-            document.getElementById('oficina-prefixo').value = "";
-            document.getElementById('oficina-descricao').value = "";
-            document.getElementById('oficina-pecas').value = "";
-            document.getElementById('oficina-km').value = "";
-            document.getElementById('oficina-custo').value = "";
-            document.getElementById('oficina-responsavel').value = "";
-            listaFotosManutencaoBase64 = [];
-            document.getElementById('preview-fotos-manutencao').innerHTML = "";
-            carregarHistoricoOficina();
-        });
-    }
-
-    function carregarHistoricoOficina() {
-        const filtro = document.getElementById('filtro-busca-oficina').value.trim().toLowerCase();
-        db.collection("manutencoes_frota").get().then((snap) => {
-            cacheManutencoes = {};
-            let html = '<table class="painel-tabela"><tr><th>Carro</th><th>Tipo</th><th>Km</th><th>Custo</th></tr>';
-            let lista = [];
-            snap.forEach(d => {
-                cacheManutencoes[d.id] = d.data();
-                lista.push({ id: d.id, ...d.data() });
-            });
-            lista.sort((a, b) => (b.data || "").localeCompare(a.data || ""));
-
-            let contador = 0;
-            lista.forEach(m => {
-                if (!filtro || (m.prefixo && m.prefixo.toLowerCase().includes(filtro))) {
-                    let dataFmt = m.data ? new Date(m.data).toLocaleDateString('pt-BR') : '-';
-                    let custoFmt = m.custo ? `R$ ${m.custo.toFixed(2)}` : 'R$ 0,00';
-                    
-                    html += `<tr class="linha-tabela-clicavel" onclick="abrirDetalhesManutencao('${m.id}')">
-                        <td><b>${m.prefixo}</b><br><span style="font-size:9px; color:var(--texto-secundario);">${dataFmt}</span></td>
-                        <td>${m.servico}</td>
-                        <td>${m.km} km</td>
-                        <td style="color:#34d399; font-weight:700;">${custoFmt}</td>
-                    </tr>`;
-                    contador++;
-                }
-            });
-
-            if (contador === 0) {
-                html += `<tr><td colspan="4" style="text-align:center; color:var(--texto-secundario);">Nenhum histórico encontrado.</td></tr>`;
-            }
-
-            document.getElementById('lista-manutencoes-oficina').innerHTML = html + '</table>';
-        });
-    }
-
-    function abrirDetalhesManutencao(idDoc) {
-        const m = cacheManutencoes[idDoc];
-        if (!m) return;
-
-        let dataFmt = m.data ? new Date(m.data).toLocaleString('pt-BR') : '-';
-        let custoFmt = m.custo ? `R$ ${m.custo.toFixed(2)}` : 'R$ 0,00';
-
-        let html = `
-            <div style="margin-bottom: 8px;"><b>Carro / Prefixo:</b> <span style="color:#60a5fa; font-size:14px; font-weight:800;">${m.prefixo}</span></div>
-            <div style="margin-bottom: 8px;"><b>Data do Registro:</b> ${dataFmt}</div>
-            <div style="margin-bottom: 8px;"><b>Tipo de Serviço:</b> ${m.servico}</div>
-            <div style="margin-bottom: 8px;"><b>Quilometragem:</b> ${m.km} Km</div>
-            <div style="margin-bottom: 8px;"><b>Responsável / Oficina:</b> ${m.responsavel}</div>
-            <div style="margin-bottom: 8px;"><b>Custo Total:</b> <span style="color:#34d399; font-weight:800;">${custoFmt}</span></div>
-            
-            <div style="margin-top: 12px; margin-bottom: 4px; font-weight: 700; color: #60a5fa;">O que foi feito (Serviço):</div>
-            <div style="background: var(--bg-input); padding: 10px; border-radius: 8px; color: #f8fafc; line-height: 1.4;">${m.descricao}</div>
-
-            <div style="margin-top: 12px; margin-bottom: 4px; font-weight: 700; color: #34d399;">Peças Substituídas:</div>
-            <div style="background: var(--bg-input); padding: 10px; border-radius: 8px; color: #f8fafc; line-height: 1.4;">${m.pecas}</div>
-        `;
-
-        if (m.fotos && m.fotos.length > 0) {
-            html += `<div style="margin-top: 12px;"><b>Fotos da Manutenção (Clique para ampliar):</b><div class="preview-fotos" style="margin-top: 4px;">`;
-            m.fotos.forEach(f => {
-                html += `<img src="${f}" class="miniatura-foto" onclick="ampliarFoto('${f}')">`;
-            });
-            html += `</div></div>`;
-        }
-
-        document.getElementById('modal-manutencao-titulo').innerText = `Manutenção - Carro ${m.prefixo}`;
-        document.getElementById('modal-manutencao-corpo').innerHTML = html;
-        document.getElementById('modal-detalhe-manutencao').style.display = 'flex';
-    }
-
-    function fecharModalManutencao() {
-        document.getElementById('modal-detalhe-manutencao').style.display = 'none';
-    }
-
-    function carregarAlertasPreventivos() {
-        document.getElementById('lista-alertas-preventivos').innerHTML = '<span style="color:#10b981;">Nenhum alerta pendente. Frota regularizada.</span>';
-    }
-
-    function carregarChecklistsPainelOficina() {
-        const filtro = document.getElementById('filtro-checklist-oficina').value.trim().toLowerCase();
-        db.collection("checklists_onibus").get().then((snap) => {
-            cacheChecklists = {};
-            let html = '<table class="painel-tabela"><tr><th>Carro</th><th>Motorista</th><th>Km</th><th>Status</th></tr>';
-            let lista = [];
-            snap.forEach(d => {
-                cacheChecklists[d.id] = d.data();
-                lista.push({ id: d.id, ...d.data() });
-            });
-            lista.sort((a, b) => (b.dataHoraEnvio || "").localeCompare(a.dataHoraEnvio || ""));
-
-            let contador = 0;
-            lista.forEach(c => {
-                if (!filtro || (c.prefixo && c.prefixo.toLowerCase().includes(filtro))) {
-                    let temDefeito = false;
-                    if (c.respostas) {
-                        for (let k in c.respostas) {
-                            if (c.respostas[k] === "DEFEITO") temDefeito = true;
-                        }
-                    }
-
-                    let statusTexto = temDefeito ? '<span style="color:#f87171; font-weight:800;">⚠️ Defeito</span>' : '<span style="color:#34d399; font-weight:600;">OK</span>';
-                    let estiloLinha = temDefeito ? 'background: rgba(220, 38, 38, 0.1);' : '';
-
-                    html += `<tr class="linha-tabela-clicavel" style="${estiloLinha}" onclick="abrirDetalhesChecklist('${c.id}')">
-                        <td><b>${c.prefixo || 'N/D'}</b></td>
-                        <td>${c.motorista || 'N/D'}</td>
-                        <td>${c.kmInicial || '-'}</td>
-                        <td>${statusTexto}</td>
-                    </tr>`;
-                    contador++;
-                }
-            });
-
-            if (contador === 0) {
-                html += `<tr><td colspan="4" style="text-align:center; color:var(--texto-secundario);">Nenhum check-list encontrado.</td></tr>`;
-            }
-
-            document.getElementById('lista-checklists-oficina').innerHTML = html + '</table>';
-        });
-    }
-
-    function carregarChecklistsPainelControlador() {
-        const filtro = document.getElementById('filtro-checklist-controlador').value.trim().toLowerCase();
-        db.collection("checklists_onibus").get().then((snap) => {
-            cacheChecklists = {};
-            let html = '<table class="painel-tabela"><tr><th>Carro</th><th>Motorista</th><th>Km</th><th>Status</th></tr>';
-            let lista = [];
-            snap.forEach(d => {
-                cacheChecklists[d.id] = d.data();
-                lista.push({ id: d.id, ...d.data() });
-            });
-            lista.sort((a, b) => (b.dataHoraEnvio || "").localeCompare(a.dataHoraEnvio || ""));
-
-            let contador = 0;
-            lista.forEach(c => {
-                if (!filtro || (c.prefixo && c.prefixo.toLowerCase().includes(filtro))) {
-                    let temDefeito = false;
-                    if (c.respostas) {
-                        for (let k in c.respostas) {
-                            if (c.respostas[k] === "DEFEITO") temDefeito = true;
-                        }
-                    }
-
-                    let statusTexto = temDefeito ? '<span style="color:#f87171; font-weight:800;">⚠️ Defeito</span>' : '<span style="color:#34d399; font-weight:600;">OK</span>';
-                    let estiloLinha = temDefeito ? 'background: rgba(220, 38, 38, 0.1);' : '';
-
-                    html += `<tr class="linha-tabela-clicavel" style="${estiloLinha}" onclick="abrirDetalhesChecklist('${c.id}')">
-                        <td><b>${c.prefixo || 'N/D'}</b></td>
-                        <td>${c.motorista || 'N/D'}</td>
-                        <td>${c.kmInicial || '-'}</td>
-                        <td>${statusTexto}</td>
-                    </tr>`;
-                    contador++;
-                }
-            });
-
-            if (contador === 0) {
-                html += `<tr><td colspan="4" style="text-align:center; color:var(--texto-secundario);">Nenhum check-list encontrado.</td></tr>`;
-            }
-
-            document.getElementById('lista-checklists-controlador').innerHTML = html + '</table>';
-        });
-    }
-
-    function abrirDetalhesChecklist(idDoc) {
-        const dados = cacheChecklists[idDoc];
-        if (!dados) return;
-
-        document.getElementById('modal-titulo-carro').innerText = `Carro: ${dados.prefixo} (${dados.turno || 'Turno N/D'})`;
-        
-        let htmlDefeitos = `<div style="margin-bottom: 10px;"><b>Motorista:</b> ${dados.motorista} (Chapa: ${dados.chapa})</div>`;
-        htmlDefeitos += `<div style="margin-bottom: 10px;"><b>Quilometragem:</b> ${dados.kmInicial} Km | <b>Linha:</b> ${dados.linha || 'Não informada'}</div>`;
-        
-        htmlDefeitos += `<div style="margin-top: 10px; margin-bottom: 6px; font-weight: 700; color: #60a5fa;">Itens Vistoriados:</div>`;
-        htmlDefeitos += `<div style="display: flex; flex-direction: column; gap: 4px; background: var(--bg-input); padding: 10px; border-radius: 8px;">`;
-
-        if (dados.respostas) {
-            for (let chave in dados.respostas) {
-                let nomeAmigavel = nomeAmigavelItens[chave] || chave;
-                let statusItem = dados.respostas[chave];
-                let corStatus = statusItem === "DEFEITO" ? "color: #f87171; font-weight: bold;" : "color: #34d399;";
-                htmlDefeitos += `<div>• ${nomeAmigavel}: <span style="${corStatus}">${statusItem}</span></div>`;
-            }
-        }
-        htmlDefeitos += `</div>`;
-
-        if (dados.observacoes) {
-            htmlDefeitos += `<div style="margin-top: 12px;"><b>Observações do Motorista:</b><div style="background: var(--bg-input); padding: 8px; border-radius: 6px; margin-top: 4px; color: #f8fafc; font-style: italic;">${dados.observacoes}</div></div>`;
-        }
-
-        if (dados.fotos && dados.fotos.length > 0) {
-            htmlDefeitos += `<div style="margin-top: 12px;"><b>Fotos Anexadas (Clique para ampliar):</b><div class="preview-fotos" style="margin-top: 4px;">`;
-            dados.fotos.forEach(f => {
-                htmlDefeitos += `<img src="${f}" class="miniatura-foto" onclick="ampliarFoto('${f}')">`;
-            });
-            htmlDefeitos += `</div></div>`;
-        }
-
-        document.getElementById('modal-corpo-detalhes').innerHTML = htmlDefeitos;
-        document.getElementById('modal-detalhe-checklist').style.display = 'flex';
-    }
-
-    function fecharModalDetalhes() {
-        document.getElementById('modal-detalhe-checklist').style.display = 'none';
-    }
-
-    function ampliarFoto(urlFoto) {
-        document.getElementById('img-zoom-exibicao').src = urlFoto;
-        document.getElementById('modal-zoom-foto').style.display = 'flex';
-    }
-
-    function fecharZoomFoto() {
-        document.getElementById('modal-zoom-foto').style.display = 'none';
-    }
-
-    function carregarDadosPainel() {
-        db.collection("chamados_oficina").where("status", "==", "PENDENTE").get().then((snap) => {
-            let html = "";
-            let quantidadeAtual = snap.size;
-
-            document.getElementById('kpi-chamados').innerText = quantidadeAtual;
-            document.getElementById('badge-contador-chamados').innerText = `${quantidadeAtual} pendentes`;
-
-            if (totalChamadosAnterior !== -1 && quantidadeAtual > totalChamadosAnterior) {
-                tocarAlertaSonoro();
-                mostrarToast("🚨 Novo chamado urgente recebido!", "erro");
-            }
-            totalChamadosAnterior = quantidadeAtual;
-
-            db.collection("checklists_onibus").get().then(snapCheck => {
-                document.getElementById('kpi-checklists').innerText = snapCheck.size;
-            });
-
-            snap.forEach(d => {
-                let c = d.data();
-                let docId = d.id;
-                let gpsLink = c.latitude ? `<a href="https://maps.google.com/?q=${c.latitude},${c.longitude}" target="_blank" style="color:#38bdf8; font-weight:600; margin-right:10px; text-decoration:none;">🗺️ Mapa</a>` : '';
+        db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${mesAtual}`).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const dados = doc.data();
+                document.getElementById('input-passagem').value = dados.passagem || "";
+                document.getElementById('pref-filhos').value = dados.filhos || "0";
                 
-                let whatsappBtn = '';
-                if (c.whatsapp) {
-                    let numeroLimpo = c.whatsapp.replace(/\D/g, '');
-                    whatsappBtn = `<a href="https://wa.me/55${numeroLimpo}?text=Olá%20${encodeURIComponent(c.motorista)},%20recebemos%20seu%20chamado%20referente%20ao%20carro%20${c.prefixo}." target="_blank" style="background:#059669; color:#fff; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:700; text-decoration:none; margin-right:6px; display:inline-block;">💬 WhatsApp</a>`;
-                } else {
-                    whatsappBtn = `<span style="font-size:10px; color:var(--texto-secundario); margin-right:6px;">Sem WhatsApp</span>`;
-                }
-
-                let htmlFoto = '';
-                if (c.foto) {
-                    htmlFoto = `<div style="margin-top: 6px; margin-bottom: 4px;">
-                        <span style="font-size:10px; color:#60a5fa; font-weight:700; display:block; margin-bottom:2px;">📸 Foto da Avaria:</span>
-                        <img src="${c.foto}" class="miniatura-foto" onclick="ampliarFoto('${c.foto}')" style="width: 55px; height: 55px;">
-                    </div>`;
-                }
-
-                html += `<div style="background:var(--bg-input); border:1px solid rgba(220,38,38,0.4); padding:10px; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div style="flex:1; padding-right:8px;">
-                        <b>${c.motorista}</b> (Carro: <b>${c.prefixo}</b>)<br>
-                        <span style="color:#cbd5e1; font-size:11px; display:block; margin-top:2px;">${c.descricao}</span>
-                        ${htmlFoto}
-                        <div style="margin-top:6px; display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
-                            ${gpsLink}
-                            ${whatsappBtn}
-                        </div>
-                    </div>
-                    <button onclick="resolverChamado('${docId}')" style="background:var(--sucesso); border:none; color:#fff; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:700; cursor:pointer; text-transform:uppercase; white-space:nowrap;">Concluir</button>
-                </div>`;
-            });
-            document.getElementById('lista-chamados-painel').innerHTML = html || "Nenhum chamado pendente no momento.";
-        });
-    }
-
-    function resolverChamado(idDoc) {
-        db.collection("chamados_oficina").doc(idDoc).update({
-            status: "RESOLVIDO"
-        }).then(() => {
-            mostrarToast("Chamado concluído com sucesso!", "sucesso");
-            carregarDadosPainel();
-        });
-    }
-
-    function clicarCardChamados() {
-        const secao = document.getElementById('secao-chamados-painel');
-        if (secao) {
-            secao.scrollIntoView({ behavior: 'smooth' });
-            secao.style.borderColor = '#f87171';
-            setTimeout(() => { secao.style.borderColor = ''; }, 1500);
-        }
-    }
-
-    function clicarCardChecklists() {
-        const secao = document.getElementById('secao-checklists-painel');
-        if (secao) {
-            secao.scrollIntoView({ behavior: 'smooth' });
-            secao.style.borderColor = '#60a5fa';
-            setTimeout(() => { secao.style.borderColor = ''; }, 1500);
-        }
-    }
-
-    async function gerarRelatorioGeralPDF() {
-        mostrarToast("Gerando relatório completo da frota em PDF...", "aviso");
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        let y = 20;
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(15);
-        doc.text("VIPOL TRANSPORTES - RELATÓRIO GERAL DA FROTA", 14, y);
-        y += 6;
-        
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.text(`Data de Emissão: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, 14, y);
-        y += 5;
-        doc.text(`Gestor / Emitente: ${usuarioNomeAtivo} (Chapa: ${usuarioChapaAtivo})`, 14, y);
-        y += 6;
-
-        doc.setLineWidth(0.4);
-        doc.line(14, y, 196, y);
-        y += 10;
-
-        try {
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.setTextColor(220, 38, 38);
-            doc.text("1. Check-lists com Defeitos Registrados", 14, y);
-            y += 6;
-
-            const snapChecklists = await db.collection("checklists_onibus").get();
-            let qtdDefeitos = 0;
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(0, 0, 0);
-
-            snapChecklists.forEach((docSnap) => {
-                let c = docSnap.data();
-                let temDefeito = false;
-                let itensDefeituosos = [];
-
-                if (c.respostas) {
-                    for (let k in c.respostas) {
-                        if (c.respostas[k] === "DEFEITO") {
-                            temDefeito = true;
-                            itensDefeituosos.push(nomeAmigavelItens[k] || k);
+                for (let i = 1; i <= 31; i++) {
+                    const card = document.getElementById(`card-dia-${i}`);
+                    if(card) {
+                        if (dados.dias && dados.dias[i-1]) {
+                            card.querySelector('.in-entrada').value = dados.dias[i-1].ent || "";
+                            card.querySelector('.in-janta').value = dados.dias[i-1].jan || "";
+                            card.querySelector('.in-saida').value = dados.dias[i-1].sai || "";
+                        } else {
+                            card.querySelector('.in-entrada').value = "";
+                            card.querySelector('.in-janta').value = "60";
+                            card.querySelector('.in-saida').value = "";
                         }
                     }
                 }
-
-                if (temDefeito) {
-                    qtdDefeitos++;
-                    if (y > 265) { doc.addPage(); y = 20; }
-
-                    doc.setFont("helvetica", "bold");
-                    doc.text(`Carro: ${c.prefixo || 'N/D'} | Motorista: ${c.motorista || 'N/D'} | Km: ${c.kmInicial || '-'}`, 14, y);
-                    y += 5;
-                    doc.setFont("helvetica", "normal");
-                    doc.text(`Itens com Defeito: ${itensDefeituosos.join(', ')}`, 18, y, { maxWidth: 170 });
-                    y += 5;
-                    if (c.observacoes) {
-                        doc.text(`Obs: ${c.observacoes}`, 18, y, { maxWidth: 170 });
-                        y += 5;
-                    }
-                    y += 3;
-                }
-            });
-
-            if (qtdDefeitos === 0) {
-                doc.text("Nenhum check-list com defeito registrado.", 14, y);
-                y += 8;
-            }
-
-            y += 5;
-            if (y > 260) { doc.addPage(); y = 20; }
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.setTextColor(217, 119, 6);
-            doc.text("2. Chamados Urgentes e Panes na Rua", 14, y);
-            y += 6;
-
-            const snapChamados = await db.collection("chamados_oficina").get();
-            let qtdChamados = 0;
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(0, 0, 0);
-
-            snapChamados.forEach((docSnap) => {
-                let ch = docSnap.data();
-                qtdChamados++;
-                if (y > 265) { doc.addPage(); y = 20; }
-
-                let dataCh = ch.dataHora ? new Date(ch.dataHora).toLocaleString('pt-BR') : '-';
-                doc.setFont("helvetica", "bold");
-                doc.text(`Carro: ${ch.prefixo} | Status: ${ch.status} | Data: ${dataCh}`, 14, y);
-                y += 5;
-                doc.setFont("helvetica", "normal");
-                doc.text(`Descrição: ${ch.descricao}`, 18, y, { maxWidth: 170 });
-                y += 8;
-            });
-
-            if (qtdChamados === 0) {
-                doc.text("Nenhum chamado urgente registrado.", 14, y);
-                y += 8;
-            }
-
-            y += 5;
-            if (y > 260) { doc.addPage(); y = 20; }
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.setTextColor(5, 150, 105);
-            doc.text("3. Manutenções Realizadas no Mês", 14, y);
-            y += 6;
-
-            const snapManutencoes = await db.collection("manutencoes_frota").get();
-            let mesAtual = new Date().getMonth();
-            let anoAtual = new Date().getFullYear();
-            let qtdManutencoesMes = 0;
-            let custoTotalMes = 0;
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(0, 0, 0);
-
-            snapManutencoes.forEach((docSnap) => {
-                let m = docSnap.data();
-                if (m.data) {
-                    let dataManut = new Date(m.data);
-                    if (dataManut.getMonth() === mesAtual && dataManut.getFullYear() === anoAtual) {
-                        qtdManutencoesMes++;
-                        custoTotalMes += Number(m.custo || 0);
-
-                        if (y > 265) { doc.addPage(); y = 20; }
-
-                        let dataFmt = dataManut.toLocaleDateString('pt-BR');
-                        doc.setFont("helvetica", "bold");
-                        doc.text(`Carro: ${m.prefixo} | Tipo: ${m.servico} | Km: ${m.km} | Data: ${dataFmt}`, 14, y);
-                        y += 5;
-                        doc.setFont("helvetica", "normal");
-                        doc.text(`Serviço: ${m.descricao}`, 18, y, { maxWidth: 170 });
-                        y += 5;
-                        doc.text(`Peças: ${m.pecas} | Custo: R$ ${Number(m.custo || 0).toFixed(2)} | Resp: ${m.responsavel}`, 18, y, { maxWidth: 170 });
-                        y += 8;
+                document.getElementById('txt-status-nuvem').innerText = "Dados carregados da Nuvem! ☁️";
+            } else {
+                document.getElementById('input-passagem').value = "";
+                document.getElementById('pref-filhos').value = "0";
+                for (let i = 1; i <= 31; i++) {
+                    const card = document.getElementById(`card-dia-${i}`);
+                    if(card) {
+                        card.querySelector('.in-entrada').value = "";
+                        card.querySelector('.in-janta').value = "60";
+                        card.querySelector('.in-saida').value = "";
                     }
                 }
-            });
-
-            if (qtdManutencoesMes === 0) {
-                doc.text("Nenhuma manutenção registrada neste mês.", 14, y);
-                y += 8;
-            } else {
-                y += 2;
-                doc.setFont("helvetica", "bold");
-                doc.text(`Custo Total em Manutenções no Mês: R$ ${custoTotalMes.toFixed(2)}`, 14, y);
+                document.getElementById('txt-status-nuvem').innerText = "Mês sem registros salvos 📂";
             }
-
-            doc.save(`Relatorio_Gerencial_Frota_${new Date().toISOString().split('T')[0]}.pdf`);
-            mostrarToast("Relatório Geral gerado com sucesso!", "sucesso");
-        } catch (error) {
-            console.error(error);
-            mostrarToast("Erro ao gerar PDF geral.", "erro");
-        }
+            calcularTudo();
+            
+            setTimeout(() => {
+                carregandoDados = false;
+            }, 300);
+        })
+        .catch((error) => {
+            document.getElementById('txt-status-nuvem').innerText = "Erro ao conectar com a Nuvem ❌";
+            console.error("Erro ao carregar: ", error);
+            carregandoDados = false;
+        });
     }
 
-    async function gerarRelatorioIndividualPDF() {
-        const prefixoBusca = document.getElementById('oficina-prefixo').value.trim();
+    function abrirTelaImpressaoPDF() {
+        const todosOsCards = document.querySelectorAll('.linha-ponto');
         
-        if (!prefixoBusca) {
-            mostrarToast("Digite o Prefixo do carro no campo acima para gerar o relatório!", "aviso");
-            return;
-        }
-
-        mostrarToast(`Gerando relatório do carro ${prefixoBusca}...`, "aviso");
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        doc.text(`VIPOL TRANSPORTES - HISTÓRICO DO VEÍCULO`, 14, 20);
-        
-        doc.setFontSize(14);
-        doc.setTextColor(29, 78, 216);
-        doc.text(`Prefixo: ${prefixoBusca}`, 14, 28);
-        
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`, 14, 34);
-
-        doc.setLineWidth(0.5);
-        doc.line(14, 38, 196, 38);
-
-        try {
-            const snapManutencoes = await db.collection("manutencoes_frota")
-                .where("prefixo", "==", prefixoBusca)
-                .get();
-
-            let y = 46;
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.text("Histórico de Manutenções e Serviços:", 14, y);
-            y += 8;
-
-            if (snapManutencoes.empty) {
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(10);
-                doc.text("Nenhuma manutenção registrada para este prefixo.", 14, y);
-            } else {
-                snapManutencoes.forEach((docSnap) => {
-                    let m = docSnap.data();
-                    let dataFmt = m.data ? new Date(m.data).toLocaleDateString('pt-BR') : '-';
-                    
-                    if (y > 260) {
-                        doc.addPage();
-                        y = 20;
-                    }
-
-                    doc.setFont("helvetica", "bold");
-                    doc.setFontSize(10);
-                    doc.text(`Data: ${dataFmt} | Tipo: ${m.servico} | Km: ${m.km}`, 14, y);
-                    y += 6;
-
-                    doc.setFont("helvetica", "normal");
-                    doc.setFontSize(9);
-                    doc.text(`Serviço: ${m.descricao}`, 18, y, { maxWidth: 170 });
-                    y += 6;
-                    doc.text(`Peças: ${m.pecas} | Custo: R$ ${Number(m.custo || 0).toFixed(2)}`, 18, y);
-                    y += 6;
-                    doc.text(`Responsável: ${m.responsavel}`, 18, y);
-                    y += 10;
-                });
+        todosOsCards.forEach(card => {
+            const entrada = card.querySelector('.in-entrada').value.trim();
+            const saida = card.querySelector('.in-saida').value.trim();
+            if (entrada === "" && saida === "") {
+                card.classList.add('ocultar-no-pdf');
             }
+        });
 
-            doc.save(`Historico_Carro_${prefixoBusca}.pdf`);
-            mostrarToast("Relatório do veículo gerado com sucesso!", "sucesso");
-        } catch (error) {
-            console.error(error);
-            mostrarToast("Erro ao gerar relatório do veículo.", "erro");
-        }
+        window.print();
+
+        setTimeout(() => {
+            todosOsCards.forEach(card => card.classList.remove('ocultar-no-pdf'));
+        }, 1000);
     }
 
-    setInterval(() => {
-        if (document.getElementById('painel-geral').classList.contains('ativo-tela')) {
-            carregarDadosPainel();
-            carregarChecklistsPainelControlador();
-        }
-    }, 15000);
-
-    function executarRemanejamento() {
-        mostrarToast("Remanejamento registrado com sucesso!", "sucesso");
-    }
-
-    window.onload = verificarSessao;
+    window.onload = function() {
+        verificarSessao();
+    };
 </script>
 </body>
 </html>
