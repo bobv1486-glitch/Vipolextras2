@@ -650,10 +650,24 @@
             
             if (mesSalvo) {
                 document.getElementById("sel-mes").value = mesSalvo;
+            } else {
+                document.getElementById("sel-mes").value = "Agosto";
+                localStorage.setItem("vipol_mes", "Agosto");
             }
 
             inicializarDias();
             carregarMes();
+
+            // Rola a tela automaticamente para o dia de hoje
+            setTimeout(() => {
+                const hoje = new Date();
+                const diaAtual = hoje.getDate();
+                const cardHoje = document.getElementById(`card-dia-${diaAtual}`);
+                if (cardHoje) {
+                    cardHoje.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 600);
+
         } else {
             document.getElementById("tela-login").style.display = "flex";
         }
@@ -742,7 +756,6 @@
             const imagemOriginal = new Image();
             imagemOriginal.src = e.target.result;
             imagemOriginal.onload = function() {
-                // Redimensionar para otimizar armazenamento na nuvem
                 const canvas = document.createElement('canvas');
                 const MAX_WIDTH = 800;
                 const MAX_HEIGHT = 800;
@@ -768,9 +781,7 @@
 
                 const base64Comprimido = canvas.toDataURL('image/jpeg', 0.7);
 
-                // Atualizar visual
                 const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
-                const prev = document.getElementById(`prev-frente-${dia}`); // placeholder, vamos atualizar direto
                 const imgPrev = document.getElementById(`prev-${tipo}-${dia}`);
 
                 btn.classList.add('tem-foto');
