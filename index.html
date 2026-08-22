@@ -455,7 +455,7 @@
             text-transform: uppercase;
         }
 
-        /* MODAL COM SUPORTE A ZOOM E ARRASTO NA FOTO */
+        /* MODAL COM SUPORTE A ZOOM E ARRASTO TOTAL */
         .modal-foto {
             display: none;
             position: fixed;
@@ -475,18 +475,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: auto;
-            touch-action: pinch-zoom;
+            overflow: scroll; /* Permite barras de rolagem nativas para arrastar em qualquer direção */
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal-foto img {
-            max-width: 100%;
-            max-height: 100%;
+            display: block;
+            margin: auto;
+            max-width: none; /* Permite que a imagem ultrapasse o tamanho da tela ao dar zoom */
+            max-height: none;
+            width: 100%; /* Começa ajustada à tela */
+            height: auto;
             border-radius: 8px;
-            object-fit: contain;
-            transition: transform 0.1s ease;
-            transform-origin: center center;
             cursor: zoom-in;
+            transition: transform 0.2s ease;
+            transform-origin: center center;
         }
 
         .btn-fechar-modal {
@@ -775,8 +778,8 @@
             imagemOriginal.src = e.target.result;
             imagemOriginal.onload = function() {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 900;
-                const MAX_HEIGHT = 900;
+                const MAX_WIDTH = 1200;
+                const MAX_HEIGHT = 1200;
                 let largura = imagemOriginal.width;
                 let altura = imagemOriginal.height;
 
@@ -797,7 +800,7 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(imagemOriginal, 0, 0, largura, altura);
 
-                const base64Comprimido = canvas.toDataURL('image/jpeg', 0.8);
+                const base64Comprimido = canvas.toDataURL('image/jpeg', 0.85);
 
                 const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
                 const imgPrev = document.getElementById(`prev-${tipo}-${dia}`);
@@ -817,25 +820,33 @@
         if(!src) return;
         nivelZoomAtual = 1;
         const imgModal = document.getElementById('img-modal-zoom');
+        const container = document.getElementById('container-zoom');
         imgModal.src = src;
-        imgModal.style.transform = `scale(${nivelZoomAtual})`;
+        imgModal.style.width = '100%';
+        container.scrollLeft = 0;
+        container.scrollTop = 0;
         document.getElementById('modal-foto').style.display = 'flex';
     }
 
     function alternarZoomImagem(event) {
         event.stopPropagation();
         const imgModal = document.getElementById('img-modal-zoom');
+        const container = document.getElementById('container-zoom');
+        
         if (nivelZoomAtual === 1) {
-            nivelZoomAtual = 2.5; // Aplica um zoom de 2.5x ao tocar/clicar
+            nivelZoomAtual = 2.5; // Amplia para 2.5x
+            imgModal.style.width = '250%'; // Aumenta a largura real permitindo scroll lateral
         } else {
-            nivelZoomAtual = 1; // Volta ao normal
+            nivelZoomAtual = 1; // Volta ao tamanho original da tela
+            imgModal.style.width = '100%';
+            container.scrollLeft = 0;
+            container.scrollTop = 0;
         }
-        imgModal.style.transform = `scale(${nivelZoomAtual})`;
     }
 
     function fecharModalFoto() {
         nivelZoomAtual = 1;
-        document.getElementById('img-modal-zoom').style.transform = `scale(1)`;
+        document.getElementById('img-modal-zoom').style.width = '100%';
         document.getElementById('modal-foto').style.display = 'none';
     }
 
