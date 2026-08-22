@@ -455,33 +455,51 @@
             text-transform: uppercase;
         }
 
-        /* MODAL PARA VISUALIZAR FOTO GRANDE */
+        /* MODAL COM SUPORTE A ZOOM E ARRASTO NA FOTO */
         .modal-foto {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 10000;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            padding: 20px;
+            padding: 10px;
+            overflow: hidden;
         }
+
+        .container-zoom-foto {
+            width: 100%;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            touch-action: pinch-zoom;
+        }
+
         .modal-foto img {
             max-width: 100%;
-            max-height: 80vh;
+            max-height: 100%;
             border-radius: 8px;
             object-fit: contain;
+            transition: transform 0.1s ease;
+            transform-origin: center center;
+            cursor: zoom-in;
         }
+
         .btn-fechar-modal {
-            margin-top: 15px;
+            margin-top: 10px;
             background: #ef4444;
             color: white;
             border: none;
-            padding: 8px 20px;
+            padding: 10px 25px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
+            text-transform: uppercase;
+            font-size: 13px;
         }
 
         @media print {
@@ -530,10 +548,12 @@
         </div>
     </div>
 
-    <!-- MODAL DE VISUALIZAÇÃO DE FOTO -->
-    <div id="modal-foto" class="modal-foto" onclick="fecharModalFoto()">
-        <img id="img-modal-zoom" src="" alt="Ficha ampliada">
-        <button class="btn-fechar-modal">Fechar</button>
+    <!-- MODAL DE VISUALIZAÇÃO DE FOTO COM ZOOM -->
+    <div id="modal-foto" class="modal-foto">
+        <div class="container-zoom-foto" id="container-zoom">
+            <img id="img-modal-zoom" src="" alt="Ficha ampliada" onclick="alternarZoomImagem(event)">
+        </div>
+        <button class="btn-fechar-modal" onclick="fecharModalFoto()">Fechar Foto</button>
     </div>
 
     <!-- PAINEL PRINCIPAL -->
@@ -625,6 +645,7 @@
     let carregandoDados = false;
     let usuarioChapaAtivo = "";
     let usuarioNomeAtivo = "";
+    let nivelZoomAtual = 1;
 
     const MAPEAMENTO_MESES = {
         "Janeiro": 0, "Fevereiro": 1, "Marco": 2, "Abril": 3,
@@ -634,7 +655,6 @@
 
     const DIAS_DA_SEMANA_NOMES = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
-    // SISTEMA DE CONTROLE DE SESSÃO PROFISSIONAL
     function verificarSessao() {
         const chapaSalva = localStorage.getItem("vipol_chapa");
         const nomeSalvo = localStorage.getItem("vipol_nome");
@@ -658,7 +678,6 @@
             inicializarDias();
             carregarMes();
 
-            // Rola a tela automaticamente para o dia de hoje
             setTimeout(() => {
                 const hoje = new Date();
                 const diaAtual = hoje.getDate();
@@ -742,7 +761,6 @@
         container.innerHTML = htmlDias;
     }
 
-    // MANIPULAÇÃO DE FOTOS (FRENTE E VERSO) COM REDIMENSIONAMENTO AUTOMÁTICO
     function acionarCamera(dia, tipo) {
         document.getElementById(`input-file-${tipo}-${dia}`).click();
     }
@@ -757,8 +775,8 @@
             imagemOriginal.src = e.target.result;
             imagemOriginal.onload = function() {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800;
-                const MAX_HEIGHT = 800;
+                const MAX_WIDTH = 900;
+                const MAX_HEIGHT = 900;
                 let largura = imagemOriginal.width;
                 let altura = imagemOriginal.height;
 
@@ -779,7 +797,7 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(imagemOriginal, 0, 0, largura, altura);
 
-                const base64Comprimido = canvas.toDataURL('image/jpeg', 0.7);
+                const base64Comprimido = canvas.toDataURL('image/jpeg', 0.8);
 
                 const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
                 const imgPrev = document.getElementById(`prev-${tipo}-${dia}`);
@@ -797,11 +815,27 @@
 
     function ampliarFoto(src) {
         if(!src) return;
-        document.getElementById('img-modal-zoom').src = src;
+        nivelZoomAtual = 1;
+        const imgModal = document.getElementById('img-modal-zoom');
+        imgModal.src = src;
+        imgModal.style.transform = `scale(${nivelZoomAtual})`;
         document.getElementById('modal-foto').style.display = 'flex';
     }
 
+    function alternarZoomImagem(event) {
+        event.stopPropagation();
+        const imgModal = document.getElementById('img-modal-zoom');
+        if (nivelZoomAtual === 1) {
+            nivelZoomAtual = 2.5; // Aplica um zoom de 2.5x ao tocar/clicar
+        } else {
+            nivelZoomAtual = 1; // Volta ao normal
+        }
+        imgModal.style.transform = `scale(${nivelZoomAtual})`;
+    }
+
     function fecharModalFoto() {
+        nivelZoomAtual = 1;
+        document.getElementById('img-modal-zoom').style.transform = `scale(1)`;
         document.getElementById('modal-foto').style.display = 'none';
     }
 
@@ -954,7 +988,6 @@
         const SALARIO_BASE = 3143.00;
         const VALE_FIXO = 1258.00;
         const HORA_NORMAL = SALARIO_BASE / 220;
-        
         const VALOR_ADICIONAL_NOTURNO_HORA = HORA_NORMAL * 0.20;
 
         todosOsCards.forEach(card => {
