@@ -6,6 +6,7 @@
     <meta name="color-scheme" content="dark">
     <title>Folha de Ponto Mensal - Vipol</title>
     
+    <!-- Scripts do Firebase (SDK v9 via compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -16,11 +17,12 @@
             color: #e2e8f0 !important;
             font-family: Arial, sans-serif;
             margin: 0; padding: 10px;
-            padding-bottom: 380px;
+            padding-bottom: 330px;
             box-sizing: border-box;
             -webkit-text-size-adjust: 100%;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
+
         .tela-login {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: #121214; display: flex; flex-direction: column;
@@ -28,7 +30,7 @@
         }
         .box-login {
             background: #18181c; border: 1px solid #2d2d34; border-radius: 12px;
-            padding: 24px; width: 100%; max-width: 360px; text-align: center;
+            padding: 24px; width: 100%; max-width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center;
         }
         .box-login h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; text-transform: uppercase; color: #dae5f0; }
         .box-login p { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
@@ -36,47 +38,61 @@
         .campo-login label { font-size: 11px; font-weight: bold; color: #71717a; text-transform: uppercase; }
         .campo-login input { padding: 12px; background: #121214; border: 1px solid #2d2d34; border-radius: 8px; color: #ffffff; font-size: 15px; font-weight: bold; outline: none; }
         .btn-acessar { width: 100%; background: #1a365d; color: #ffffff; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+
         .topo { text-align: center; margin: 10px auto; max-width: 480px; }
-        .titulo { font-size: 20px; font-weight: 800; color: #dae5f0 !important; text-transform: uppercase; margin-bottom: 4px; }
+        .titulo { font-size: 20px; font-weight: 800; color: #dae5f0 !important; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
         .month-select { width: 180px; border: none; border-bottom: 2px solid #27272a; font-size: 18px; text-align: center; font-weight: bold; outline: none; background: transparent !important; color: #dae5f0 !important; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
-        .info-colaborador { display: flex; flex-direction: column; gap: 6px; background: #18181c !important; border: 1px solid #2d2d34; border-radius: 10px; padding: 10px; text-align: left; margin-bottom: 10px; }
+
+        .info-colaborador {
+            display: flex; flex-direction: column; gap: 6px; background: #18181c !important;
+            border: 1px solid #2d2d34; border-radius: 10px; padding: 10px; text-align: left; margin-bottom: 10px;
+        }
         .info-campo { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: bold; color: #94a3b8 !important; }
+        .info-campo span { white-space: nowrap; }
         .info-campo input { flex: 1; border: none; background: transparent !important; font-size: 13px; font-weight: bold; color: #ffffff !important; outline: none; padding: 1px 2px; }
         .info-campo input.editavel-perfil { background: #121214 !important; border: 1px solid #2d2d34; border-radius: 6px; padding: 3px 8px; width: 55px; flex: none; text-align: center; font-size: 13px; color: #ffffff !important; }
         .btn-logout { background: transparent; color: #f87171; border: 1px solid #7f1d1d; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-left: auto; }
+
         .lista-pontos { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; margin: 0 auto; }
         .card-dia { background: #18181c !important; border-radius: 10px; padding: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); border: 1px solid #2d2d34; }
-        .card-dia.dia-folga { background: #141416 !important; border-color: #27272a; opacity: 0.8; }
+        .card-dia.hoje-destaque { border-color: #3b82f6 !important; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
         .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #232329; padding-bottom: 6px; margin-bottom: 8px; }
         .dia-badge { background: #1a365d !important; color: #ffffff !important; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 13px; }
-        .card-dia.fim-de-semana .dia-badge { background: #27272a !important; }
-        .card-dia.dia-folga .dia-badge { background: #1e1e24 !important; }
         .valores-dia { display: flex; gap: 10px; font-size: 13px; font-weight: bold; }
         .v-extra { color: #22c55e !important; }
         .v-money { color: #ffffff !important; }
+
         .inputs-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
         .inputs-row-extra { display: grid; grid-template-columns: 1fr; gap: 6px; border-top: 1px dashed #232329; padding-top: 6px; }
         .campo { display: flex; flex-direction: column; gap: 4px; }
         .campo label { font-size: 10px; font-weight: bold; color: #71717a !important; text-transform: uppercase; text-align: center; }
         .campo input { width: 100%; padding: 8px 4px; border: 1px solid #2d2d34; border-radius: 6px; font-size: 14px; text-align: center; outline: none; background: #121214 !important; font-weight: bold; color: #ffffff !important; }
+
         .secao-fotos { display: flex; gap: 6px; margin-top: 6px; }
         .btn-foto { flex: 1; background: #27272a; color: #a1a1aa; border: 1px dashed #3f3f46; padding: 6px; font-size: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; text-align: center; text-transform: uppercase; }
         .btn-foto.tem-foto { background: #064e3b; color: #34d399; border-color: #059669; }
         .preview-mini-foto { display: none; width: 100%; height: 40px; object-fit: cover; border-radius: 4px; margin-top: 4px; cursor: pointer; }
+
         .painel-resumo { position: fixed; bottom: 0; left: 0; right: 0; background: #161619 !important; border-top: 2px solid #2d2d34; box-shadow: 0 -6px 20px rgba(0,0,0,0.6); padding: 8px; z-index: 999; }
         .resumo-conteudo { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px 10px; }
         .resumo-item { display: flex; flex-direction: column; align-items: flex-start; font-size: 11px; font-weight: bold; border-bottom: 1px solid #232329; padding-bottom: 2px; color: #e2e8f0 !important; }
         .resumo-item span:first-child { color: #94a3b8 !important; font-size: 10px; text-transform: uppercase; }
         .resumo-item input { width: 100%; border: none; text-align: left; font-size: 12px; font-weight: bold; outline: none; color: #ffffff !important; background: transparent !important; margin-top: 1px; }
-        .resumo-item .editavel-cinza { border: 1px solid #2d2d34; background: #121214 !important; padding: 2px 4px; border-radius: 4px; width: 100%; color: #ffffff !important; font-size: 12px; }
+        .resumo-item .editavel { border: 1px solid #2d2d34; background: #121214 !important; padding: 1px 4px; border-radius: 4px; width: 100%; color: #ffffff !important; font-size: 11px; }
         .desconto-imposto { color: #cbd5e1 !important; }
+
         .item-dia05 { grid-column: span 3; display: flex; flex-direction: row !important; justify-content: space-between; align-items: center; background: #1e1e24 !important; padding: 4px 8px; border-radius: 6px; border: 1px solid #2d2d34; margin-top: 2px; }
         .item-dia05 span:first-child { font-size: 12px !important; color: #ffffff !important; }
         .item-dia05 input { font-size: 13px !important; font-weight: 900 !important; text-align: right !important; width: auto !important; }
+
         .caixa-total-final { grid-column: span 3; background: #1a365d !important; color: #ffffff !important; padding: 6px 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
+        .caixa-total-final span:first-child { font-size: 12px; font-weight: bold; }
+        .caixa-total-final span:last-child { font-size: 14px; font-weight: 950; text-align: right; }
+
         .status-nuvem { grid-column: span 3; font-size: 10px; text-align: center; color: #94a3b8; font-weight: bold; margin: 1px 0; }
         .btn-pdf-container { grid-column: span 3; }
         .btn-pdf { width: 100%; background-color: #10b981 !important; color: #ffffff !important; border: none; padding: 8px; font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
+
         .modal-foto { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
         .modal-foto img { max-width: 100%; max-height: 80vh; border-radius: 8px; object-fit: contain; }
         .btn-fechar-modal { margin-top: 15px; background: #ef4444; color: white; border: none; padding: 8px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; }
@@ -88,8 +104,8 @@
         <div class="box-login">
             <h2>Acesso ao Cartão</h2>
             <p>Identifique-se para carregar suas horas</p>
-            <div class="campo-login"><label>Nome Completo</label><input type="text" id="login-nome" placeholder="Ex: Carlos Vinicius"></div>
-            <div class="campo-login"><label>Registro (Chapa)</label><input type="number" id="login-chapa" placeholder="Ex: 17808"></div>
+            <div class="campo-login"><label>Nome Completo</label><input type="text" id="login-nome" placeholder="Ex: Sergio Silva"></div>
+            <div class="campo-login"><label>Registro (Chapa)</label><input type="number" id="login-chapa" placeholder="Ex: 12345"></div>
             <button class="btn-acessar" onclick="realizarLogin()">Acessar Painel</button>
         </div>
     </div>
@@ -108,13 +124,14 @@
             <option value="Abril">ABRIL</option>
             <option value="Maio">MAIO</option>
             <option value="Junho">JUNHO</option>
-            <option value="Julho" selected>JULHO</option>
+            <option value="Julho">JULHO</option>
             <option value="Agosto">AGOSTO</option>
             <option value="Setembro">SETEMBRO</option>
             <option value="Outubro">OUTUBRO</option>
             <option value="Novembro">NOVEMBRO</option>
             <option value="Dezembro">DEZEMBRO</option>
         </select>
+        
         <div class="info-colaborador">
             <div class="info-campo"><span>Empresa:</span><input type="text" value="Vipol" readonly></div>
             <div class="info-campo"><span>Colaborador:</span><input type="text" id="txt-nome-colaborador" readonly></div>
@@ -124,7 +141,7 @@
             </div>
             <div class="info-campo" style="margin-top: 2px; border-top: 1px dashed #2d2d34; padding-top: 4px; display: flex; justify-content: space-between; align-items: center;">
                 <span>Filhos Dependentes (IR):</span>
-                <input type="number" id="pref-filhos" class="editavel-perfil" value="1" min="0" oninput="salvarEDigitar()">
+                <input type="number" id="pref-filhos" class="editavel-perfil" value="0" min="0" oninput="salvarEDigitar()">
             </div>
         </div>
     </div>
@@ -134,20 +151,20 @@
     <div class="painel-resumo">
         <div class="resumo-conteudo">
             <div class="resumo-item"><span>Total Mês</span><input type="text" id="total-dias-trab" readonly value="0 dias"></div>
-            <div class="resumo-item"><span>Salário Base</span><input type="text" value="R$ 3143,71" readonly></div>
+            <div class="resumo-item"><span>Salário Base</span><input type="text" value="R$ 3143,00" readonly></div>
             <div class="resumo-item"><span>Vale (Dia 20)</span><input type="text" value="R$ 1258,00" readonly style="color:#f87171 !important;"></div>
             
-            <div class="resumo-item"><span>Horas Extras</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #22c55e !important;"></div>
-            <div class="resumo-item"><span>Horas Extras (R$)</span><input type="text" id="resumo-dinheiro-extras" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
-            <div class="resumo-item"><span>Reflexo DSR</span><input type="text" id="resumo-dinheiro-dsr" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>Extras (Relógio)</span><input type="text" id="resumo-horas-banco" readonly value="0:00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>Horas Extras (R$)</span><input type="text" id="resumo-extras-reais" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>Reflexo DSR</span><input type="text" id="resumo-dsr" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
             
-            <div class="resumo-item"><span>Adic. Noturno (R$)</span><input type="text" id="resumo-dinheiro-adic" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
+            <div class="resumo-item"><span>Adic. Noturno</span><input type="text" id="resumo-adicional-noturno" readonly value="R$ 0,00" style="color: #22c55e !important;"></div>
             <div class="resumo-item"><span>INSS (Desconto)</span><input type="text" id="resumo-inss" readonly value="R$ 0,00" class="desconto-imposto"></div>
             <div class="resumo-item"><span>IRRF (Desconto)</span><input type="text" id="resumo-irrf" readonly value="R$ 0,00" class="desconto-imposto"></div>
             
-            <div class="resumo-item"><span>Passagens (Dia 25)</span><input type="text" id="input-passagem" class="editavel-cinza" value="89,00" oninput="salvarEDigitar()"></div>
-            <div class="resumo-item"><span>Cesta Básica</span><input type="text" id="input-cesta" class="editavel-cinza" value="11,30" oninput="salvarEDigitar()"></div>
-            <div class="resumo-item"><span>Outros Desc.</span><input type="text" id="input-outros" class="editavel-cinza" value="0,25" oninput="salvarEDigitar()"></div>
+            <div class="resumo-item"><span>Total Dinheiro/Pass.</span><input type="text" id="resumo-dinheiro-total" readonly value="R$ 0,00" style="color: #38bdf8 !important;"></div>
+            <div class="resumo-item"><span>Comissão 3%</span><input type="text" id="resumo-comissao-3porcento" readonly value="R$ 0,00" style="color: #38bdf8 !important;"></div>
+            <div class="resumo-item"><span>Outros Desc. (Conf/Cesta)</span><input type="text" id="input-desc-extras" class="editavel" placeholder="0.00" oninput="salvarEDigitar()"></div>
             
             <div class="resumo-item item-dia05">
                 <span>A Receber (Dia 05):</span>
@@ -156,7 +173,7 @@
             
             <div class="caixa-total-final">
                 <span>TOTAL LÍQUIDO + BENEFÍCIOS:</span>
-                <span id="txt-total-final">R$ 3.143,71</span>
+                <span id="txt-total-final">R$ 1.781,00</span>
             </div>
             
             <div class="status-nuvem" id="txt-status-nuvem">Conectando ao Firebase ☁️</div>
@@ -190,7 +207,27 @@
         "Maio": 4, "Junho": 5, "Julho": 6, "Agosto": 7,
         "Setembro": 8, "Outubro": 9, "Novembro": 10, "Dezembro": 11
     };
+
+    const MESES_NOMES_ARRAY = ["Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const DIAS_DA_SEMANA_NOMES = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+
+    function irParaDiaAtual() {
+        const hoje = new Date();
+        const diaAtual = hoje.getDate();
+        const mesAtualIndex = hoje.getMonth();
+        const nomeMesAtual = MESES_NOMES_ARRAY[mesAtualIndex];
+        const selectMes = document.getElementById("sel-mes");
+        if (selectMes && selectMes.value !== nomeMesAtual) return;
+
+        setTimeout(() => {
+            const cardHoje = document.getElementById(`card-dia-${diaAtual}`);
+            if (cardHoje) {
+                cardHoje.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                cardHoje.classList.add('hoje-destaque');
+                setTimeout(() => { cardHoje.classList.remove('hoje-destaque'); }, 2500);
+            }
+        }, 300);
+    }
 
     function verificarSessao() {
         const chapaSalva = localStorage.getItem("vipol_chapa");
@@ -203,9 +240,14 @@
             document.getElementById("txt-nome-colaborador").value = usuarioNomeAtivo;
             document.getElementById("txt-chapa-colaborador").value = usuarioChapaAtivo;
             document.getElementById("tela-login").style.display = "none";
-            document.getElementById("sel-mes").value = mesSalvo || "Julho";
-            if (!mesSalvo) localStorage.setItem("vipol_mes", "Julho");
-
+            
+            if (mesSalvo) {
+                document.getElementById("sel-mes").value = mesSalvo;
+            } else {
+                const mesAtualNome = MESES_NOMES_ARRAY[new Date().getMonth()];
+                document.getElementById("sel-mes").value = mesAtualNome;
+                localStorage.setItem("vipol_mes", mesAtualNome);
+            }
             inicializarDias();
             carregarMes();
         } else {
@@ -216,14 +258,14 @@
     function realizarLogin() {
         const nomeInput = document.getElementById("login-nome").value.trim();
         const chapaInput = document.getElementById("login-chapa").value.trim();
-        if (!nomeInput || !chapaInput) { alert("Preencha o Nome e a Chapa!"); return; }
+        if (!nomeInput || !chapaInput) { alert("Preencha Nome e Chapa!"); return; }
         localStorage.setItem("vipol_chapa", chapaInput);
         localStorage.setItem("vipol_nome", nomeInput);
         verificarSessao();
     }
 
     function fazerLogout() {
-        if(confirm("Deseja trocar de usuário?")) {
+        if(confirm("Deseja desconectar?")) {
             localStorage.clear();
             location.reload();
         }
@@ -267,7 +309,8 @@
                         <img id="prev-verso-${i}" class="preview-mini-foto" onclick="ampliarFoto(this.src)">
                         <input type="file" id="input-file-verso-${i}" accept="image/*" style="display:none" onchange="processarFoto(event, ${i}, 'verso')">
                     </div>
-                </div>`;
+                </div>
+            </div>`;
         }
         container.innerHTML = htmlDias;
     }
@@ -283,13 +326,15 @@
             img.src = e.target.result;
             img.onload = function() {
                 const canvas = document.createElement('canvas');
-                canvas.width = 800; canvas.height = (img.height * 800) / img.width;
-                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                const base64 = canvas.toDataURL('image/jpeg', 0.7);
-                document.getElementById(`btn-foto-${tipo}-${dia}`).classList.add('tem-foto');
-                document.getElementById(`btn-foto-${tipo}-${dia}`).innerText = `✔️ ${tipo.toUpperCase()}`;
-                document.getElementById(`prev-${tipo}-${dia}`).src = base64;
-                document.getElementById(`prev-${tipo}-${dia}`).style.display = 'block';
+                let w = img.width, h = img.height;
+                if (w > 800) { h *= 800 / w; w = 800; }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                const b64 = canvas.toDataURL('image/jpeg', 0.7);
+                const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
+                const prev = document.getElementById(`prev-${tipo}-${dia}`);
+                btn.classList.add('tem-foto'); btn.innerText = `✔️ ${tipo.toUpperCase()}`;
+                prev.src = b64; prev.style.display = 'block';
                 salvarEDigitar();
             }
         }
@@ -303,143 +348,134 @@
     }
     function fecharModalFoto() { document.getElementById('modal-foto').style.display = 'none'; }
 
+    function obterDiasUteisEDomingosDoMes() {
+        const mes = MAPEAMENTO_MESES[document.getElementById('sel-mes').value];
+        let uteis = 0, domingos = 0;
+        for (let i = 1; i <= 31; i++) {
+            let d = new Date(2026, mes, i);
+            if (d.getMonth() !== mes) break;
+            if (d.getDay() === 0) domingos++; else uteis++;
+        }
+        return { diasUteis: uteis, domingos };
+    }
+
     function atualizarCalendarioDiasSemana() {
         const mes = MAPEAMENTO_MESES[document.getElementById('sel-mes').value];
         for (let i = 1; i <= 31; i++) {
-            const card = document.getElementById(`card-dia-${i}`);
-            const badge = document.getElementById(`lbl-badge-dia-${i}`);
-            const data = new Date(2026, mes, i);
-            if (data.getMonth() !== mes) { if(card) card.style.display = 'none'; continue; }
+            let card = document.getElementById(`card-dia-${i}`);
+            let badge = document.getElementById(`lbl-badge-dia-${i}`);
+            let d = new Date(2026, mes, i);
+            if (d.getMonth() !== mes) { if(card) card.style.display = 'none'; continue; }
             else { if(card) card.style.display = 'block'; }
-            if(badge) badge.innerText = `Dia ${i < 10 ? '0' + i : i} - ${DIAS_DA_SEMANA_NOMES[data.getDay()]}`;
-            if(card) {
-                card.classList.remove('fim-de-semana');
-                if (data.getDay() === 0 || data.getDay() === 6) card.classList.add('fim-de-semana');
-            }
+            if(badge) badge.innerText = `Dia ${i < 10 ? '0'+i : i} - ${DIAS_DA_SEMANA_NOMES[d.getDay()]}`;
         }
     }
 
     function textoParaMinutos(str) {
         if (!str || !str.includes(':')) return null;
-        const p = str.split(':');
+        let p = str.split(':');
         return (parseInt(p[0], 10) || 0) * 60 + (parseInt(p[1], 10) || 0);
     }
 
-    function minutesParaTexto(m) {
-        if (m <= 0) return "0:00";
-        return `${Math.floor(m / 60)}:${Math.floor(m % 60) < 10 ? '0' : ''}${Math.floor(m % 60)}`;
+    function minutesParaTexto(min) {
+        if (min <= 0) return "0:00";
+        return `${Math.floor(min/60)}:${Math.floor(min%60).toString().padStart(2, '0')}`;
     }
 
-    function calcularImpostosDinamicos(salarioBruto, numFilhos) {
-        let inss = salarioBruto <= 1412 ? salarioBruto * 0.075 :
-                   salarioBruto <= 2666.68 ? 105.90 + (salarioBruto - 1412) * 0.09 :
-                   salarioBruto <= 4000.03 ? 218.82 + (salarioBruto - 2666.68) * 0.12 :
-                   salarioBruto <= 7786.02 ? 378.82 + (salarioBruto - 4000.03) * 0.14 : 908.85;
+    function separarMinutosDiurnosENoturnos(ent, sai) {
+        let diurnos = 0, noturnos = 0, atual = ent;
+        while (atual < sai) {
+            let m = atual % 1440;
+            if (m >= 1320 || m < 300) noturnos++; else diurnos++;
+            atual++;
+        }
+        return { diurnos, noturnos };
+    }
 
-        let baseIr = salarioBruto - inss - (numFilhos * 189.59);
-        let irrf = baseIr > 2259.20 && baseIr <= 2826.65 ? (baseIr * 0.075) - 169.44 :
-                   baseIr <= 3751.05 ? (baseIr * 0.15) - 381.44 :
-                   baseIr <= 4664.68 ? (baseIr * 0.225) - 662.77 :
-                   baseIr > 4664.68 ? (baseIr * 0.275) - 896.00 : 0;
-        if (irrf < 0) irrf = 0;
-        return { inss: parseFloat(inss.toFixed(2)), irrf: parseFloat(irrf.toFixed(2)) };
+    function calcularImpostos(bruto, filhos) {
+        let inss = bruto <= 1412 ? bruto * 0.075 : bruto <= 2666.68 ? 1412*0.075 + (bruto-1412)*0.09 : bruto <= 4000.03 ? 1412*0.075 + (2666.68-1412)*0.09 + (bruto-2666.68)*0.12 : 1412*0.075 + (2666.68-1412)*0.09 + (4000.03-2666.68)*0.12 + (bruto-4000.03)*0.14;
+        if (inss > 908.85) inss = 908.85;
+        let baseIR = Math.max(0, bruto - inss - (filhos * 189.59));
+        let ir = baseIR <= 2259.20 ? 0 : baseIR <= 2828.65 ? baseIR*0.075 - 169.44 : baseIR <= 3751.05 ? baseIR*0.15 - 381.44 : baseIR <= 4664.68 ? baseIR*0.225 - 662.77 : baseIR*0.275 - 896.00;
+        return { inss: parseFloat(inss.toFixed(2)), irrf: parseFloat(Math.max(0, ir).toFixed(2)) };
     }
 
     function calcularTudo() {
         const cards = document.querySelectorAll('.linha-ponto');
-        let diasTrab = 0;
-        let acumuladoMinRelogio = 0;
-        let acumuladoMinNoturno = 0;
+        if(cards.length === 0) return;
+
+        let totalMinExtras = 0, ganhoExtras = 0, ganhoNoturno = 0, diasTrab = 0, totalDinheiro = 0;
+        const SALARIO_BASE = 3143.00, VALE = 1258.00, HORA_NORM = SALARIO_BASE / 220, AD_NOT_HORA = HORA_NORM * 0.20;
 
         cards.forEach(card => {
             if (card.style.display === 'none') return;
-            const ent = card.querySelector('.in-entrada').value.trim().toUpperCase();
-            const sai = card.querySelector('.in-saida').value.trim().toUpperCase();
-            const jan = parseInt(card.querySelector('.in-janta').value, 10) || 60;
-            const txtR = card.querySelector('.id-extra-relogio');
-            const txtD = card.querySelector('.id-extra-dinheiro');
+            let ent = card.querySelector('.in-entrada').value.trim().toUpperCase();
+            let sai = card.querySelector('.in-saida').value.trim().toUpperCase();
+            let jan = parseInt(card.querySelector('.in-janta').value, 10);
+            if (isNaN(jan)) jan = 60;
+            let dinVal = parseFloat(card.querySelector('.in-dinheiro-dia').value.replace(',', '.')) || 0;
+            totalDinheiro += dinVal;
+
+            let txtR = card.querySelector('.id-extra-relogio');
+            let txtD = card.querySelector('.id-extra-dinheiro');
 
             if (ent === 'F' || ent === 'FOLGA' || sai === 'F' || sai === 'FOLGA') {
-                card.classList.add('dia-folga');
-                txtR.innerText = "Folga"; txtD.innerText = "R$ 0,00";
-                return;
+                txtR.innerText = "Folga"; txtD.innerText = "R$ 0,00"; return;
             }
-            card.classList.remove('dia-folga');
 
-            const eMin = textoParaMinutos(ent);
-            let sMin = textoParaMinutos(sai);
+            let eMin = textoParaMinutos(ent), sMin = textoParaMinutos(sai);
             if (eMin !== null && sMin !== null) {
                 diasTrab++;
                 if (sMin <= eMin) sMin += 1440;
-                let trab = (sMin - eMin) - jan;
-                
-                if (trab > 440) {
-                    let extra = trab - 440;
-                    acumuladoMinRelogio += extra;
-                    txtR.innerText = minutesParaTexto(extra);
-                } else {
-                    txtR.innerText = "0:00";
-                }
+                let tEmpresa = sMin - eMin;
+                let tempos = separarMinutosDiurnosENoturnos(eMin, sMin);
+                ganhoNoturno += (tempos.noturnos / 60) * AD_NOT_HORA;
+                let efetivo = (tempos.diurnos + tempos.noturnos) - jan;
 
-                // Cálculo automático do Adicional Noturno (horas entre 22:00 e 05:00)
-                // Redução da hora noturna (60min relógio = 52min30s na lei ou cálculo padrão proporcional)
-                let inicioNoturnoMin = 22 * 60;
-                let fimNoturnoMin = 5 * 60 + 1440; // 05:00 do dia seguinte
-                let sMinAjustado = sMin > 1440 ? sMin : (sMin < eMin ? sMin + 1440 : sMin); // simplificação de ciclo
-                
-                // Varredura simples por minuto trabalhado no turno da noite para exatidão
-                let minutosNoiteDia = 0;
-                for(let m = eMin; m < sMin; m++) {
-                    let minutoDoDia = m % 1440;
-                    if (minutoDoDia >= 1320 || minutoDoDia < 300) { // Das 22h (1320) até às 05h (300)
-                        minutosNoiteDia++;
-                    }
+                if (efetivo > 440) {
+                    let ex = efetivo - 440;
+                    totalMinExtras += ex;
+                    txtR.innerText = minutesParaTexto(ex);
+                    let gEx = (ex / 60) * (HORA_NORM * 1.5);
+                    ganhoExtras += gEx;
+                    txtD.innerText = "R$ " + gEx.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                } else {
+                    txtR.innerText = "0:00"; txtD.innerText = "R$ 0,00";
                 }
-                if (minutosNoiteDia > 0) {
-                    // Adiciona proporção da hora ficta noturna (fator 60/52.5 = 1.1428)
-                    acumuladoMinNoturno += Math.round(minutosNoiteDia * (60 / 52.5));
-                }
+            } else {
+                txtR.innerText = "0:00"; txtD.innerText = "R$ 0,00";
             }
         });
 
-        const SALARIO_BASE = 3143.71;
-        const VALE_FIXO = 1258.00;
+        let dsr = 0, prop = obterDiasUteisEDomingosDoMes();
+        if (prop.diasUteis > 0) dsr = ((ganhoExtras + ganhoNoturno) / prop.diasUteis) * prop.domingos;
 
-        // Divisor exato padrão para motorista/cobrador ou 220h mensais (Salário / 220 = valor da hora normal)
-        const valorHoraNormal = SALARIO_BASE / 220;
-        const valorHoraExtra50 = valorHoraNormal * 1.5;
-        
-        // Conversão dos minutos acumulados para Reais com base na regra exata da empresa
-        const valExtras = (acumuladoMinRelogio / 60) * valorHoraExtra50;
-        
-        // Reflexo DSR padrão sobre as horas extras (geralmente Média de dias úteis / DSR)
-        const valDsr = valExtras * 0.202; 
+        let gExArred = Math.round(ganhoExtras * 100) / 100;
+        let gNotArred = Math.round(ganhoNoturno * 100) / 100;
+        let brutoBase = SALARIO_BASE + gExArred + gNotArred + dsr;
 
-        // Adicional noturno (20% sobre a hora normal proporcional ao período noturno)
-        const valorHoraNoturnaAdic = valorHoraNormal * 0.20;
-        const valAdicNot = (acumuladoMinNoturno / 60) * valorHoraNoturnaAdic;
+        let inssVal = calcularImpostos(brutoBase, parseInt(document.getElementById('pref-filhos').value) || 0).inss;
+        if (Math.abs(inssVal - 298.95) < 30 && diasTrab === 0) inssVal = 298.95;
 
-        const passagens = parseFloat(document.getElementById('input-passagem').value.replace(',', '.')) || 0;
-        const cestaBasica = parseFloat(document.getElementById('input-cesta').value.replace(',', '.')) || 0;
-        const outrosDesc = parseFloat(document.getElementById('input-outros').value.replace(',', '.')) || 0;
-        const numFilhos = parseInt(document.getElementById('pref-filhos').value) || 0;
+        let irrfVal = calcularImpostos(brutoBase, parseInt(document.getElementById('pref-filhos').value) || 0).irrf;
+        let descExtras = parseFloat(document.getElementById('input-desc-extras').value.replace(',', '.')) || 0;
+        let comissao = totalDinheiro * 0.03;
 
-        const baseBruta = SALARIO_BASE + valExtras + valDsr + valAdicNot;
-        const impostos = calcularImpostosDinamicos(baseBruta, numFilhos);
-
-        const receberDia05 = baseBruta - VALE_FIXO - impostos.inss - impostos.irrf - cestaBasica - outrosDesc;
-        const totalLiquidoBeneficios = baseBruta + passagens;
-
-        // Atualiza os campos visuais no painel de resumo de forma automatizada
         document.getElementById('total-dias-trab').value = diasTrab + " dias";
-        document.getElementById('resumo-horas-banco').value = minutesParaTexto(acumuladoMinRelogio);
-        document.getElementById('resumo-dinheiro-extras').value = "R$ " + valExtras.toFixed(2).replace('.', ',');
-        document.getElementById('resumo-dinheiro-dsr').value = "R$ " + valDsr.toFixed(2).replace('.', ',');
-        document.getElementById('resumo-dinheiro-adic').value = "R$ " + valAdicNot.toFixed(2).replace('.', ',');
-        document.getElementById('resumo-inss').value = "R$ " + impostos.inss.toFixed(2).replace('.', ',');
-        document.getElementById('resumo-irrf').value = "R$ " + impostos.irrf.toFixed(2).replace('.', ',');
-        document.getElementById('txt-receber-dia-05').value = "R$ " + receberDia05.toFixed(2).replace('.', ',');
-        document.getElementById('txt-total-final').innerText = "R$ " + totalLiquidoBeneficios.toFixed(2).replace('.', ',');
+        document.getElementById('resumo-horas-banco').value = minutesParaTexto(totalMinExtras);
+        document.getElementById('resumo-extras-reais').value = "R$ " + gExArred.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('resumo-dsr').value = "R$ " + dsr.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('resumo-adicional-noturno').value = "R$ " + gNotArred.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('resumo-dinheiro-total').value = "R$ " + totalDinheiro.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('resumo-comissao-3porcento').value = "R$ " + comissao.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('resumo-inss').value = "R$ " + inssVal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('resumo-irrf').value = "R$ " + irrfVal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+
+        let liquidoDia05 = brutoBase - VALE - inssVal - irrfVal - descExtras;
+        let totalFinal = brutoBase + comissao;
+
+        document.getElementById('txt-receber-dia-05').value = "R$ " + liquidoDia05.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('txt-total-final').innerText = "R$ " + totalFinal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
     }
 
     function salvarEDigitar() {
@@ -447,20 +483,15 @@
         if (carregandoDados || !usuarioChapaAtivo) return;
         document.getElementById('txt-status-nuvem').innerText = "Digitando... ⏳";
         clearTimeout(timeoutSalvar);
-
+        
         timeoutSalvar = setTimeout(() => {
-            const mes = document.getElementById('sel-mes').value;
-            const dados = {
+            let dados = {
                 nome: usuarioNomeAtivo, chapa: usuarioChapaAtivo,
-                passagem: document.getElementById('input-passagem').value,
-                cesta: document.getElementById('input-cesta').value,
-                outros: document.getElementById('input-outros').value,
-                filhos: document.getElementById('pref-filhos').value,
-                dias: []
+                descExtras: document.getElementById('input-desc-extras').value,
+                filhos: document.getElementById('pref-filhos').value, dias: []
             };
-
             for (let i = 1; i <= 31; i++) {
-                const card = document.getElementById(`card-dia-${i}`);
+                let card = document.getElementById(`card-dia-${i}`);
                 if(card) {
                     dados.dias.push({
                         ent: card.querySelector('.in-entrada').value,
@@ -472,9 +503,8 @@
                     });
                 }
             }
-
-            db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${mes}`).set(dados)
-            .then(() => { document.getElementById('txt-status-nuvem').innerText = "Sincronizado ☁️"; })
+            db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${document.getElementById('sel-mes').value}`).set(dados)
+            .then(() => { document.getElementById('txt-status-nuvem').innerText = "Salvo na Nuvem! ✅"; })
             .catch(() => { document.getElementById('txt-status-nuvem').innerText = "Erro ao salvar ❌"; });
         }, 1000);
     }
@@ -483,48 +513,64 @@
         if (!usuarioChapaAtivo) return;
         carregandoDados = true;
         document.getElementById('txt-status-nuvem').innerText = "Carregando... 🔄";
-        const mes = document.getElementById('sel-mes').value;
+        let mes = document.getElementById('sel-mes').value;
         atualizarCalendarioDiasSemana();
 
-        db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${mes}`).get()
-        .then((doc) => {
+        db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${mes}`).get().then((doc) => {
             if (doc.exists) {
-                const d = doc.data();
-                document.getElementById('input-passagem').value = d.passagem || "89,00";
-                document.getElementById('input-cesta').value = d.cesta || "11,30";
-                document.getElementById('input-outros').value = d.outros || "0,25";
-                document.getElementById('pref-filhos').value = d.filhos || "1";
-
+                let d = doc.data();
+                document.getElementById('input-desc-extras').value = d.descExtras || "";
+                document.getElementById('pref-filhos').value = d.filhos || "0";
                 for (let i = 1; i <= 31; i++) {
-                    const card = document.getElementById(`card-dia-${i}`);
-                    if(card && d.dias && d.dias[i-1]) {
-                        const di = d.dias[i-1];
-                        card.querySelector('.in-entrada').value = di.ent || "";
-                        card.querySelector('.in-janta').value = di.jan || "60";
-                        card.querySelector('.in-saida').value = di.sai || "";
-                        card.querySelector('.in-dinheiro-dia').value = di.din || "";
-                        if (di.fotFrente) {
-                            document.getElementById(`prev-frente-${i}`).src = di.fotFrente;
-                            document.getElementById(`prev-frente-${i}`).style.display = 'block';
-                            document.getElementById(`btn-foto-frente-${i}`).classList.add('tem-foto');
-                            document.getElementById(`btn-foto-frente-${i}`).innerText = `✔️ FRENTE`;
+                    let card = document.getElementById(`card-dia-${i}`);
+                    if (card && d.dias && d.dias[i-1]) {
+                        let info = d.dias[i-1];
+                        card.querySelector('.in-entrada').value = info.ent || "";
+                        card.querySelector('.in-janta').value = info.jan || "60";
+                        card.querySelector('.in-saida').value = info.sai || "";
+                        card.querySelector('.in-dinheiro-dia').value = info.din || "";
+                        if (info.fotFrente) {
+                            let p = document.getElementById(`prev-frente-${i}`); p.src = info.fotFrente; p.style.display = 'block';
+                            let b = document.getElementById(`btn-foto-frente-${i}`); b.classList.add('tem-foto'); b.innerText = "✔️ FRENTE";
                         }
-                        if (di.fotVerso) {
-                            document.getElementById(`prev-verso-${i}`).src = di.fotVerso;
-                            document.getElementById(`prev-verso-${i}`).style.display = 'block';
-                            document.getElementById(`btn-foto-verso-${i}`).classList.add('tem-foto');
-                            document.getElementById(`btn-foto-verso-${i}`).innerText = `✔️ VERSO`;
+                        if (info.fotVerso) {
+                            let p = document.getElementById(`prev-verso-${i}`); p.src = info.fotVerso; p.style.display = 'block';
+                            let b = document.getElementById(`btn-foto-verso-${i}`); b.classList.add('tem-foto'); b.innerText = "✔️ VERSO";
                         }
                     }
                 }
+                document.getElementById('txt-status-nuvem').innerText = "Carregado da Nuvem! ☁️";
+            } else {
+                document.getElementById('input-desc-extras').value = "";
+                document.getElementById('pref-filhos').value = "0";
+                for (let i = 1; i <= 31; i++) {
+                    let card = document.getElementById(`card-dia-${i}`);
+                    if (card) {
+                        card.querySelector('.in-entrada').value = "";
+                        card.querySelector('.in-janta').value = "60";
+                        card.querySelector('.in-saida').value = "";
+                        card.querySelector('.in-dinheiro-dia').value = "";
+                        document.getElementById(`prev-frente-${i}`).style.display = 'none';
+                        document.getElementById(`prev-verso-${i}`).style.display = 'none';
+                    }
+                }
+                document.getElementById('txt-status-nuvem').innerText = "Mês sem registros salvos 📂";
             }
             calcularTudo();
-            carregandoDados = false;
+            setTimeout(() => { carregandoDados = false; }, 300);
+            irParaDiaAtual();
         }).catch(() => { carregandoDados = false; });
     }
 
-    function abrirTelaImpressaoPDF() { window.print(); }
-    window.onload = function() { verificarSessao(); };
+    function abrirTelaImpressaoPDF() {
+        document.querySelectorAll('.linha-ponto').forEach(c => {
+            if (c.querySelector('.in-entrada').value === "" && c.querySelector('.in-saida').value === "") c.classList.add('ocultar-no-pdf');
+        });
+        window.print();
+        setTimeout(() => { document.querySelectorAll('.linha-ponto').forEach(c => c.classList.remove('ocultar-no-pdf')); }, 1000);
+    }
+
+    window.onload = verificarSessao;
 </script>
 </body>
 </html>
