@@ -329,10 +329,11 @@
             img.onload = function() {
                 const canvas = document.createElement('canvas');
                 let w = img.width, h = img.height;
-                if (w > 900) { h *= 900 / w; w = 900; }
+                if (w > 600) { h *= 600 / w; w = 600; }
                 canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                const b64 = canvas.toDataURL('image/jpeg', 0.8);
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                const b64 = canvas.toDataURL('image/jpeg', 0.5);
                 
                 const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
                 const prev = document.getElementById(`prev-${tipo}-${dia}`);
