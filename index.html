@@ -9,6 +9,8 @@
     <!-- Scripts do Firebase (SDK v9 via compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- Adicionado o script do Firebase Storage -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
     <style>
         :root { color-scheme: dark; }
@@ -73,7 +75,6 @@
         .btn-foto.tem-foto { background: #064e3b; color: #34d399; border-color: #059669; }
         .preview-mini-foto { display: none; width: 100%; height: 45px; object-fit: cover; border-radius: 4px; margin-top: 4px; cursor: pointer; border: 1px solid #059669; }
 
-        /* Estilos do Modal de Zoom com prioridade alta de toque */
         .modal-foto { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; justify-content: center; align-items: center; flex-direction: column; padding: 15px; }
         .modal-foto img { max-width: 100%; max-height: 80vh; border-radius: 8px; object-fit: contain; border: 2px solid #3f3f46; }
         .btn-fechar-modal { margin-top: 15px; background: #ef4444; color: white; border: none; padding: 12px 28px; font-weight: bold; font-size: 14px; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
@@ -111,7 +112,6 @@
         </div>
     </div>
 
-    <!-- Modal de Zoom da Foto -->
     <div id="modal-foto" class="modal-foto" onclick="fecharModalFoto()">
         <img id="img-modal-zoom" src="" alt="Ficha ampliada">
         <button class="btn-fechar-modal" onclick="fecharModalFoto()">Fechar</button>
@@ -198,6 +198,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const storage = firebase.storage(); // Inicializado o Firebase Storage
 
     let timeoutSalvar = null;
     let carregandoDados = false;
@@ -303,12 +304,12 @@
                 <div class="secao-fotos">
                     <div style="flex:1;">
                         <button type="button" class="btn-foto" id="btn-foto-frente-${i}" onclick="acionarCamera(${i}, 'frente')">📸 Ficha Frente</button>
-                        <img id="prev-frente-${i}" class="preview-mini-foto">
+                        <img id="prev-frente-${i}" class="preview-mini-foto" data-url="">
                         <input type="file" id="input-file-frente-${i}" accept="image/*" style="display:none" onchange="processarFoto(event, ${i}, 'frente')">
                     </div>
                     <div style="flex:1;">
                         <button type="button" class="btn-foto" id="btn-foto-verso-${i}" onclick="acionarCamera(${i}, 'verso')">📸 Ficha Verso</button>
-                        <img id="prev-verso-${i}" class="preview-mini-foto">
+                        <img id="prev-verso-${i}" class="preview-mini-foto" data-url="">
                         <input type="file" id="input-file-verso-${i}" accept="image/*" style="display:none" onchange="processarFoto(event, ${i}, 'verso')">
                     </div>
                 </div>
@@ -319,36 +320,38 @@
 
     function acionarCamera(dia, tipo) { document.getElementById(`input-file-${tipo}-${dia}`).click(); }
 
+    // Envia a foto direto para o Firebase Storage em vez de guardar no Firestore
     function processarFoto(event, dia, tipo) {
         const arquivo = event.target.files[0];
         if (!arquivo) return;
-        const leitor = new FileReader();
-        leitor.onload = function(e) {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                let w = img.width, h = img.height;
-                if (w > 600) { h *= 600 / w; w = 600; }
-                canvas.width = w; canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, w, h);
-                const b64 = canvas.toDataURL('image/jpeg', 0.5);
-                
+
+        const mesAtual = document.getElementById('sel-mes').value;
+        const nomeArquivo = `fotos_ponto/${usuarioChapaAtivo}_${mesAtual}_dia${dia}_${tipo}.jpg`;
+        const storageRef = storage.ref().child(nomeArquivo);
+
+        document.getElementById('txt-status-nuvem').innerText = "Enviando foto... 📷";
+
+        storageRef.put(arquivo).then((snapshot) => {
+            snapshot.ref.getDownloadURL().then((downloadURL) => {
                 const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
                 const prev = document.getElementById(`prev-${tipo}-${dia}`);
                 
                 btn.classList.add('tem-foto'); 
                 btn.innerText = `✔️ ${tipo.toUpperCase()}`;
                 
-                prev.src = b64; 
+                prev.src = downloadURL; 
+                prev.dataset.url = downloadURL; // Armazena a URL no elemento
                 prev.style.display = 'block';
-                prev.onclick = function() { ampliarFoto(b64); };
                 
-                salvarEDigitar();
-            }
-        }
-        leitor.readAsDataURL(arquivo);
+                prev.onclick = function() { ampliarFoto(downloadURL); };
+                
+                salvarEDigitar(); // Salva os dados gerais + URL no Firestore
+                document.getElementById('txt-status-nuvem').innerText = "Foto enviada com sucesso! ✅";
+            });
+        }).catch((error) => {
+            console.error("Erro no upload da foto:", error);
+            document.getElementById('txt-status-nuvem').innerText = "Erro ao enviar foto ❌";
+        });
     }
 
     function ampliarFoto(src) {
@@ -508,16 +511,14 @@
             for (let i = 1; i <= 31; i++) {
                 let card = document.getElementById(`card-dia-${i}`);
                 if(card) {
-                    let srcFrente = document.getElementById(`prev-frente-${i}`).src;
-                    let srcVerso = document.getElementById(`prev-verso-${i}`).src;
-
                     dados.dias.push({
                         ent: card.querySelector('.in-entrada').value,
                         jan: card.querySelector('.in-janta').value,
                         sai: card.querySelector('.in-saida').value,
                         din: card.querySelector('.in-dinheiro-dia').value,
-                        fotFrente: (srcFrente && srcFrente.startsWith('data:')) ? srcFrente : '',
-                        fotVerso: (srcVerso && srcVerso.startsWith('data:')) ? srcVerso : ''
+                        // Agora salva apenas o Link (URL) do Storage, poupando espaço no Firestore
+                        fotFrente: document.getElementById(`prev-frente-${i}`).dataset.url || '',
+                        fotVerso: document.getElementById(`prev-verso-${i}`).dataset.url || ''
                     });
                 }
             }
@@ -551,6 +552,7 @@
                         if (info.fotFrente) {
                             let p = document.getElementById(`prev-frente-${i}`); 
                             p.src = info.fotFrente; 
+                            p.dataset.url = info.fotFrente;
                             p.style.display = 'block';
                             p.onclick = function() { ampliarFoto(info.fotFrente); };
                             let b = document.getElementById(`btn-foto-frente-${i}`); 
@@ -560,6 +562,7 @@
                         if (info.fotVerso) {
                             let p = document.getElementById(`prev-verso-${i}`); 
                             p.src = info.fotVerso; 
+                            p.dataset.url = info.fotVerso;
                             p.style.display = 'block';
                             p.onclick = function() { ampliarFoto(info.fotVerso); };
                             let b = document.getElementById(`btn-foto-verso-${i}`); 
@@ -579,8 +582,11 @@
                         card.querySelector('.in-janta').value = "60";
                         card.querySelector('.in-saida').value = "";
                         card.querySelector('.in-dinheiro-dia').value = "";
-                        document.getElementById(`prev-frente-${i}`).style.display = 'none';
-                        document.getElementById(`prev-verso-${i}`).style.display = 'none';
+                        
+                        let prevF = document.getElementById(`prev-frente-${i}`);
+                        prevF.style.display = 'none'; prevF.dataset.url = "";
+                        let prevV = document.getElementById(`prev-verso-${i}`);
+                        prevV.style.display = 'none'; prevV.dataset.url = "";
                     }
                 }
                 document.getElementById('txt-status-nuvem').innerText = "Mês sem registros salvos 📂";
