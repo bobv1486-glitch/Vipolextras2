@@ -93,7 +93,6 @@
         .caixa-total-final span:first-child { font-size: 12px; font-weight: bold; }
         .caixa-total-final span:last-child { font-size: 14px; font-weight: 950; text-align: right; }
 
-        /* Bloco do Holerite no Resumo */
         .secao-holerite { grid-column: span 3; background: #1f1f26; border: 1px dashed #3b82f6; border-radius: 6px; padding: 6px; margin-top: 4px; }
         .titulo-holerite { font-size: 10px; font-weight: bold; color: #3b82f6; text-transform: uppercase; margin-bottom: 4px; text-align: center; }
 
@@ -180,7 +179,6 @@
                 <span id="txt-total-final">R$ 1.781,00</span>
             </div>
 
-            <!-- Seção de Fotos do Holerite / Fechamento do Mês -->
             <div class="secao-holerite">
                 <div class="titulo-holerite">📄 Fechamento / Holerite do Mês</div>
                 <div class="secao-fotos" style="margin-top: 0;">
@@ -323,12 +321,12 @@
                     <div style="flex:1;">
                         <button type="button" class="btn-foto" id="btn-foto-frente-${i}" onclick="acionarCamera(${i}, 'frente')">📸 Ficha Frente</button>
                         <img id="prev-frente-${i}" class="preview-mini-foto">
-                        <input type="file" id="input-file-frente-${i}" accept="image/*" style="display:none" onchange="processarFoto(event, ${i}, 'frente')">
+                        <input type="file" id="input-file-frente-${i}" accept="image/*" style="display:none" onchange="comprimirEProcessarFoto(event, ${i}, 'frente')">
                     </div>
                     <div style="flex:1;">
                         <button type="button" class="btn-foto" id="btn-foto-verso-${i}" onclick="acionarCamera(${i}, 'verso')">📸 Ficha Verso</button>
                         <img id="prev-verso-${i}" class="preview-mini-foto">
-                        <input type="file" id="input-file-verso-${i}" accept="image/*" style="display:none" onchange="processarFoto(event, ${i}, 'verso')">
+                        <input type="file" id="input-file-verso-${i}" accept="image/*" style="display:none" onchange="comprimirEProcessarFoto(event, ${i}, 'verso')">
                     </div>
                 </div>
             </div>`;
@@ -339,76 +337,129 @@
     function acionarCamera(dia, tipo) { document.getElementById(`input-file-${tipo}-${dia}`).click(); }
     function acionarCameraHolerite(tipo) { document.getElementById(`input-file-holerite-${tipo}`).click(); }
 
-    // Processa foto diária e baixa para o celular
-    function processarFoto(event, dia, tipo) {
+    // Função que comprime a imagem para não estourar o limite do Firebase
+    function comprimirEProcessarFoto(event, dia, tipo) {
         const arquivo = event.target.files[0];
         if (!arquivo) return;
+        document.getElementById('txt-status-nuvem').innerText = "Compactando foto... 📱";
+
         const leitor = new FileReader();
-        
-        document.getElementById('txt-status-nuvem').innerText = "Salvando foto no celular... 📱";
-
         leitor.onload = function(e) {
-            const b64 = e.target.result;
-            const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
-            const prev = document.getElementById(`prev-${tipo}-${dia}`);
-            
-            btn.classList.add('tem-foto'); 
-            btn.innerText = `✔️ ${tipo.toUpperCase()}`;
-            prev.src = b64; 
-            prev.style.display = 'block';
-            prev.onclick = function() { ampliarFoto(b64); };
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let largura = img.width;
+                let altura = img.height;
+                const maxDim = 800; // Redimensiona mantendo a qualidade de leitura
 
-            let mesAtual = document.getElementById('sel-mes').value;
-            let nomeLimpo = usuarioNomeAtivo.replace(/[^a-zA-Z0-9]/g, "_");
-            let nomeArquivo = `Ponto_${nomeLimpo}_${mesAtual}_Dia_${dia < 10 ? '0'+dia : dia}_${tipo.toUpperCase()}.jpg`;
+                if (largura > altura && largura > maxDim) {
+                    altura *= maxDim / largura;
+                    largura = maxDim;
+                } else if (altura > maxDim) {
+                    largura *= maxDim / altura;
+                    altura = maxDim;
+                }
 
-            let linkDownload = document.createElement('a');
-            linkDownload.href = b64;
-            linkDownload.download = nomeArquivo;
-            document.body.appendChild(linkDownload);
-            linkDownload.click();
-            document.body.removeChild(linkDownload);
+                canvas.width = largura;
+                canvas.height = altura;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, largura, altura);
 
-            document.getElementById('txt-status-nuvem').innerText = "Foto salva no celular! 📥";
-            salvarEDigitar();
+                const b64 = canvas.toDataURL('image/jpeg', 0.65); // Qualidade otimizada
+                concluirProcessamentoFoto(b64, dia, tipo);
+            }
         }
         leitor.readAsDataURL(arquivo);
     }
 
-    // Processa foto do holerite e baixa para o celular
-    function processarFotoHolerite(event, tipo) {
+    function comprimirEProcessarHolerite(event, tipo) {
         const arquivo = event.target.files[0];
         if (!arquivo) return;
+        document.getElementById('txt-status-nuvem').innerText = "Compactando holerite... 📱";
+
         const leitor = new FileReader();
-        
-        document.getElementById('txt-status-nuvem').innerText = "Salvando holerite no celular... 📱";
-
         leitor.onload = function(e) {
-            const b64 = e.target.result;
-            const btn = document.getElementById(`btn-foto-holerite-${tipo}`);
-            const prev = document.getElementById(`prev-holerite-${tipo}`);
-            
-            btn.classList.add('tem-foto'); 
-            btn.innerText = `✔️ HOLERITE ${tipo.toUpperCase()}`;
-            prev.src = b64; 
-            prev.style.display = 'block';
-            prev.onclick = function() { ampliarFoto(b64); };
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let largura = img.width;
+                let altura = img.height;
+                const maxDim = 800;
 
-            let mesAtual = document.getElementById('sel-mes').value;
-            let nomeLimpo = usuarioNomeAtivo.replace(/[^a-zA-Z0-9]/g, "_");
-            let nomeArquivo = `Holerite_${nomeLimpo}_${mesAtual}_${tipo.toUpperCase()}.jpg`;
+                if (largura > altura && largura > maxDim) {
+                    altura *= maxDim / largura;
+                    largura = maxDim;
+                } else if (altura > maxDim) {
+                    largura *= maxDim / altura;
+                    altura = maxDim;
+                }
 
-            let linkDownload = document.createElement('a');
-            linkDownload.href = b64;
-            linkDownload.download = nomeArquivo;
-            document.body.appendChild(linkDownload);
-            linkDownload.click();
-            document.body.removeChild(linkDownload);
+                canvas.width = largura;
+                canvas.height = altura;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, largura, altura);
 
-            document.getElementById('txt-status-nuvem').innerText = "Holerite salvo no celular! 📥";
-            salvarEDigitar();
+                const b64 = canvas.toDataURL('image/jpeg', 0.65);
+                concluirProcessamentoHolerite(b64, tipo);
+            }
         }
         leitor.readAsDataURL(arquivo);
+    }
+
+    function concluirProcessamentoFoto(b64, dia, tipo) {
+        const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
+        const prev = document.getElementById(`prev-${tipo}-${dia}`);
+        
+        btn.classList.add('tem-foto'); 
+        btn.innerText = `✔️ ${tipo.toUpperCase()}`;
+        prev.src = b64; 
+        prev.style.display = 'block';
+        prev.onclick = function() { ampliarFoto(b64); };
+
+        let mesAtual = document.getElementById('sel-mes').value;
+        let nomeLimpo = usuarioNomeAtivo.replace(/[^a-zA-Z0-9]/g, "_");
+        let nomeArquivo = `Ponto_${nomeLimpo}_${mesAtual}_Dia_${dia < 10 ? '0'+dia : dia}_${tipo.toUpperCase()}.jpg`;
+
+        let linkDownload = document.createElement('a');
+        linkDownload.href = b64;
+        linkDownload.download = nomeArquivo;
+        document.body.appendChild(linkDownload);
+        linkDownload.click();
+        document.body.removeChild(linkDownload);
+
+        document.getElementById('txt-status-nuvem').innerText = "Foto salva com sucesso! 📥";
+        salvarEDigitar();
+    }
+
+    function concluirProcessamentoHolerite(b64, tipo) {
+        const btn = document.getElementById(`btn-foto-holerite-${tipo}`);
+        const prev = document.getElementById(`prev-holerite-${tipo}`);
+        
+        btn.classList.add('tem-foto'); 
+        btn.innerText = `✔️ HOLERITE ${tipo.toUpperCase()}`;
+        prev.src = b64; 
+        prev.style.display = 'block';
+        prev.onclick = function() { ampliarFoto(b64); };
+
+        let mesAtual = document.getElementById('sel-mes').value;
+        let nomeLimpo = usuarioNomeAtivo.replace(/[^a-zA-Z0-9]/g, "_");
+        let nomeArquivo = `Holerite_${nomeLimpo}_${mesAtual}_${tipo.toUpperCase()}.jpg`;
+
+        let linkDownload = document.createElement('a');
+        linkDownload.href = b64;
+        linkDownload.download = nomeArquivo;
+        document.body.appendChild(linkDownload);
+        linkDownload.click();
+        document.body.removeChild(linkDownload);
+
+        document.getElementById('txt-status-nuvem').innerText = "Holerite salvo com sucesso! 📥";
+        salvarEDigitar();
+    }
+
+    function processarFotoHolerite(event, tipo) {
+        comprimirEProcessarHolerite(event, tipo);
     }
 
     function ampliarFoto(src) {
@@ -582,7 +633,10 @@
             }
             db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${document.getElementById('sel-mes').value}`).set(dados)
             .then(() => { document.getElementById('txt-status-nuvem').innerText = "Salvo na Nuvem! ✅"; })
-            .catch(() => { document.getElementById('txt-status-nuvem').innerText = "Erro ao salvar ❌"; });
+            .catch((err) => { 
+                console.error(err);
+                document.getElementById('txt-status-nuvem').innerText = "Erro: Dados muito grandes ❌"; 
+            });
         }, 1000);
     }
 
@@ -599,7 +653,6 @@
                 document.getElementById('input-desc-extras').value = d.descExtras || "";
                 document.getElementById('pref-filhos').value = d.filhos || "0";
 
-                // Carregar Holerite salvo
                 if (d.holeriteFrente) {
                     let p = document.getElementById('prev-holerite-frente'); p.src = d.holeriteFrente; p.style.display = 'block';
                     p.onclick = function() { ampliarFoto(d.holeriteFrente); };
