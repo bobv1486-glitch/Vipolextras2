@@ -9,6 +9,7 @@
     <!-- Scripts do Firebase (SDK v9 via compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
     <style>
         :root { color-scheme: dark; }
@@ -17,7 +18,7 @@
             color: #e2e8f0 !important;
             font-family: Arial, sans-serif;
             margin: 0; padding: 10px;
-            padding-bottom: 420px;
+            padding-bottom: 330px;
             box-sizing: border-box;
             -webkit-text-size-adjust: 100%;
         }
@@ -93,9 +94,6 @@
         .caixa-total-final span:first-child { font-size: 12px; font-weight: bold; }
         .caixa-total-final span:last-child { font-size: 14px; font-weight: 950; text-align: right; }
 
-        .secao-holerite { grid-column: span 3; background: #1f1f26; border: 1px dashed #3b82f6; border-radius: 6px; padding: 6px; margin-top: 4px; }
-        .titulo-holerite { font-size: 10px; font-weight: bold; color: #3b82f6; text-transform: uppercase; margin-bottom: 4px; text-align: center; }
-
         .status-nuvem { grid-column: span 3; font-size: 10px; text-align: center; color: #94a3b8; font-weight: bold; margin: 1px 0; }
         .btn-pdf-container { grid-column: span 3; }
         .btn-pdf { width: 100%; background-color: #10b981 !important; color: #ffffff !important; border: none; padding: 8px; font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
@@ -114,7 +112,7 @@
     </div>
 
     <div id="modal-foto" class="modal-foto" onclick="fecharModalFoto()">
-        <img id="img-modal-zoom" src="" alt="Foto ampliada">
+        <img id="img-modal-zoom" src="" alt="Ficha ampliada">
         <button class="btn-fechar-modal" onclick="fecharModalFoto()">Fechar</button>
     </div>
 
@@ -178,22 +176,6 @@
                 <span>TOTAL LÍQUIDO + BENEFÍCIOS:</span>
                 <span id="txt-total-final">R$ 1.781,00</span>
             </div>
-
-            <div class="secao-holerite">
-                <div class="titulo-holerite">📄 Fechamento / Holerite do Mês</div>
-                <div class="secao-fotos" style="margin-top: 0;">
-                    <div style="flex:1;">
-                        <button type="button" class="btn-foto" id="btn-foto-holerite-frente" onclick="acionarCameraHolerite('frente')">📸 Holerite Frente</button>
-                        <img id="prev-holerite-frente" class="preview-mini-foto">
-                        <input type="file" id="input-file-holerite-frente" accept="image/*" style="display:none" onchange="processarFotoHolerite(event, 'frente')">
-                    </div>
-                    <div style="flex:1;">
-                        <button type="button" class="btn-foto" id="btn-foto-holerite-verso" onclick="acionarCameraHolerite('verso')">📸 Holerite Verso</button>
-                        <img id="prev-holerite-verso" class="preview-mini-foto">
-                        <input type="file" id="input-file-holerite-verso" accept="image/*" style="display:none" onchange="processarFotoHolerite(event, 'verso')">
-                    </div>
-                </div>
-            </div>
             
             <div class="status-nuvem" id="txt-status-nuvem">Conectando ao Firebase ☁️</div>
             
@@ -215,6 +197,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
     let timeoutSalvar = null;
     let carregandoDados = false;
@@ -320,13 +303,13 @@
                 <div class="secao-fotos">
                     <div style="flex:1;">
                         <button type="button" class="btn-foto" id="btn-foto-frente-${i}" onclick="acionarCamera(${i}, 'frente')">📸 Ficha Frente</button>
-                        <img id="prev-frente-${i}" class="preview-mini-foto">
-                        <input type="file" id="input-file-frente-${i}" accept="image/*" style="display:none" onchange="comprimirEProcessarFoto(event, ${i}, 'frente')">
+                        <img id="prev-frente-${i}" class="preview-mini-foto" data-url="">
+                        <input type="file" id="input-file-frente-${i}" accept="image/*" style="display:none" onchange="processarFoto(event, ${i}, 'frente')">
                     </div>
                     <div style="flex:1;">
                         <button type="button" class="btn-foto" id="btn-foto-verso-${i}" onclick="acionarCamera(${i}, 'verso')">📸 Ficha Verso</button>
-                        <img id="prev-verso-${i}" class="preview-mini-foto">
-                        <input type="file" id="input-file-verso-${i}" accept="image/*" style="display:none" onchange="comprimirEProcessarFoto(event, ${i}, 'verso')">
+                        <img id="prev-verso-${i}" class="preview-mini-foto" data-url="">
+                        <input type="file" id="input-file-verso-${i}" accept="image/*" style="display:none" onchange="processarFoto(event, ${i}, 'verso')">
                     </div>
                 </div>
             </div>`;
@@ -335,23 +318,19 @@
     }
 
     function acionarCamera(dia, tipo) { document.getElementById(`input-file-${tipo}-${dia}`).click(); }
-    function acionarCameraHolerite(tipo) { document.getElementById(`input-file-holerite-${tipo}`).click(); }
 
-    // Função que comprime a imagem para não estourar o limite do Firebase
-    function comprimirEProcessarFoto(event, dia, tipo) {
-        const arquivo = event.target.files[0];
-        if (!arquivo) return;
-        document.getElementById('txt-status-nuvem').innerText = "Compactando foto... 📱";
-
-        const leitor = new FileReader();
-        leitor.onload = function(e) {
+    // Função de compressão de imagem para garantir envio rápido e evitar falhas de rede no celular
+    function comprimirEEnviarFoto(arquivo, dia, tipo) {
+        const reader = new FileReader();
+        reader.readAsDataURL(arquivo);
+        reader.onload = function (event) {
             const img = new Image();
-            img.src = e.target.result;
-            img.onload = function() {
+            img.src = event.target.result;
+            img.onload = function () {
                 const canvas = document.createElement('canvas');
                 let largura = img.width;
                 let altura = img.height;
-                const maxDim = 800; // Redimensiona mantendo a qualidade de leitura
+                const maxDim = 1200; // Limita tamanho máximo para otimizar envio
 
                 if (largura > altura && largura > maxDim) {
                     altura *= maxDim / largura;
@@ -366,100 +345,48 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, largura, altura);
 
-                const b64 = canvas.toDataURL('image/jpeg', 0.65); // Qualidade otimizada
-                concluirProcessamentoFoto(b64, dia, tipo);
-            }
-        }
-        leitor.readAsDataURL(arquivo);
+                canvas.toBlob((blob) => {
+                    enviarBlobParaStorage(blob, dia, tipo);
+                }, 'image/jpeg', 0.8); // Qualidade JPEG em 80%
+            };
+        };
     }
 
-    function comprimirEProcessarHolerite(event, tipo) {
+    function processarFoto(event, dia, tipo) {
         const arquivo = event.target.files[0];
         if (!arquivo) return;
-        document.getElementById('txt-status-nuvem').innerText = "Compactando holerite... 📱";
-
-        const leitor = new FileReader();
-        leitor.onload = function(e) {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                let largura = img.width;
-                let altura = img.height;
-                const maxDim = 800;
-
-                if (largura > altura && largura > maxDim) {
-                    altura *= maxDim / largura;
-                    largura = maxDim;
-                } else if (altura > maxDim) {
-                    largura *= maxDim / altura;
-                    altura = maxDim;
-                }
-
-                canvas.width = largura;
-                canvas.height = altura;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, largura, altura);
-
-                const b64 = canvas.toDataURL('image/jpeg', 0.65);
-                concluirProcessamentoHolerite(b64, tipo);
-            }
-        }
-        leitor.readAsDataURL(arquivo);
+        document.getElementById('txt-status-nuvem').innerText = "Comprimindo foto... 📸";
+        comprimirEEnviarFoto(arquivo, dia, tipo);
     }
 
-    function concluirProcessamentoFoto(b64, dia, tipo) {
-        const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
-        const prev = document.getElementById(`prev-${tipo}-${dia}`);
-        
-        btn.classList.add('tem-foto'); 
-        btn.innerText = `✔️ ${tipo.toUpperCase()}`;
-        prev.src = b64; 
-        prev.style.display = 'block';
-        prev.onclick = function() { ampliarFoto(b64); };
+    function enviarBlobParaStorage(blob, dia, tipo) {
+        const mesAtual = document.getElementById('sel-mes').value;
+        const nomeArquivo = `fotos_ponto/${usuarioChapaAtivo}_${mesAtual}_dia${dia}_${tipo}.jpg`;
+        const storageRef = storage.ref().child(nomeArquivo);
 
-        let mesAtual = document.getElementById('sel-mes').value;
-        let nomeLimpo = usuarioNomeAtivo.replace(/[^a-zA-Z0-9]/g, "_");
-        let nomeArquivo = `Ponto_${nomeLimpo}_${mesAtual}_Dia_${dia < 10 ? '0'+dia : dia}_${tipo.toUpperCase()}.jpg`;
+        document.getElementById('txt-status-nuvem').innerText = "Enviando foto para nuvem... ☁️";
 
-        let linkDownload = document.createElement('a');
-        linkDownload.href = b64;
-        linkDownload.download = nomeArquivo;
-        document.body.appendChild(linkDownload);
-        linkDownload.click();
-        document.body.removeChild(linkDownload);
-
-        document.getElementById('txt-status-nuvem').innerText = "Foto salva com sucesso! 📥";
-        salvarEDigitar();
-    }
-
-    function concluirProcessamentoHolerite(b64, tipo) {
-        const btn = document.getElementById(`btn-foto-holerite-${tipo}`);
-        const prev = document.getElementById(`prev-holerite-${tipo}`);
-        
-        btn.classList.add('tem-foto'); 
-        btn.innerText = `✔️ HOLERITE ${tipo.toUpperCase()}`;
-        prev.src = b64; 
-        prev.style.display = 'block';
-        prev.onclick = function() { ampliarFoto(b64); };
-
-        let mesAtual = document.getElementById('sel-mes').value;
-        let nomeLimpo = usuarioNomeAtivo.replace(/[^a-zA-Z0-9]/g, "_");
-        let nomeArquivo = `Holerite_${nomeLimpo}_${mesAtual}_${tipo.toUpperCase()}.jpg`;
-
-        let linkDownload = document.createElement('a');
-        linkDownload.href = b64;
-        linkDownload.download = nomeArquivo;
-        document.body.appendChild(linkDownload);
-        linkDownload.click();
-        document.body.removeChild(linkDownload);
-
-        document.getElementById('txt-status-nuvem').innerText = "Holerite salvo com sucesso! 📥";
-        salvarEDigitar();
-    }
-
-    function processarFotoHolerite(event, tipo) {
-        comprimirEProcessarHolerite(event, tipo);
+        storageRef.put(blob).then((snapshot) => {
+            snapshot.ref.getDownloadURL().then((downloadURL) => {
+                const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
+                const prev = document.getElementById(`prev-${tipo}-${dia}`);
+                
+                btn.classList.add('tem-foto'); 
+                btn.innerText = `✔️ ${tipo.toUpperCase()}`;
+                
+                prev.src = downloadURL; 
+                prev.dataset.url = downloadURL;
+                prev.style.display = 'block';
+                prev.onclick = function() { ampliarFoto(downloadURL); };
+                
+                salvarEDigitar(); 
+                document.getElementById('txt-status-nuvem').innerText = "Foto salva com sucesso! ✅";
+            });
+        }).catch((error) => {
+            console.error("Erro no upload da foto:", error);
+            document.getElementById('txt-status-nuvem').innerText = "Erro ao enviar foto ❌ (Verifique permissões)";
+            alert("Não foi possível enviar a foto. Certifique-se de que as Regras do Firebase Storage estão configuradas para permitir gravação.");
+        });
     }
 
     function ampliarFoto(src) {
@@ -553,6 +480,7 @@
             if (eMin !== null && sMin !== null) {
                 diasTrab++;
                 if (sMin <= eMin) sMin += 1440;
+                let tEmpresa = sMin - eMin;
                 let tempos = separarMinutosDiurnosENoturnos(eMin, sMin);
                 ganhoNoturno += (tempos.noturnos / 60) * AD_NOT_HORA;
                 let efetivo = (tempos.diurnos + tempos.noturnos) - jan;
@@ -613,10 +541,7 @@
             let dados = {
                 nome: usuarioNomeAtivo, chapa: usuarioChapaAtivo,
                 descExtras: document.getElementById('input-desc-extras').value,
-                filhos: document.getElementById('pref-filhos').value,
-                holeriteFrente: document.getElementById('prev-holerite-frente').src.startsWith('data:') ? document.getElementById('prev-holerite-frente').src : '',
-                holeriteVerso: document.getElementById('prev-holerite-verso').src.startsWith('data:') ? document.getElementById('prev-holerite-verso').src : '',
-                dias: []
+                filhos: document.getElementById('pref-filhos').value, dias: []
             };
             for (let i = 1; i <= 31; i++) {
                 let card = document.getElementById(`card-dia-${i}`);
@@ -626,17 +551,14 @@
                         jan: card.querySelector('.in-janta').value,
                         sai: card.querySelector('.in-saida').value,
                         din: card.querySelector('.in-dinheiro-dia').value,
-                        fotFrente: document.getElementById(`prev-frente-${i}`).src.startsWith('data:') ? document.getElementById(`prev-frente-${i}`).src : '',
-                        fotVerso: document.getElementById(`prev-verso-${i}`).src.startsWith('data:') ? document.getElementById(`prev-verso-${i}`).src : ''
+                        fotFrente: document.getElementById(`prev-frente-${i}`).dataset.url || '',
+                        fotVerso: document.getElementById(`prev-verso-${i}`).dataset.url || ''
                     });
                 }
             }
             db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${document.getElementById('sel-mes').value}`).set(dados)
             .then(() => { document.getElementById('txt-status-nuvem').innerText = "Salvo na Nuvem! ✅"; })
-            .catch((err) => { 
-                console.error(err);
-                document.getElementById('txt-status-nuvem').innerText = "Erro: Dados muito grandes ❌"; 
-            });
+            .catch(() => { document.getElementById('txt-status-nuvem').innerText = "Erro ao salvar ❌"; });
         }, 1000);
     }
 
@@ -652,27 +574,6 @@
                 let d = doc.data();
                 document.getElementById('input-desc-extras').value = d.descExtras || "";
                 document.getElementById('pref-filhos').value = d.filhos || "0";
-
-                if (d.holeriteFrente) {
-                    let p = document.getElementById('prev-holerite-frente'); p.src = d.holeriteFrente; p.style.display = 'block';
-                    p.onclick = function() { ampliarFoto(d.holeriteFrente); };
-                    let b = document.getElementById('btn-foto-holerite-frente'); b.classList.add('tem-foto'); b.innerText = "✔️ HOLERITE FRENTE";
-                } else {
-                    document.getElementById('prev-holerite-frente').style.display = 'none';
-                    document.getElementById('btn-foto-holerite-frente').classList.remove('tem-foto');
-                    document.getElementById('btn-foto-holerite-frente').innerText = "📸 Holerite Frente";
-                }
-
-                if (d.holeriteVerso) {
-                    let p = document.getElementById('prev-holerite-verso'); p.src = d.holeriteVerso; p.style.display = 'block';
-                    p.onclick = function() { ampliarFoto(d.holeriteVerso); };
-                    let b = document.getElementById('btn-foto-holerite-verso'); b.classList.add('tem-foto'); b.innerText = "✔️ HOLERITE VERSO";
-                } else {
-                    document.getElementById('prev-holerite-verso').style.display = 'none';
-                    document.getElementById('btn-foto-holerite-verso').classList.remove('tem-foto');
-                    document.getElementById('btn-foto-holerite-verso').innerText = "📸 Holerite Verso";
-                }
-
                 for (let i = 1; i <= 31; i++) {
                     let card = document.getElementById(`card-dia-${i}`);
                     if (card && d.dias && d.dias[i-1]) {
@@ -683,14 +584,24 @@
                         card.querySelector('.in-dinheiro-dia').value = info.din || "";
                         
                         if (info.fotFrente) {
-                            let p = document.getElementById(`prev-frente-${i}`); p.src = info.fotFrente; p.style.display = 'block';
+                            let p = document.getElementById(`prev-frente-${i}`); 
+                            p.src = info.fotFrente; 
+                            p.dataset.url = info.fotFrente;
+                            p.style.display = 'block';
                             p.onclick = function() { ampliarFoto(info.fotFrente); };
-                            let b = document.getElementById(`btn-foto-frente-${i}`); b.classList.add('tem-foto'); b.innerText = "✔️ FRENTE";
+                            let b = document.getElementById(`btn-foto-frente-${i}`); 
+                            b.classList.add('tem-foto'); 
+                            b.innerText = "✔️ FRENTE";
                         }
                         if (info.fotVerso) {
-                            let p = document.getElementById(`prev-verso-${i}`); p.src = info.fotVerso; p.style.display = 'block';
+                            let p = document.getElementById(`prev-verso-${i}`); 
+                            p.src = info.fotVerso; 
+                            p.dataset.url = info.fotVerso;
+                            p.style.display = 'block';
                             p.onclick = function() { ampliarFoto(info.fotVerso); };
-                            let b = document.getElementById(`btn-foto-verso-${i}`); b.classList.add('tem-foto'); b.innerText = "✔️ VERSO";
+                            let b = document.getElementById(`btn-foto-verso-${i}`); 
+                            b.classList.add('tem-foto'); 
+                            b.innerText = "✔️ VERSO";
                         }
                     }
                 }
@@ -698,13 +609,6 @@
             } else {
                 document.getElementById('input-desc-extras').value = "";
                 document.getElementById('pref-filhos').value = "0";
-                document.getElementById('prev-holerite-frente').style.display = 'none';
-                document.getElementById('prev-holerite-verso').style.display = 'none';
-                document.getElementById('btn-foto-holerite-frente').classList.remove('tem-foto');
-                document.getElementById('btn-foto-holerite-frente').innerText = "📸 Holerite Frente";
-                document.getElementById('btn-foto-holerite-verso').classList.remove('tem-foto');
-                document.getElementById('btn-foto-holerite-verso').innerText = "📸 Holerite Verso";
-
                 for (let i = 1; i <= 31; i++) {
                     let card = document.getElementById(`card-dia-${i}`);
                     if (card) {
@@ -712,8 +616,11 @@
                         card.querySelector('.in-janta').value = "60";
                         card.querySelector('.in-saida').value = "";
                         card.querySelector('.in-dinheiro-dia').value = "";
-                        document.getElementById(`prev-frente-${i}`).style.display = 'none';
-                        document.getElementById(`prev-verso-${i}`).style.display = 'none';
+                        
+                        let prevF = document.getElementById(`prev-frente-${i}`);
+                        prevF.style.display = 'none'; prevF.dataset.url = "";
+                        let prevV = document.getElementById(`prev-verso-${i}`);
+                        prevV.style.display = 'none'; prevV.dataset.url = "";
                     }
                 }
                 document.getElementById('txt-status-nuvem').innerText = "Mês sem registros salvos 📂";
