@@ -6,10 +6,9 @@
     <meta name="color-scheme" content="dark">
     <title>Folha de Ponto Mensal - Vipol</title>
     
-    <!-- Scripts do Firebase (SDK v9 via compat) -->
+    <!-- Scripts do Firebase (SDK v9 via compat - Apenas Firestore necessário) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
     <style>
         :root { color-scheme: dark; }
@@ -177,7 +176,7 @@
                 <span id="txt-total-final">R$ 1.781,00</span>
             </div>
             
-            <div class="status-nuvem" id="txt-status-nuvem">Conectando ao Firebase ☁️</div>
+            <div class="status-nuvem" id="txt-status-nuvem">Conectado ao Firebase ☁️</div>
             
             <div class="btn-pdf-container">
                 <button class="btn-pdf" onclick="abrirTelaImpressaoPDF()">Gerar Relatório PDF</button>
@@ -197,7 +196,6 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const storage = firebase.storage();
 
     let timeoutSalvar = null;
     let carregandoDados = false;
@@ -319,18 +317,23 @@
 
     function acionarCamera(dia, tipo) { document.getElementById(`input-file-${tipo}-${dia}`).click(); }
 
-    // Função de compressão de imagem para garantir envio rápido e evitar falhas de rede no celular
-    function comprimirEEnviarFoto(arquivo, dia, tipo) {
+    // Processamento otimizado: Comprime a foto no navegador e converte direto para string Base64 segura para o Firestore
+    function processarFoto(event, dia, tipo) {
+        const arquivo = event.target.files[0];
+        if (!arquivo) return;
+
+        document.getElementById('txt-status-nuvem').innerText = "Processando foto... 📷";
+
         const reader = new FileReader();
         reader.readAsDataURL(arquivo);
-        reader.onload = function (event) {
+        reader.onload = function (e) {
             const img = new Image();
-            img.src = event.target.result;
+            img.src = e.target.result;
             img.onload = function () {
                 const canvas = document.createElement('canvas');
                 let largura = img.width;
                 let altura = img.height;
-                const maxDim = 1200; // Limita tamanho máximo para otimizar envio
+                const maxDim = 800; // Reduz a resolução para garantir leveza máxima no banco
 
                 if (largura > altura && largura > maxDim) {
                     altura *= maxDim / largura;
@@ -345,48 +348,25 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, largura, altura);
 
-                canvas.toBlob((blob) => {
-                    enviarBlobParaStorage(blob, dia, tipo);
-                }, 'image/jpeg', 0.8); // Qualidade JPEG em 80%
-            };
-        };
-    }
+                // Converte para JPEG comprimido (70% de qualidade, ideal para documentos legíveis e leves)
+                const base64Data = canvas.toDataURL('image/jpeg', 0.7);
 
-    function processarFoto(event, dia, tipo) {
-        const arquivo = event.target.files[0];
-        if (!arquivo) return;
-        document.getElementById('txt-status-nuvem').innerText = "Comprimindo foto... 📸";
-        comprimirEEnviarFoto(arquivo, dia, tipo);
-    }
-
-    function enviarBlobParaStorage(blob, dia, tipo) {
-        const mesAtual = document.getElementById('sel-mes').value;
-        const nomeArquivo = `fotos_ponto/${usuarioChapaAtivo}_${mesAtual}_dia${dia}_${tipo}.jpg`;
-        const storageRef = storage.ref().child(nomeArquivo);
-
-        document.getElementById('txt-status-nuvem').innerText = "Enviando foto para nuvem... ☁️";
-
-        storageRef.put(blob).then((snapshot) => {
-            snapshot.ref.getDownloadURL().then((downloadURL) => {
                 const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
                 const prev = document.getElementById(`prev-${tipo}-${dia}`);
                 
                 btn.classList.add('tem-foto'); 
                 btn.innerText = `✔️ ${tipo.toUpperCase()}`;
                 
-                prev.src = downloadURL; 
-                prev.dataset.url = downloadURL;
+                prev.src = base64Data; 
+                prev.dataset.url = base64Data;
                 prev.style.display = 'block';
-                prev.onclick = function() { ampliarFoto(downloadURL); };
-                
-                salvarEDigitar(); 
-                document.getElementById('txt-status-nuvem').innerText = "Foto salva com sucesso! ✅";
-            });
-        }).catch((error) => {
-            console.error("Erro no upload da foto:", error);
-            document.getElementById('txt-status-nuvem').innerText = "Erro ao enviar foto ❌ (Verifique permissões)";
-            alert("Não foi possível enviar a foto. Certifique-se de que as Regras do Firebase Storage estão configuradas para permitir gravação.");
-        });
+                prev.onclick = function() { ampliarFoto(base64Data); };
+
+                // Salva automaticamente no Firestore
+                salvarEDigitar();
+                document.getElementById('txt-status-nuvem').innerText = "Foto processada com sucesso! ✅";
+            };
+        };
     }
 
     function ampliarFoto(src) {
@@ -558,7 +538,10 @@
             }
             db.collection("pontos_funcionarios").doc(`${usuarioChapaAtivo}_${document.getElementById('sel-mes').value}`).set(dados)
             .then(() => { document.getElementById('txt-status-nuvem').innerText = "Salvo na Nuvem! ✅"; })
-            .catch(() => { document.getElementById('txt-status-nuvem').innerText = "Erro ao salvar ❌"; });
+            .catch((err) => { 
+                console.error(err);
+                document.getElementById('txt-status-nuvem').innerText = "Erro ao salvar ❌"; 
+            });
         }, 1000);
     }
 
