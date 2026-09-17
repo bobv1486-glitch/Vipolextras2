@@ -17,7 +17,7 @@
             color: #e2e8f0 !important;
             font-family: Arial, sans-serif;
             margin: 0; padding: 10px;
-            padding-bottom: 330px;
+            padding-bottom: 270px;
             box-sizing: border-box;
             -webkit-text-size-adjust: 100%;
         }
@@ -68,15 +68,6 @@
         .campo label { font-size: 10px; font-weight: bold; color: #71717a !important; text-transform: uppercase; text-align: center; }
         .campo input { width: 100%; padding: 8px 4px; border: 1px solid #2d2d34; border-radius: 6px; font-size: 14px; text-align: center; outline: none; background: #121214 !important; font-weight: bold; color: #ffffff !important; }
 
-        .secao-fotos { display: flex; gap: 6px; margin-top: 6px; }
-        .btn-foto { flex: 1; background: #27272a; color: #a1a1aa; border: 1px dashed #3f3f46; padding: 6px; font-size: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; text-align: center; text-transform: uppercase; }
-        .btn-foto.tem-foto { background: #064e3b; color: #34d399; border-color: #059669; }
-        .preview-mini-foto { display: none; width: 100%; height: 45px; object-fit: cover; border-radius: 4px; margin-top: 4px; cursor: pointer; border: 1px solid #059669; }
-
-        .modal-foto { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 99999; justify-content: center; align-items: center; flex-direction: column; padding: 15px; }
-        .modal-foto img { max-width: 100%; max-height: 80vh; border-radius: 8px; object-fit: contain; border: 2px solid #3f3f46; }
-        .btn-fechar-modal { margin-top: 15px; background: #ef4444; color: white; border: none; padding: 12px 28px; font-weight: bold; font-size: 14px; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
-
         .painel-resumo { position: fixed; bottom: 0; left: 0; right: 0; background: #161619 !important; border-top: 2px solid #2d2d34; box-shadow: 0 -6px 20px rgba(0,0,0,0.6); padding: 8px; z-index: 999; }
         .resumo-conteudo { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px 10px; }
         .resumo-item { display: flex; flex-direction: column; align-items: flex-start; font-size: 11px; font-weight: bold; border-bottom: 1px solid #232329; padding-bottom: 2px; color: #e2e8f0 !important; }
@@ -108,11 +99,6 @@
             <div class="campo-login"><label>Registro (Chapa)</label><input type="number" id="login-chapa" placeholder="Ex: 12345"></div>
             <button class="btn-acessar" onclick="realizarLogin()">Acessar Painel</button>
         </div>
-    </div>
-
-    <div id="modal-foto" class="modal-foto" onclick="fecharModalFoto()">
-        <img id="img-modal-zoom" src="" alt="Ficha ampliada">
-        <button class="btn-fechar-modal" onclick="fecharModalFoto()">Fechar</button>
     </div>
 
     <div class="topo">
@@ -298,87 +284,9 @@
                 <div class="inputs-row-extra">
                     <div class="campo"><label>Dinheiro Recebido (R$)</label><input type="text" class="in-dinheiro-dia" placeholder="0.00" oninput="salvarEDigitar()"></div>
                 </div>
-                <div class="secao-fotos">
-                    <div style="flex:1;">
-                        <button type="button" class="btn-foto" id="btn-foto-frente-${i}" onclick="acionarCamera(${i}, 'frente')">📸 Ficha Frente</button>
-                        <img id="prev-frente-${i}" class="preview-mini-foto" data-url="">
-                        <input type="file" id="input-file-frente-${i}" accept="image/*" style="display:none" onchange="processarFoto(event, ${i}, 'frente')">
-                    </div>
-                    <div style="flex:1;">
-                        <button type="button" class="btn-foto" id="btn-foto-verso-${i}" onclick="acionarCamera(${i}, 'verso')">📸 Ficha Verso</button>
-                        <img id="prev-verso-${i}" class="preview-mini-foto" data-url="">
-                        <input type="file" id="input-file-verso-${i}" accept="image/*" style="display:none" onchange="processarFoto(event, ${i}, 'verso')">
-                    </div>
-                </div>
             </div>`;
         }
         container.innerHTML = htmlDias;
-    }
-
-    function acionarCamera(dia, tipo) { document.getElementById(`input-file-${tipo}-${dia}`).click(); }
-
-    // Processamento otimizado: Comprime a foto no navegador e converte direto para string Base64 segura para o Firestore
-    function processarFoto(event, dia, tipo) {
-        const arquivo = event.target.files[0];
-        if (!arquivo) return;
-
-        document.getElementById('txt-status-nuvem').innerText = "Processando foto... 📷";
-
-        const reader = new FileReader();
-        reader.readAsDataURL(arquivo);
-        reader.onload = function (e) {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = function () {
-                const canvas = document.createElement('canvas');
-                let largura = img.width;
-                let altura = img.height;
-                const maxDim = 800; // Reduz a resolução para garantir leveza máxima no banco
-
-                if (largura > altura && largura > maxDim) {
-                    altura *= maxDim / largura;
-                    largura = maxDim;
-                } else if (altura > maxDim) {
-                    largura *= maxDim / altura;
-                    altura = maxDim;
-                }
-
-                canvas.width = largura;
-                canvas.height = altura;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, largura, altura);
-
-                // Converte para JPEG comprimido (70% de qualidade, ideal para documentos legíveis e leves)
-                const base64Data = canvas.toDataURL('image/jpeg', 0.7);
-
-                const btn = document.getElementById(`btn-foto-${tipo}-${dia}`);
-                const prev = document.getElementById(`prev-${tipo}-${dia}`);
-                
-                btn.classList.add('tem-foto'); 
-                btn.innerText = `✔️ ${tipo.toUpperCase()}`;
-                
-                prev.src = base64Data; 
-                prev.dataset.url = base64Data;
-                prev.style.display = 'block';
-                prev.onclick = function() { ampliarFoto(base64Data); };
-
-                // Salva automaticamente no Firestore
-                salvarEDigitar();
-                document.getElementById('txt-status-nuvem').innerText = "Foto processada com sucesso! ✅";
-            };
-        };
-    }
-
-    function ampliarFoto(src) {
-        if (!src) return;
-        const modalImg = document.getElementById('img-modal-zoom');
-        const modalDiv = document.getElementById('modal-foto');
-        modalImg.src = src;
-        modalDiv.style.display = 'flex';
-    }
-
-    function fecharModalFoto() {
-        document.getElementById('modal-foto').style.display = 'none';
     }
 
     function obterDiasUteisEDomingosDoMes() {
@@ -530,9 +438,7 @@
                         ent: card.querySelector('.in-entrada').value,
                         jan: card.querySelector('.in-janta').value,
                         sai: card.querySelector('.in-saida').value,
-                        din: card.querySelector('.in-dinheiro-dia').value,
-                        fotFrente: document.getElementById(`prev-frente-${i}`).dataset.url || '',
-                        fotVerso: document.getElementById(`prev-verso-${i}`).dataset.url || ''
+                        din: card.querySelector('.in-dinheiro-dia').value
                     });
                 }
             }
@@ -565,27 +471,6 @@
                         card.querySelector('.in-janta').value = info.jan || "60";
                         card.querySelector('.in-saida').value = info.sai || "";
                         card.querySelector('.in-dinheiro-dia').value = info.din || "";
-                        
-                        if (info.fotFrente) {
-                            let p = document.getElementById(`prev-frente-${i}`); 
-                            p.src = info.fotFrente; 
-                            p.dataset.url = info.fotFrente;
-                            p.style.display = 'block';
-                            p.onclick = function() { ampliarFoto(info.fotFrente); };
-                            let b = document.getElementById(`btn-foto-frente-${i}`); 
-                            b.classList.add('tem-foto'); 
-                            b.innerText = "✔️ FRENTE";
-                        }
-                        if (info.fotVerso) {
-                            let p = document.getElementById(`prev-verso-${i}`); 
-                            p.src = info.fotVerso; 
-                            p.dataset.url = info.fotVerso;
-                            p.style.display = 'block';
-                            p.onclick = function() { ampliarFoto(info.fotVerso); };
-                            let b = document.getElementById(`btn-foto-verso-${i}`); 
-                            b.classList.add('tem-foto'); 
-                            b.innerText = "✔️ VERSO";
-                        }
                     }
                 }
                 document.getElementById('txt-status-nuvem').innerText = "Carregado da Nuvem! ☁️";
@@ -599,11 +484,6 @@
                         card.querySelector('.in-janta').value = "60";
                         card.querySelector('.in-saida').value = "";
                         card.querySelector('.in-dinheiro-dia').value = "";
-                        
-                        let prevF = document.getElementById(`prev-frente-${i}`);
-                        prevF.style.display = 'none'; prevF.dataset.url = "";
-                        let prevV = document.getElementById(`prev-verso-${i}`);
-                        prevV.style.display = 'none'; prevV.dataset.url = "";
                     }
                 }
                 document.getElementById('txt-status-nuvem').innerText = "Mês sem registros salvos 📂";
